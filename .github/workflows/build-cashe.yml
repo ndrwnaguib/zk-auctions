@@ -1,0 +1,43 @@
+# src: https://github.com/powdr-labs/powdr/blob/main/.github/workflows/build-cache.yml
+name: Generate rust cache for PR builds
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - main
+
+env:
+    CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Install Rust toolchain 1.74 (with clippy and rustfmt)
+      run: rustup toolchain install nightly-2023-12-21 && rustup component add clippy --toolchain nightly-2023-12-21 && rustup component add rustfmt --toolchain nightly-2023-12-21
+    - name: Lint
+      run: cargo clippy --all --all-targets --all-features -- -D warnings
+    - name: Lint
+      run: cargo clippy --all --all-targets --no-default-features -- -D warnings
+    - name: Format
+      run: cargo fmt --all --check --verbose
+    - name: Build
+      run: cargo build --all-targets --all --all-features
+    - name: ⚡ Save rust cache
+      uses: actions/cache/save@v3
+      with:
+        path: |
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+          Cargo.lock
+        key: ${{ runner.os }}-cargo-pr-tests-${{ hashFiles('**/Cargo.lock') }}
