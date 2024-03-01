@@ -1,14 +1,11 @@
 # src: https://github.com/powdr-labs/powdr/blob/main/.github/workflows/build-cache.yml
 name: Generate rust cache for PR builds
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * *' # run at 2 AM UTC
   pull_request:
-  merge_group:
+    branches: [main]
+
   push:
-    branches:
-      - main
+    branches: [main]
 
 env:
     CARGO_TERM_COLOR: always
