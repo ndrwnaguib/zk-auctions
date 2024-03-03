@@ -1,11 +1,5 @@
-[workspace]
-members = [
-    "packages/circuits",
-    "packages/cli",
-]
-
 [package]
-name = "halo2-scaffold"
+name = "circuits"
 version = "0.3.0"
 edition = "2021"
 
@@ -13,13 +7,6 @@ edition = "2021"
 
 [dependencies]
 rand = "=0.8"
-ark-std = { version = "=0.3.0", features = ["print-trace"] }
-serde = { version = "=1.0", default-features = false, features = ["derive"] }
-serde_json = "=1.0"
-log = "=0.4"
-env_logger = "=0.10"
-clap = { version = "=4.0", features = ["derive"] }
-clap-num = "=1.0.2"
 
 # halo2
 halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v2023_02_02" }
