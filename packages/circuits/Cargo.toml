@@ -24,7 +24,6 @@ snark-verifier-sdk = { git = "https://github.com/axiom-crypto/snark-verifier.git
 [dev-dependencies]
 test-log = "=0.2.11"
 ethers-core = "=2.0.6"
-rusty-hook = "^0.11.2"
 
 [features]
 default = []
