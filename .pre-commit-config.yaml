@@ -5,13 +5,13 @@ repos:
         name: cargo test
         entry: cargo test
         language: system
-        stages: [pre-commit]
+        stages: [pre-push]
 
       - id: cargo-check-fmt
         name: cargo check and format
         entry: sh -c 'cargo check && cargo fmt --all --check'
         language: system
-        stages: [pre-push]
+        stages: [pre-commit]
 
       - id: commit-msg
         name: commitlint
