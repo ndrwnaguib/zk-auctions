@@ -1,20 +1,44 @@
 repos:
   - repo: local
     hooks:
-      - id: cargo-test
-        name: cargo test
-        entry: cargo test
-        language: system
-        stages: [pre-push]
-
-      - id: cargo-check-fmt
-        name: cargo check and format
-        entry: sh -c 'cargo check && cargo fmt --all --check'
-        language: system
-        stages: [pre-commit]
-
       - id: commit-msg
         name: commitlint
         entry: commitlint --edit
         language: system
         stages: [commit-msg]
+      
+      - id: cargo-fmt
+        name: cargo format
+        entry: cargo fmt
+        language: system
+        args: ["--all", "--check"]
+        types: [rust]
+        stages: [pre-commit]
+      
+      - id: cargo-clippy
+        name: cargo clippy
+        description: Lint rust sources
+        entry: cargo clippy
+        language: system
+        args: ["--", "-D", "warnings"]
+        types: [rust]
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: cargo-check
+        name: cargo check
+        description: Check the package for errors.
+        entry: cargo check
+        language: system
+        types: [rust]
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: cargo-test
+        name: cargo test
+        description: Checking tests for errors.
+        entry: cargo test
+        language: system
+        types: [rust]
+        pass_filenames: false
+        stages: [pre-push]
