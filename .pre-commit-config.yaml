@@ -11,7 +11,7 @@ repos:
         name: cargo format
         entry: cargo fmt
         language: system
-        args: ["--all", "--check"]
+        args: ["--", "--check"]
         types: [rust]
         stages: [pre-commit]
       
