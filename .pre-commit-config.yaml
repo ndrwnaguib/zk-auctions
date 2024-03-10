@@ -2,7 +2,7 @@ repos:
   - repo: local
     hooks:
       - id: commit-msg
-        name: commitlint
+        name: commit lint
         entry: commitlint --edit
         language: system
         stages: [commit-msg]
