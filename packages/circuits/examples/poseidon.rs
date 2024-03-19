@@ -1,11 +1,11 @@
 use clap::Parser;
+use cli::{cmd::Cli, run};
 use halo2_base::{
     gates::{circuit::builder::BaseCircuitBuilder, GateChip},
     poseidon::hasher::PoseidonHasher,
     utils::BigPrimeField,
     AssignedValue,
 };
-use halo2_scaffold::scaffold::{cmd::Cli, run};
 use serde::{Deserialize, Serialize};
 use snark_verifier_sdk::halo2::OptimizedPoseidonSpec;
 

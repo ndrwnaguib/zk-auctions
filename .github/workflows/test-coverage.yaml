@@ -1,0 +1,32 @@
+name: Test Coverage
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore: ['**/Dockerfile', '**/public/**', '**/.*ignore', '**/*.toml']
+  push:
+    branches: [main, staging]
+    paths-ignore: ['**/Dockerfile', '**/public/**', '**/.*ignore', '**/*.toml']
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust toolchain 1.74
+        run: rustup toolchain install nightly-2023-12-21
+
+      - name: Install cargo-llvm-cov
+        run: cargo install cargo-llvm-cov
+
+      - name: Run tests with coverage
+        run: cargo llvm-cov --all-features --workspace --html --output-dir=target/llvm-cov/html
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: target/llvm-cov/html
+          

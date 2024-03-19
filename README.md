@@ -5,17 +5,16 @@ This repository is intended to provide a playground for you to easily start writ
 
 ## Setup
 
-Install rust:
+- Install rust:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Clone this repo:
+- Installing commitlint tools globally via NPM for the pre-commit tool 
 
 ```bash
-git clone https://github.com/axiom-crypto/halo2-scaffold.git
-cd halo2-scaffold
+npm install -g @commitlint/cli @commitlint/config-conventional
 ```
 
 ## Quick start with `halo2-lib`
