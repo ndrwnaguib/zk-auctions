@@ -1,9 +1,12 @@
-name: Pre-commit Static Analysis
+name: Static Analysis
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore: ['**/Dockerfile', '**/public/**', '**/.*ignore', '**/*.toml']
   push:
-    branches: [main]
+    branches: [main, staging]
+    paths-ignore: ['**/Dockerfile', '**/public/**', '**/.*ignore', '**/*.toml']
 
 jobs:
   pre-commit:
