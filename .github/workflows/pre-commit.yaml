@@ -20,7 +20,13 @@ jobs:
       - name: Install Rust toolchain 1.74 (with clippy and rustfmt)
         run: rustup toolchain install nightly-2023-12-21 && rustup component add clippy --toolchain nightly-2023-12-21 && rustup component add rustfmt --toolchain nightly-2023-12-21
 
-      - uses: pre-commit/action@v3.0.0
+      - name: Run pre-commit hooks
+        uses: pre-commit/action@v3.0.0
         with:
           extra_args: --all-files
+
+      - name: Run pre-push hooks
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files --hook-stage pre-push
           
