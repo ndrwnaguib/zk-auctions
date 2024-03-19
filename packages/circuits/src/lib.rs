@@ -1,3 +1,2 @@
-#![allow(incomplete_features)]
-
-pub mod vanilla_circuits;
+pub mod strain_circuit;
+pub(crate) mod params;
