@@ -10,7 +10,7 @@ repos:
       - id: cargo-fmt
         name: cargo format
         entry: cargo fmt
-        language: system
+        language: rust
         args: ["--", "--check"]
         types: [rust]
         stages: [pre-commit]
@@ -19,7 +19,7 @@ repos:
         name: cargo clippy
         description: Lint rust sources
         entry: cargo clippy
-        language: system
+        language: rust
         args: ["--", "-D", "warnings"]
         types: [rust]
         pass_filenames: false
@@ -29,7 +29,7 @@ repos:
         name: cargo check
         description: Check the package for errors.
         entry: cargo check
-        language: system
+        language: rust
         types: [rust]
         pass_filenames: false
         stages: [pre-commit]
@@ -38,7 +38,7 @@ repos:
         name: cargo test
         description: Checking tests for errors.
         entry: cargo test
-        language: system
+        language: rust
         types: [rust]
         pass_filenames: false
-        stages: [pre-push]
+        stages: [pre-push, pre-merge-commit]
