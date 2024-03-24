@@ -1,10 +1,10 @@
 use clap::Parser;
+use cli::cmd::Cli;
+use cli::run;
 use halo2_base::gates::circuit::builder::BaseCircuitBuilder;
 use halo2_base::gates::{GateInstructions, RangeInstructions};
 use halo2_base::utils::ScalarField;
 use halo2_base::AssignedValue;
-use halo2_scaffold::scaffold::cmd::Cli;
-use halo2_scaffold::scaffold::run;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
