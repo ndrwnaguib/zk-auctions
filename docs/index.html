@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-03-24 Sun 00:48 -->
+<!-- 2024-03-31 Sun 11:21 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ZK-Auctions Toolkit Grant Proposal and Progress Tracking</title>
@@ -254,95 +254,96 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge785ff2">1. Project Overview</a>
+<li><a href="#org2c1bd18">1. Project Overview</a>
 <ul>
-<li><a href="#orgf5c24df">1.1. Overview</a></li>
-<li><a href="#orgffa4479">1.2. Short Rationale</a></li>
-<li><a href="#orgcc95a0c">1.3. Project Details and Motivation </a>
+<li><a href="#orgc0abd43">1.1. Overview</a></li>
+<li><a href="#org23a7bbf">1.2. Short Rationale</a></li>
+<li><a href="#org2e6d17c">1.3. Project Details and Motivation </a>
 <ul>
-<li><a href="#org20a6bc6">1.3.1. Backend</a></li>
+<li><a href="#org213bdda">1.3.1. Backend</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org642b6d6">2. Team</a>
+<li><a href="#org0ab25f9">2. Team</a>
 <ul>
-<li><a href="#orgf02340a">2.1. Team members</a></li>
-<li><a href="#orgb3092de">2.2. Team Code Repos</a></li>
+<li><a href="#org8f872b2">2.1. Team members</a></li>
+<li><a href="#orgf255d19">2.2. Team Code Repos</a></li>
 </ul>
 </li>
-<li><a href="#org4e70e39">3. Development Roadmap</a>
+<li><a href="#org7de46ae">3. Development Roadmap</a>
 <ul>
-<li><a href="#orgabecc82">3.1. Milestone 1: Research, Proof-sketching, and Algorithm Design </a>
+<li><a href="#org5209c90">3.1. Milestone 1: Research, Proof-sketching, and Algorithm Design </a>
 <ul>
-<li><a href="#org2c46657">3.1.1. Objectives</a></li>
+<li><a href="#orge3e5707">3.1.1. Objectives</a></li>
 </ul>
 </li>
-<li><a href="#org89f1e62">3.2. <span class="todo TODO">TODO</span> Milestone 1 Tasks (2-month period) <code>[1/4]</code></a>
+<li><a href="#org83e936a">3.2. <span class="todo TODO">TODO</span> Milestone 1 Tasks (2-month period) <code>[1/4]</code></a>
 <ul>
-<li><a href="#org58d351c">3.2.1. <span class="done DONE">DONE</span> Milestone 1: (Sprint 1) <code>[2/2]</code></a>
+<li><a href="#orgc137f0b">3.2.1. <span class="done DONE">DONE</span> Milestone 1: (Sprint 1) <code>[2/2]</code></a>
 <ul>
-<li><a href="#orgdf0336c">3.2.1.1. <span class="done DONE">DONE</span> Milestone 1: Research</a>
+<li><a href="#org98e5f47">3.2.1.1. <span class="done DONE">DONE</span> Milestone 1: Research</a>
 <ul>
-<li><a href="#orgfb7de25">3.2.1.1.1. In (Galal, Hisham S. and Youssef, Amr M., 2019),</a></li>
-<li><a href="#org61ef13a">3.2.1.1.2. \(\star\) In (Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Hao and Zhu, Liehuang and Liu, Yong and Liu, Jiamou and Khoussainov, Bakh, 2024),</a></li>
-<li><a href="#org274dc9d">3.2.1.1.3. \(\star\) In (Blass, Erik-Oliver and Kerschbaum, Florian, 2018) , the authors propose a maliciously-secure</a></li>
+<li><a href="#orgfd6831e">3.2.1.1.1. In (Galal, Hisham S. and Youssef, Amr M., 2019),</a></li>
+<li><a href="#orgae54cb5">3.2.1.1.2. \(\star\) In (Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Hao and Zhu, Liehuang and Liu, Yong and Liu, Jiamou and Khoussainov, Bakh, 2024),</a></li>
+<li><a href="#org2e1e417">3.2.1.1.3. \(\star\) In (Blass, Erik-Oliver and Kerschbaum, Florian, 2018) , the authors propose a maliciously-secure</a></li>
 </ul>
 </li>
-<li><a href="#org607766d">3.2.1.2. Questions</a></li>
-<li><a href="#org0001d2b">3.2.1.3. <span class="done DONE">DONE</span> Milestone 1: Development environment setup</a></li>
+<li><a href="#org2a5f451">3.2.1.2. Questions</a></li>
+<li><a href="#org03b7830">3.2.1.3. <span class="done DONE">DONE</span> Milestone 1: Development environment setup</a></li>
 </ul>
 </li>
-<li><a href="#org91dcb1d">3.2.2. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2) <code>[0/2]</code></a>
+<li><a href="#orgef1bd22">3.2.2. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2) <code>[0/2]</code></a>
 <ul>
-<li><a href="#org41a2841">3.2.2.1. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2): Technical specification</a>
+<li><a href="#orgddd6283">3.2.2.1. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2): Technical specification</a>
 <ul>
-<li><a href="#orgeb7ca8d">3.2.2.1.1. Auction Specification Model </a></li>
+<li><a href="#org1ceed2a">3.2.2.1.1. Auction Specification Model </a></li>
 </ul>
 </li>
-<li><a href="#org7409044">3.2.2.2. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2): Test suite development</a></li>
+<li><a href="#org3c27421">3.2.2.2. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2): Test suite development</a></li>
 </ul>
 </li>
-<li><a href="#org484d8f3">3.2.3. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 3) <code>[0/2]</code></a>
+<li><a href="#orgc4f3c93">3.2.3. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 3) <code>[0/2]</code></a>
 <ul>
-<li><a href="#org9aaad00">3.2.3.1. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 3): Test suite development (cont'd)</a></li>
-<li><a href="#orgc94c441">3.2.3.2. <span class="todo TODO">TODO</span> Milestone1 1: (Sprint 3): Sketching the Pseudo-code</a></li>
+<li><a href="#org2d4a801">3.2.3.1. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 3): Test suite development (cont'd)</a></li>
+<li><a href="#orgb9f0609">3.2.3.2. <span class="todo TODO">TODO</span> Milestone1 1: (Sprint 3): Sketching the Pseudo-code</a></li>
 </ul>
 </li>
-<li><a href="#orge2ee161">3.2.4. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 4) <code>[0/0]</code></a></li>
-<li><a href="#org9fbc593">3.2.5. Logistics</a></li>
+<li><a href="#orgb67179e">3.2.4. <span class="todo TODO">TODO</span> Milestone 1: (Sprint 4) <code>[0/0]</code></a></li>
+<li><a href="#orgb19774f">3.2.5. Logistics</a></li>
 </ul>
 </li>
-<li><a href="#org9f33557">3.3. Milestone 2: Development </a>
+<li><a href="#org5f2a6d6">3.3. Milestone 2: Development </a>
 <ul>
-<li><a href="#orgddda2f8">3.3.1. Objectives</a></li>
-<li><a href="#org75813bb">3.3.2. Tasks</a></li>
-<li><a href="#orgb831377">3.3.3. Logistics</a></li>
+<li><a href="#org6bc6e46">3.3.1. Objectives</a></li>
+<li><a href="#org54432eb">3.3.2. Tasks</a></li>
+<li><a href="#org5c29942">3.3.3. Logistics</a></li>
 </ul>
 </li>
-<li><a href="#org1ea478e">3.4. Milestone 3: Optimization, Testing, and Documentation</a>
+<li><a href="#orgd4540e5">3.4. Milestone 3: Optimization, Testing, and Documentation</a>
 <ul>
-<li><a href="#orgd07ec42">3.4.1. Objectives</a></li>
-<li><a href="#org3445bd7">3.4.2. Tasks</a></li>
-<li><a href="#org6719a16">3.4.3. Logistics</a></li>
+<li><a href="#org8261e0f">3.4.1. Objectives</a></li>
+<li><a href="#orgb87f9fe">3.4.2. Tasks</a></li>
+<li><a href="#org53c3917">3.4.3. Logistics</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org3de0f19">4. Additional Information</a>
+<li><a href="#orgeda9200">4. Additional Information</a>
 <ul>
-<li><a href="#orgd2a6f9a">4.1. Meetings</a>
+<li><a href="#orgd1232e5">4.1. Meetings</a>
 <ul>
-<li><a href="#org17abba2">4.1.1. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span></a></li>
-<li><a href="#org0daf729">4.1.2. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></a></li>
-<li><a href="#org8b108fd">4.1.3. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span></a></li>
+<li><a href="#org2463d22">4.1.1. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span></a></li>
+<li><a href="#org1702d7a">4.1.2. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></a></li>
+<li><a href="#org6a02d17">4.1.3. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span></a></li>
+<li><a href="#orgb907133">4.1.4. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-31 Sun&gt;</span></span></a></li>
 </ul>
 </li>
-<li><a href="#org9c6cbdf">4.2. Resources</a></li>
-<li><a href="#orgb7cd44d">4.3. Technical Notes</a></li>
+<li><a href="#org5c130e3">4.2. Resources</a></li>
+<li><a href="#orgc68e038">4.3. Technical Notes</a></li>
 </ul>
 </li>
-<li><a href="#org17c2024">5. Bibliography</a></li>
+<li><a href="#orge6eed8b">5. Bibliography</a></li>
 </ul>
 </div>
 </div>
@@ -469,12 +470,12 @@ org_html_manager.setup();  // activate after the parameters are set
 <i>(This document is powered by the <a href="https://orgmode.org/">greatest mode</a> of the <a href="https://www.gnu.org/software/emacs/">greatest software of all time</a>)</i>
 </p>
 </div>
-<div id="outline-container-orge785ff2" class="outline-2">
-<h2 id="orge785ff2"><span class="section-number-2">1.</span> Project Overview</h2>
+<div id="outline-container-org2c1bd18" class="outline-2">
+<h2 id="org2c1bd18"><span class="section-number-2">1.</span> Project Overview</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgf5c24df" class="outline-3">
-<h3 id="orgf5c24df"><span class="section-number-3">1.1.</span> Overview</h3>
+<div id="outline-container-orgc0abd43" class="outline-3">
+<h3 id="orgc0abd43"><span class="section-number-3">1.1.</span> Overview</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 The proposed idea is to develop a toolkit called <code>zk-auctions</code> (which stands for
@@ -497,7 +498,7 @@ The toolkit seeks to address the need for bidder anonymity, transaction
 security, and decentralized auction processes while ensuring modularity and
 efficient integration with blockchain platforms. However, the final product is
 not at all only targeted at the so-called HTTP/3 world. But, the properties
-described in <a href="#org17a09ee">Project Motivation</a> are the imperative contribution of this toolkit,
+described in <a href="#org882d542">Project Motivation</a> are the imperative contribution of this toolkit,
 let it be deployed on a blockchain, message-queue, REST APIs, etc.
 </p>
 
@@ -509,8 +510,8 @@ consequently, allows for exploitation).
 </div>
 </div>
 
-<div id="outline-container-orgffa4479" class="outline-3">
-<h3 id="orgffa4479"><span class="section-number-3">1.2.</span> Short Rationale</h3>
+<div id="outline-container-org23a7bbf" class="outline-3">
+<h3 id="org23a7bbf"><span class="section-number-3">1.2.</span> Short Rationale</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 A zero-knowledge-proof-based contract library for First-Bid, Second-Bid,
@@ -520,8 +521,8 @@ and integrity while particularly avoiding neopotism.
 </div>
 </div>
 
-<div id="outline-container-orgcc95a0c" class="outline-3">
-<h3 id="orgcc95a0c"><span class="section-number-3">1.3.</span> Project Details and Motivation <a id="org17a09ee"></a></h3>
+<div id="outline-container-org2e6d17c" class="outline-3">
+<h3 id="org2e6d17c"><span class="section-number-3">1.3.</span> Project Details and Motivation <a id="org882d542"></a></h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 The output of the project will be a Rust-based toolkit that simulates a
@@ -576,8 +577,8 @@ auction at time \(t\), it could still be abused in an auction at time \(t +
 </ul>
 </div>
 
-<div id="outline-container-org20a6bc6" class="outline-4">
-<h4 id="org20a6bc6"><span class="section-number-4">1.3.1.</span> Backend</h4>
+<div id="outline-container-org213bdda" class="outline-4">
+<h4 id="org213bdda"><span class="section-number-4">1.3.1.</span> Backend</h4>
 <div class="outline-text-4" id="text-1-3-1">
 <p>
 The backend will be developed using Rust programming language for the following
@@ -594,15 +595,15 @@ reasons:
 </div>
 </div>
 
-<div id="outline-container-org642b6d6" class="outline-2">
-<h2 id="org642b6d6"><span class="section-number-2">2.</span> Team</h2>
+<div id="outline-container-org0ab25f9" class="outline-2">
+<h2 id="org0ab25f9"><span class="section-number-2">2.</span> Team</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgf02340a" class="outline-3">
-<h3 id="orgf02340a"><span class="section-number-3">2.1.</span> Team members</h3>
+<div id="outline-container-org8f872b2" class="outline-3">
+<h3 id="org8f872b2"><span class="section-number-3">2.1.</span> Team members</h3>
 <div class="outline-text-3" id="text-2-1">
 <ul class="org-ul">
-<li>ndrwnaguib (<code class="src src-sh">base64 --decode &lt;&lt;&lt; <span style="color: #CC9393;">"bmRyd25hZ3VpYkBnbWFpbC5jb20="</span></code>)</li>
+<li>ndrwnaguib (<code class="src src-sh">base64 --decode &lt;&lt;&lt; <span style="color: #305f5e;">"bmRyd25hZ3VpYkBnbWFpbC5jb20="</span></code>)</li>
 </ul>
 
 <p>
@@ -621,8 +622,8 @@ undergraduate studies, Andrew majored in Computer Science at Helwan University.
 </div>
 </div>
 
-<div id="outline-container-orgb3092de" class="outline-3">
-<h3 id="orgb3092de"><span class="section-number-3">2.2.</span> Team Code Repos</h3>
+<div id="outline-container-orgf255d19" class="outline-3">
+<h3 id="orgf255d19"><span class="section-number-3">2.2.</span> Team Code Repos</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 <a href="https://github.com/ndrwnaguib/zk-auctions">https://github.com/ndrwnaguib/zk-auctions</a>
@@ -631,16 +632,16 @@ undergraduate studies, Andrew majored in Computer Science at Helwan University.
 </div>
 </div>
 
-<div id="outline-container-org4e70e39" class="outline-2">
-<h2 id="org4e70e39"><span class="section-number-2">3.</span> Development Roadmap</h2>
+<div id="outline-container-org7de46ae" class="outline-2">
+<h2 id="org7de46ae"><span class="section-number-2">3.</span> Development Roadmap</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgabecc82" class="outline-3">
-<h3 id="orgabecc82"><span class="section-number-3">3.1.</span> Milestone 1: Research, Proof-sketching, and Algorithm Design <a id="org5657308"></a></h3>
+<div id="outline-container-org5209c90" class="outline-3">
+<h3 id="org5209c90"><span class="section-number-3">3.1.</span> Milestone 1: Research, Proof-sketching, and Algorithm Design <a id="org9c167f2"></a></h3>
 <div class="outline-text-3" id="text-3-1">
 </div>
-<div id="outline-container-org2c46657" class="outline-4">
-<h4 id="org2c46657"><span class="section-number-4">3.1.1.</span> Objectives</h4>
+<div id="outline-container-orge3e5707" class="outline-4">
+<h4 id="orge3e5707"><span class="section-number-4">3.1.1.</span> Objectives</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <ul class="org-ul">
 <li>Establish the core technical framework.</li>
@@ -650,20 +651,20 @@ undergraduate studies, Andrew majored in Computer Science at Helwan University.
 </div>
 </div>
 
-<div id="outline-container-org89f1e62" class="outline-3">
-<h3 id="org89f1e62"><span class="section-number-3">3.2.</span> <span class="todo TODO">TODO</span> Milestone 1 Tasks (2-month period) <code>[1/4]</code></h3>
+<div id="outline-container-org83e936a" class="outline-3">
+<h3 id="org83e936a"><span class="section-number-3">3.2.</span> <span class="todo TODO">TODO</span> Milestone 1 Tasks (2-month period) <code>[1/4]</code></h3>
 <div class="outline-text-3" id="text-3-2">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-04-14 Sun&gt;</span></span></p>
 </div>
 
-<div id="outline-container-org58d351c" class="outline-4">
-<h4 id="org58d351c"><span class="section-number-4">3.2.1.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 1) <code>[2/2]</code></h4>
+<div id="outline-container-orgc137f0b" class="outline-4">
+<h4 id="orgc137f0b"><span class="section-number-4">3.2.1.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 1) <code>[2/2]</code></h4>
 <div class="outline-text-4" id="text-3-2-1">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-03-24 Sun 00:46] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></p>
 </div>
 
-<div id="outline-container-orgdf0336c" class="outline-5">
-<h5 id="orgdf0336c"><span class="section-number-5">3.2.1.1.</span> <span class="done DONE">DONE</span> Milestone 1: Research</h5>
+<div id="outline-container-org98e5f47" class="outline-5">
+<h5 id="org98e5f47"><span class="section-number-5">3.2.1.1.</span> <span class="done DONE">DONE</span> Milestone 1: Research</h5>
 <div class="outline-text-5" id="text-3-2-1-1">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-02-28 Wed 15:43] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-02-27 Tue&gt;</span></span></p>
 <p>
@@ -672,8 +673,8 @@ zero-knowledge proofs and their intersection with auction theory. What is
 the current progress on zero-knowledge auctions?
 </p>
 </div>
-<div id="outline-container-orgfb7de25" class="outline-6">
-<h6 id="orgfb7de25"><span class="section-number-6">3.2.1.1.1.</span> In (Galal, Hisham S. and Youssef, Amr M., 2019),</h6>
+<div id="outline-container-orgfd6831e" class="outline-6">
+<h6 id="orgfd6831e"><span class="section-number-6">3.2.1.1.1.</span> In (Galal, Hisham S. and Youssef, Amr M., 2019),</h6>
 <div class="outline-text-6" id="text-3-2-1-1-1">
 <ul class="org-ul">
 <li>the bidders submit their sealed-bid as homomorphic commitments on the contract.</li>
@@ -690,9 +691,9 @@ proof of interval membership to create the underlying protocol.</li>
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="org4548668"></a>Phases of Deployment<br />
+<li><a id="orge1450f6"></a>Phases of Deployment<br />
 <ol class="org-ol">
-<li><a id="orgb437c51"></a>Contract Deployment and Parameters Setup<br />
+<li><a id="org530d310"></a>Contract Deployment and Parameters Setup<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-1">
 <ul class="org-ul">
 <li>Decide \(T_1, T_2, T_3, T_4\), which are the time intervals for four phases:
@@ -710,7 +711,7 @@ against malicious parties.</li>
 </ul>
 </div>
 </li>
-<li><a id="org864d807"></a>Commitment of Bids<br />
+<li><a id="org25d635e"></a>Commitment of Bids<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-2">
 <ul class="org-ul">
 <li>“Each bidder submits a bid commitment using Pedersen commitment scheme along with the initial deposit \(F\) in ethers”
@@ -722,7 +723,7 @@ commitment--<i>the authors instead use Chaum-Pedersen non-interactive ZKP, detai
 </ul>
 </div>
 </li>
-<li><a id="orgded61d7"></a>Opening the commitments<br />
+<li><a id="orgbc3371a"></a>Opening the commitments<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-3">
 <blockquote>
 <p>
@@ -731,7 +732,7 @@ Each bidder \(B_i\) sends the outcome of ciphertext of encrypting \((x_i, r_i)\)
 </blockquote>
 </div>
 </li>
-<li><a id="orge475bd3"></a>Verification of Comparison Proofs<br />
+<li><a id="orgb8ce3ff"></a>Verification of Comparison Proofs<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-4">
 <blockquote>
 <p>
@@ -741,7 +742,7 @@ associated account address \(B_w\) and commitment \(C_w\)"
 </blockquote>
 </div>
 </li>
-<li><a id="org35426a8"></a>Finalizing the auction<br />
+<li><a id="org81335fb"></a>Finalizing the auction<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-5">
 <blockquote>
 <p>
@@ -754,7 +755,7 @@ auction contract so that the winner can pay the winning bid.
 </li>
 </ol>
 </li>
-<li><a id="org496c5eb"></a>Gas Cost<br />
+<li><a id="orgd798db0"></a>Gas Cost<br />
 <div class="outline-text-7" id="text-3-2-1-1-1-2">
 <blockquote>
 <p>
@@ -768,8 +769,8 @@ that represent two points on the elliptic curve.
 </li>
 </ol>
 </div>
-<div id="outline-container-org61ef13a" class="outline-6">
-<h6 id="org61ef13a"><span class="section-number-6">3.2.1.1.2.</span> \(\star\) In (Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Hao and Zhu, Liehuang and Liu, Yong and Liu, Jiamou and Khoussainov, Bakh, 2024),</h6>
+<div id="outline-container-orgae54cb5" class="outline-6">
+<h6 id="orgae54cb5"><span class="section-number-6">3.2.1.1.2.</span> \(\star\) In (Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Hao and Zhu, Liehuang and Liu, Yong and Liu, Jiamou and Khoussainov, Bakh, 2024),</h6>
 <div class="outline-text-6" id="text-3-2-1-1-2">
 <ul class="org-ul">
 <li><p>
@@ -830,8 +831,8 @@ mechanism, should it be needed, will be designed accordingly.
 <hr />
 </div>
 </div>
-<div id="outline-container-org274dc9d" class="outline-6">
-<h6 id="org274dc9d"><span class="section-number-6">3.2.1.1.3.</span> \(\star\) In (Blass, Erik-Oliver and Kerschbaum, Florian, 2018) <a id="orgcc400d1"></a>, the authors propose a maliciously-secure</h6>
+<div id="outline-container-org2e1e417" class="outline-6">
+<h6 id="org2e1e417"><span class="section-number-6">3.2.1.1.3.</span> \(\star\) In (Blass, Erik-Oliver and Kerschbaum, Florian, 2018) <a id="org41a055c"></a>, the authors propose a maliciously-secure</h6>
 <div class="outline-text-6" id="text-3-2-1-1-3">
 <p>
 blockchain-based auction where all encrypted bids are compared
@@ -913,8 +914,8 @@ formulation)
 </div>
 </div>
 </div>
-<div id="outline-container-org607766d" class="outline-5">
-<h5 id="org607766d"><span class="section-number-5">3.2.1.2.</span> Questions</h5>
+<div id="outline-container-org2a5f451" class="outline-5">
+<h5 id="org2a5f451"><span class="section-number-5">3.2.1.2.</span> Questions</h5>
 <div class="outline-text-5" id="text-3-2-1-2">
 <p>
 <i>(some of which will possibly be answered in later phases of the project)</i>
@@ -934,8 +935,8 @@ particular attribute that a participant must have? E.g., age.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org0001d2b" class="outline-5">
-<h5 id="org0001d2b"><span class="section-number-5">3.2.1.3.</span> <span class="done DONE">DONE</span> Milestone 1: Development environment setup</h5>
+<div id="outline-container-org03b7830" class="outline-5">
+<h5 id="org03b7830"><span class="section-number-5">3.2.1.3.</span> <span class="done DONE">DONE</span> Milestone 1: Development environment setup</h5>
 <div class="outline-text-5" id="text-3-2-1-3">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-03-24 Sun 00:46] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-02-27 Tue&gt;</span></span></p>
 <p>
@@ -951,15 +952,15 @@ other blocks necessary for the toolkit.
 </div>
 </div>
 
-<div id="outline-container-org91dcb1d" class="outline-4">
-<h4 id="org91dcb1d"><span class="section-number-4">3.2.2.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2) <code>[0/2]</code></h4>
+<div id="outline-container-orgef1bd22" class="outline-4">
+<h4 id="orgef1bd22"><span class="section-number-4">3.2.2.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2) <code>[0/2]</code></h4>
 <div class="outline-text-4" id="text-3-2-2">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-03-13 Wed&gt;</span></span></p>
 </div>
 
 
-<div id="outline-container-org41a2841" class="outline-5">
-<h5 id="org41a2841"><span class="section-number-5">3.2.2.1.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2): Technical specification</h5>
+<div id="outline-container-orgddd6283" class="outline-5">
+<h5 id="orgddd6283"><span class="section-number-5">3.2.2.1.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2): Technical specification</h5>
 <div class="outline-text-5" id="text-3-2-2-1">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-03-13 Wed&gt;</span></span></p>
 <p>
@@ -973,35 +974,35 @@ specification for an auction implementation (similar to OpenAPI or
 <a href="https://www.w3.org/TR/vc-data-model/">VC-Data-Model</a> specifications).</li>
 </ul>
 </div>
-<div id="outline-container-orgeb7ca8d" class="outline-6">
-<h6 id="orgeb7ca8d"><span class="section-number-6">3.2.2.1.1.</span> Auction Specification Model <a id="org56f8847"></a></h6>
+<div id="outline-container-org1ceed2a" class="outline-6">
+<h6 id="org1ceed2a"><span class="section-number-6">3.2.2.1.1.</span> Auction Specification Model <a id="org7ce2e3a"></a></h6>
 <div class="outline-text-6" id="text-3-2-2-1-1">
 </div>
 <ol class="org-ol">
-<li><a id="orge467aa3"></a>Introduction<br /></li>
-<li><a id="orgb94d518"></a>What is a zero-knowledge auction?<br /></li>
-<li><a id="org80b8d4b"></a>Ecosystem Overview<br />
+<li><a id="org961f87b"></a>Introduction<br /></li>
+<li><a id="orgdab1c99"></a>What is a zero-knowledge auction?<br /></li>
+<li><a id="org743bb67"></a>Ecosystem Overview<br />
 <ol class="org-ol">
-<li><a id="org8823ef3"></a>Bidder<br /></li>
-<li><a id="org8d8646e"></a>Auctioneer (verifier)<br /></li>
-<li><a id="orgc90c1a0"></a>Bid<br /></li>
+<li><a id="orgbeec2fc"></a>Bidder<br /></li>
+<li><a id="orgfa0d081"></a>Auctioneer (verifier)<br /></li>
+<li><a id="org93f2bd4"></a>Bid<br /></li>
 </ol>
 </li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org7409044" class="outline-5">
-<h5 id="org7409044"><span class="section-number-5">3.2.2.2.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2): Test suite development</h5>
+<div id="outline-container-org3c27421" class="outline-5">
+<h5 id="org3c27421"><span class="section-number-5">3.2.2.2.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 2): Test suite development</h5>
 <div class="outline-text-5" id="text-3-2-2-2">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-03-13 Wed&gt;</span></span></p>
 <ul class="org-ul">
 <li>assess the possibility of following TDD for the remaining milestones.
 <ul class="org-ul">
 <li><span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span>: If we use Halo2's <a href="https://zcash.github.io/halo2/user/simple-example.html">simple example</a>, we should be able to
-follow TDD the moment we complete the <a href="#org5657308">Milestone 1</a>, since we will have
+follow TDD the moment we complete the <a href="#org9c167f2">Milestone 1</a>, since we will have
 the equations used in the verifier ready.</li>
 <li><span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span>: Since we've decided the first protocol prototype
-(<a href="#org8b108fd">meeting on &lt;2024-03-08 Fri&gt;</a>), following TDD is much more doable and is
+(<a href="#org6a02d17">meeting on &lt;2024-03-08 Fri&gt;</a>), following TDD is much more doable and is
 effective for a more accurate progress in Milestone 2.</li>
 </ul></li>
 <li>check other open-source projects that could be relevant.</li>
@@ -1009,20 +1010,20 @@ effective for a more accurate progress in Milestone 2.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org484d8f3" class="outline-4">
-<h4 id="org484d8f3"><span class="section-number-4">3.2.3.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 3) <code>[0/2]</code></h4>
+<div id="outline-container-orgc4f3c93" class="outline-4">
+<h4 id="orgc4f3c93"><span class="section-number-4">3.2.3.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 3) <code>[0/2]</code></h4>
 <div class="outline-text-4" id="text-3-2-3">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-03-27 Wed&gt;</span></span></p>
 </div>
-<div id="outline-container-org9aaad00" class="outline-5">
-<h5 id="org9aaad00"><span class="section-number-5">3.2.3.1.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 3): Test suite development (cont'd)</h5>
+<div id="outline-container-org2d4a801" class="outline-5">
+<h5 id="org2d4a801"><span class="section-number-5">3.2.3.1.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 3): Test suite development (cont'd)</h5>
 <div class="outline-text-5" id="text-3-2-3-1">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-03-17 Sun&gt;</span></span></p>
 <ul class="org-ul">
 <li>writing the tests of the circuits which are to be</li>
 </ul>
 <p>
-developed in <a href="#org4b9d9b9">Milestone 2</a>.
+developed in <a href="#orgbfd95c9">Milestone 2</a>.
 </p>
 <ul class="org-ul">
 <li>The mocking of the identities in testing should handle mainly Ethereum's
@@ -1030,8 +1031,8 @@ wallet addresses (potential support for HTTP/2 IP addresses in Milestone 3.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgc94c441" class="outline-5">
-<h5 id="orgc94c441"><span class="section-number-5">3.2.3.2.</span> <span class="todo TODO">TODO</span> Milestone1 1: (Sprint 3): Sketching the Pseudo-code</h5>
+<div id="outline-container-orgb9f0609" class="outline-5">
+<h5 id="orgb9f0609"><span class="section-number-5">3.2.3.2.</span> <span class="todo TODO">TODO</span> Milestone1 1: (Sprint 3): Sketching the Pseudo-code</h5>
 <div class="outline-text-5" id="text-3-2-3-2">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-03-27 Wed&gt;</span></span></p>
 <ul class="org-ul">
@@ -1043,8 +1044,8 @@ by the circuits in each algorithm.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-orge2ee161" class="outline-4">
-<h4 id="orge2ee161"><span class="section-number-4">3.2.4.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 4) <code>[0/0]</code></h4>
+<div id="outline-container-orgb67179e" class="outline-4">
+<h4 id="orgb67179e"><span class="section-number-4">3.2.4.</span> <span class="todo TODO">TODO</span> Milestone 1: (Sprint 4) <code>[0/0]</code></h4>
 <div class="outline-text-4" id="text-3-2-4">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-04-14 Sun&gt;</span></span></p>
 <ul class="org-ul">
@@ -1059,8 +1060,8 @@ by the circuits in each algorithm.</li>
 </div>
 </div>
 
-<div id="outline-container-org9fbc593" class="outline-4">
-<h4 id="org9fbc593"><span class="section-number-4">3.2.5.</span> Logistics</h4>
+<div id="outline-container-orgb19774f" class="outline-4">
+<h4 id="orgb19774f"><span class="section-number-4">3.2.5.</span> Logistics</h4>
 <div class="outline-text-4" id="text-3-2-5">
 <p class="verse">
 Estimated Duration: 1 month<br />
@@ -1072,12 +1073,12 @@ Estimated delivery date: Feb (10-20)th 2024<br />
 </div>
 </div>
 
-<div id="outline-container-org9f33557" class="outline-3">
-<h3 id="org9f33557"><span class="section-number-3">3.3.</span> Milestone 2: Development <a id="org4b9d9b9"></a></h3>
+<div id="outline-container-org5f2a6d6" class="outline-3">
+<h3 id="org5f2a6d6"><span class="section-number-3">3.3.</span> Milestone 2: Development <a id="orgbfd95c9"></a></h3>
 <div class="outline-text-3" id="text-3-3">
 </div>
-<div id="outline-container-orgddda2f8" class="outline-4">
-<h4 id="orgddda2f8"><span class="section-number-4">3.3.1.</span> Objectives</h4>
+<div id="outline-container-org6bc6e46" class="outline-4">
+<h4 id="org6bc6e46"><span class="section-number-4">3.3.1.</span> Objectives</h4>
 <div class="outline-text-4" id="text-3-3-1">
 <ul class="org-ul">
 <li>Develop the core functionality of zk-auctions (e.g., circuits, the various
@@ -1091,8 +1092,8 @@ proof systems.
 </div>
 </div>
 
-<div id="outline-container-org75813bb" class="outline-4">
-<h4 id="org75813bb"><span class="section-number-4">3.3.2.</span> Tasks</h4>
+<div id="outline-container-org54432eb" class="outline-4">
+<h4 id="org54432eb"><span class="section-number-4">3.3.2.</span> Tasks</h4>
 <div class="outline-text-4" id="text-3-3-2">
 <ol class="org-ol">
 <li>Core module development: build the main auction system modules, focusing on
@@ -1118,7 +1119,7 @@ zk_auction["protocol"] = "brandt"
 </div></li>
 </ul></li>
 <li>Implementation of the auction circuits as specified by the pseudo-code
-written in <a href="#org5657308">Milestone 1</a>.</li>
+written in <a href="#org9c167f2">Milestone 1</a>.</li>
 <li>Modular architecture enhancement: refine the system architecture to easily
 integrate alternative proof systems.
 <ul class="org-ul">
@@ -1139,8 +1140,8 @@ the potential of the system for being a victim of a DDOS-attack?</li>
 </div>
 
 
-<div id="outline-container-orgb831377" class="outline-4">
-<h4 id="orgb831377"><span class="section-number-4">3.3.3.</span> Logistics</h4>
+<div id="outline-container-org5c29942" class="outline-4">
+<h4 id="org5c29942"><span class="section-number-4">3.3.3.</span> Logistics</h4>
 <div class="outline-text-4" id="text-3-3-3">
 <p class="verse">
 Estimated Duration: 1 month<br />
@@ -1152,12 +1153,12 @@ Estimated delivery date: March (10-20)th 2024<br />
 </div>
 </div>
 
-<div id="outline-container-org1ea478e" class="outline-3">
-<h3 id="org1ea478e"><span class="section-number-3">3.4.</span> Milestone 3: Optimization, Testing, and Documentation</h3>
+<div id="outline-container-orgd4540e5" class="outline-3">
+<h3 id="orgd4540e5"><span class="section-number-3">3.4.</span> Milestone 3: Optimization, Testing, and Documentation</h3>
 <div class="outline-text-3" id="text-3-4">
 </div>
-<div id="outline-container-orgd07ec42" class="outline-4">
-<h4 id="orgd07ec42"><span class="section-number-4">3.4.1.</span> Objectives</h4>
+<div id="outline-container-org8261e0f" class="outline-4">
+<h4 id="org8261e0f"><span class="section-number-4">3.4.1.</span> Objectives</h4>
 <div class="outline-text-4" id="text-3-4-1">
 <ul class="org-ul">
 <li>Revise the codebase for performance and privacy.</li>
@@ -1168,8 +1169,8 @@ Estimated delivery date: March (10-20)th 2024<br />
 </div>
 </div>
 
-<div id="outline-container-org3445bd7" class="outline-4">
-<h4 id="org3445bd7"><span class="section-number-4">3.4.2.</span> Tasks</h4>
+<div id="outline-container-orgb87f9fe" class="outline-4">
+<h4 id="orgb87f9fe"><span class="section-number-4">3.4.2.</span> Tasks</h4>
 <div class="outline-text-4" id="text-3-4-2">
 <ol class="org-ol">
 <li>Code optimization: revise code for performance, focusing on the auction logic
@@ -1213,8 +1214,8 @@ including a review of all documentation and code.</li>
 </div>
 </div>
 
-<div id="outline-container-org6719a16" class="outline-4">
-<h4 id="org6719a16"><span class="section-number-4">3.4.3.</span> Logistics</h4>
+<div id="outline-container-org53c3917" class="outline-4">
+<h4 id="org53c3917"><span class="section-number-4">3.4.3.</span> Logistics</h4>
 <div class="outline-text-4" id="text-3-4-3">
 <p class="verse">
 Estimated Duration: 1 month<br />
@@ -1228,19 +1229,19 @@ Estimated delivery date: April (10-20)th 2024<br />
 </div>
 
 
-<div id="outline-container-org3de0f19" class="outline-2">
-<h2 id="org3de0f19"><span class="section-number-2">4.</span> Additional Information</h2>
+<div id="outline-container-orgeda9200" class="outline-2">
+<h2 id="orgeda9200"><span class="section-number-2">4.</span> Additional Information</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgd2a6f9a" class="outline-3">
-<h3 id="orgd2a6f9a"><span class="section-number-3">4.1.</span> Meetings</h3>
+<div id="outline-container-orgd1232e5" class="outline-3">
+<h3 id="orgd1232e5"><span class="section-number-3">4.1.</span> Meetings</h3>
 <div class="outline-text-3" id="text-4-1">
 </div>
-<div id="outline-container-org17abba2" class="outline-4">
-<h4 id="org17abba2"><span class="section-number-4">4.1.1.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span></h4>
+<div id="outline-container-org2463d22" class="outline-4">
+<h4 id="org2463d22"><span class="section-number-4">4.1.1.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span></h4>
 </div>
-<div id="outline-container-org0daf729" class="outline-4">
-<h4 id="org0daf729"><span class="section-number-4">4.1.2.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></h4>
+<div id="outline-container-org1702d7a" class="outline-4">
+<h4 id="org1702d7a"><span class="section-number-4">4.1.2.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></h4>
 <div class="outline-text-4" id="text-4-1-2">
 <ul class="org-ul">
 <li>We went over the progress of the literature review phase (particularly
@@ -1250,9 +1251,21 @@ supported and the engineering design of the toolkit.</li>
 </div>
 </div>
 
-<div id="outline-container-org8b108fd" class="outline-4">
-<h4 id="org8b108fd"><span class="section-number-4">4.1.3.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span></h4>
-<div class="outline-text-4" id="text-4-1-3">
+<div id="outline-container-org6a02d17" class="outline-4">
+<h4 id="org6a02d17"><span class="section-number-4">4.1.3.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span></h4>
+</div>
+<div id="outline-container-orgb907133" class="outline-4">
+<h4 id="orgb907133"><span class="section-number-4">4.1.4.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-31 Sun&gt;</span></span></h4>
+<div class="outline-text-4" id="text-4-1-4">
+<ul class="org-ul">
+<li>Revised and merged the pull requests regarding the engineering aspect of the repository.</li>
+<li>Discussed that we might need to use a proving server, however, it is a
+decision that should be made after benchmarking the runtime of the circuits.</li>
+<li>The tests should be adapted from the Strain paper and completed by Tuesday.</li>
+<li>The next step should be outlining the private and public inputs, the equations
+to be verified by the circuit as a warm up for Milestone 2.</li>
+</ul>
+
 <p>
 Agenda:
 </p>
@@ -1262,7 +1275,7 @@ Agenda:
 (Galal, Hisham S. and Youssef, Amr M., 2019).</li>
 <li>Rebase the git-hooks branch against <code>main</code>.</li>
 <li>Deciding whether we should start with <code>Strain</code> as the first protocol.</li>
-<li>Outlining the <a href="#org56f8847">auction specification model</a>.</li>
+<li>Outlining the <a href="#org7ce2e3a">auction specification model</a>.</li>
 </ul>
 
 <p>
@@ -1275,14 +1288,14 @@ Notes:
 implementation of at least one protocol.</li>
 <li><code>@0xisk</code>: it'd be very nice if we could leverage mobile devices in our
 framework.</li>
-<li>We will start by implementing <a href="#orgcc400d1"><code>Strain</code></a>.</li>
+<li>We will start by implementing <a href="#org41a055c"><code>Strain</code></a>.</li>
 </ul>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org9c6cbdf" class="outline-3">
-<h3 id="org9c6cbdf"><span class="section-number-3">4.2.</span> Resources</h3>
+<div id="outline-container-org5c130e3" class="outline-3">
+<h3 id="org5c130e3"><span class="section-number-3">4.2.</span> Resources</h3>
 <div class="outline-text-3" id="text-4-2">
 <ul class="org-ul">
 <li><a href="https://zcash.github.io/halo2/">https://zcash.github.io/halo2/</a></li>
@@ -1292,8 +1305,8 @@ framework.</li>
 </div>
 </div>
 
-<div id="outline-container-orgb7cd44d" class="outline-3">
-<h3 id="orgb7cd44d"><span class="section-number-3">4.3.</span> Technical Notes</h3>
+<div id="outline-container-orgc68e038" class="outline-3">
+<h3 id="orgc68e038"><span class="section-number-3">4.3.</span> Technical Notes</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 During the development of this project, technical notes were developed in a
@@ -1304,8 +1317,8 @@ self-contained documentation of the workflow since day one.
 </div>
 </div>
 
-<div id="outline-container-org17c2024" class="outline-2">
-<h2 id="org17c2024"><span class="section-number-2">5.</span> Bibliography</h2>
+<div id="outline-container-orge6eed8b" class="outline-2">
+<h2 id="orge6eed8b"><span class="section-number-2">5.</span> Bibliography</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Bag, Samiran and Hao, Feng and Shahandashti, Siamak F. and Ray, Indranil Ghosh (2020). <i>SEAL: Sealed-Bid Auction Without Auctioneers</i>, IEEE Transactions on Information Forensics and Security.</p>
@@ -1340,7 +1353,7 @@ Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Ha
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: ndrwnaguib and 0xisk</p>
-<p class="date">Created: 2024-03-24 Sun 00:48</p>
+<p class="date">Created: 2024-03-31 Sun 11:21</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
