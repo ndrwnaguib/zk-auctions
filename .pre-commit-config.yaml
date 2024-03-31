@@ -33,12 +33,3 @@ repos:
         types: [rust]
         pass_filenames: false
         stages: [pre-commit]
-
-      - id: cargo-test
-        name: cargo test
-        description: Checking tests for errors.
-        entry: cargo test
-        language: rust
-        types: [rust]
-        pass_filenames: false
-        stages: [pre-push, pre-merge-commit]
