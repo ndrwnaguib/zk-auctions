@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-05-01 Wed 21:48 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>[[color:navy][_Auction Specification Model v0.1-draft_]]</title>
+<meta name="author" content="Andrew Naguib" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title"><span style="color:navy;"><span class="underline">Auction Specification Model v0.1-draft</span></span>
+<br />
+<span class="subtitle">2024-05-01</span>
+</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org4907ee8">1. Introduction</a></li>
+<li><a href="#orgfa1e7c3">2. What is a zero-knowledge auction?</a></li>
+<li><a href="#orgb801e09">3. Ecosystem Overview</a>
+<ul>
+<li><a href="#org6bf5649">3.1. Bidder</a></li>
+<li><a href="#org821aae3">3.2. Auctioneer (verifier)</a></li>
+<li><a href="#org3e8ebe4">3.3. Bid</a></li>
+<li><a href="#org1f803d0">3.4. Auction type</a>
+<ul>
+<li><a href="#org6af5f3b">3.4.1. English Auctions</a></li>
+<li><a href="#orgba08326">3.4.2. Dutch Auctions</a></li>
+<li><a href="#org1c16fd0">3.4.3. Sealed-Bid Auctions</a></li>
+</ul>
+</li>
+<li><a href="#orge094146">3.5. Assets</a></li>
+</ul>
+</li>
+<li><a href="#orga77b2e9">4. Terminology</a>
+<ul>
+<li><a href="#org15a352e">4.1. Bidder</a></li>
+<li><a href="#orgc436e47">4.2. Auctioneer (verifier)</a></li>
+<li><a href="#orgef7b639">4.3. Bid</a></li>
+<li><a href="#org1b12a35">4.4. Sealed-bid Auction</a></li>
+<li><a href="#org056fee1">4.5. Gas Cost</a></li>
+</ul>
+</li>
+<li><a href="#org4d2220f">5. Verification and Validation</a>
+<ul>
+<li><a href="#org0f720fb">5.1. Identity Validation</a></li>
+<li><a href="#org2e6ae2d">5.2. Bid Validation</a></li>
+</ul>
+</li>
+<li><a href="#org8f2cf5d">6. Auction Lifecycle</a>
+<ul>
+<li><a href="#org7bbcb09">6.1. Commitment of bids.</a></li>
+<li><a href="#org7917619">6.2. Opening the commitments.</a></li>
+<li><a href="#org0fcac3f">6.3. Verification of the winner.</a></li>
+<li><a href="#orge8ce21c">6.4. Finalizing the auction.</a></li>
+</ul>
+</li>
+<li><a href="#orge10243e">7. Security and Privacy</a>
+<ul>
+<li><a href="#orgd5ce7e2">7.1. Bidder anonymity</a></li>
+<li><a href="#org72c5c15">7.2. Secure transactions</a></li>
+<li><a href="#orgc36a9e9">7.3. Integrity</a></li>
+</ul>
+</li>
+<li><a href="#org1f95b8a">8. Scalability and Efficiency</a></li>
+</ul>
+</div>
+</div>
+<details class="code-details"
+                 style ="padding: 1em;
+                          background-color: #e5f5e5;
+                          border-radius: 15px;
+                          color: hsl(157 75%);
+                          font-size: 0.9em;
+                          box-shadow: 0.05em 0.1em 5px 0.01em  #00000057;">
+                  <summary>
+                    <strong>
+                      <font face="Courier" size="3" color="green">
+                         More details about this document
+                      </font>
+                    </strong>
+                  </summary>
+<p>
+History:
+</p>
+
+<p>
+TODO: Link commit history on the file after initial commit
+</p>
+
+<p>
+Editors:
+</p>
+<ul class="org-ul">
+<li>Andrew Naguib</li>
+</ul>
+<p>
+Authors:
+</p>
+<ul class="org-ul">
+<li>Andrew Naguib</li>
+</ul>
+
+
+</details>
+
+<div id="outline-container-org4907ee8" class="outline-2">
+<h2 id="org4907ee8"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<i>This section is non-normative.</i><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+</p>
+
+<p>
+The Auction Specification Model (ASM) <code>v0.1-draft</code> defines a standardized framework for
+conducting auctions on blockchain platforms, with a particular focus on
+zero-knowledge auctions. Inspired by the principles of transparency, security,
+and privacy, ASM provides a comprehensive blueprint for developers, auctioneers,
+and participants alike to engage in fair and efficient auction processes.
+</p>
+
+<p>
+ASM facilitates the creation, exchange, and verification of auction-related data
+in a manner that ensures trust, integrity, and confidentiality. By leveraging
+blockchain technology and cryptographic techniques, ASM enables bidders to
+participate in auctions while preserving their privacy and anonymity
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfa1e7c3" class="outline-2">
+<h2 id="orgfa1e7c3"><span class="section-number-2">2.</span> What is a zero-knowledge auction?</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+<i>This section is non-normative.</i>
+</p>
+
+
+<p>
+We begin by defining an <i>auction</i> as an interactive setting involving a group of
+participants, known as bidders, who all have a mutual interest in a particular
+item, referred to as the asset. This item is being offered for sale by its
+owner, or a representative acting on their behalf, who is typically referred to
+as the auctioneer.
+</p>
+
+<p>
+Building upon the previous definition, a <i>zero-knowledge auction</i> is an auction
+where the bids and bidding process are conducted in such a way that the bidders
+can prove the validity of their bids without revealing any sensitive information
+about the bid itself or their identity. In other words, participants can
+demonstrate that they have made a valid bid without disclosing the actual
+content of the bid or any identifying information, ensuring bidder privacy while
+maintaining the integrity of the auction process.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgb801e09" class="outline-2">
+<h2 id="orgb801e09"><span class="section-number-2">3.</span> Ecosystem Overview</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org6bf5649" class="outline-3">
+<h3 id="org6bf5649"><span class="section-number-3">3.1.</span> Bidder</h3>
+</div>
+<div id="outline-container-org821aae3" class="outline-3">
+<h3 id="org821aae3"><span class="section-number-3">3.2.</span> Auctioneer (verifier)</h3>
+</div>
+<div id="outline-container-org3e8ebe4" class="outline-3">
+<h3 id="org3e8ebe4"><span class="section-number-3">3.3.</span> Bid</h3>
+</div>
+<div id="outline-container-org1f803d0" class="outline-3">
+<h3 id="org1f803d0"><span class="section-number-3">3.4.</span> Auction type</h3>
+<div class="outline-text-3" id="text-3-4">
+</div>
+<div id="outline-container-org6af5f3b" class="outline-4">
+<h4 id="org6af5f3b"><span class="section-number-4">3.4.1.</span> English Auctions</h4>
+</div>
+<div id="outline-container-orgba08326" class="outline-4">
+<h4 id="orgba08326"><span class="section-number-4">3.4.2.</span> Dutch Auctions</h4>
+</div>
+<div id="outline-container-org1c16fd0" class="outline-4">
+<h4 id="org1c16fd0"><span class="section-number-4">3.4.3.</span> Sealed-Bid Auctions</h4>
+<div class="outline-text-4" id="text-3-4-3">
+</div>
+<ol class="org-ol">
+<li><a id="org7919a93"></a>First-Price Sealed-Bid Auction<br /></li>
+<li><a id="org002c5d5"></a>Second-Price Sealed-Bid Auction<br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orge094146" class="outline-3">
+<h3 id="orge094146"><span class="section-number-3">3.5.</span> Assets</h3>
+<div class="outline-text-3" id="text-3-5">
+<p>
+<i>This section is non-normative.</i>
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orga77b2e9" class="outline-2">
+<h2 id="orga77b2e9"><span class="section-number-2">4.</span> Terminology</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+<i>This section is non-normative.</i>
+</p>
+</div>
+
+<div id="outline-container-org15a352e" class="outline-3">
+<h3 id="org15a352e"><span class="section-number-3">4.1.</span> Bidder</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+A participant in an auction who submits bids for items or assets being
+auctioned. Bidders compete with each other by placing bids with the intention of
+acquiring the auctioned item at the best possible price.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc436e47" class="outline-3">
+<h3 id="orgc436e47"><span class="section-number-3">4.2.</span> Auctioneer (verifier)</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+The entity responsible for overseeing and managing the auction process. The
+auctioneer verifies the validity of bids, ensures compliance with auction rules,
+and ultimately determines the winning bid. In the context of zero-knowledge
+auctions, the auctioneer may also act as a verifier, validating bids without
+gaining knowledge of their content or the identity of the bidders
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgef7b639" class="outline-3">
+<h3 id="orgef7b639"><span class="section-number-3">4.3.</span> Bid</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+An offer made by a bidder to purchase an item or asset being auctioned. Bids
+typically include the bid amount and any relevant terms or conditions specified
+by the bidder. Bids can be submitted openly in English or Dutch auctions, or in
+sealed envelopes in sealed-bid auctions.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1b12a35" class="outline-3">
+<h3 id="org1b12a35"><span class="section-number-3">4.4.</span> Sealed-bid Auction</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+An auction format where bidders submit their bids privately without knowledge of
+other bidders' bids. Bids are typically sealed in envelopes or submitted
+electronically in a confidential manner. The bids are then opened simultaneously
+at the end of the auction, and the highest bid, in the case of First-price
+Sealed-Bid auction, wins.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org056fee1" class="outline-3">
+<h3 id="org056fee1"><span class="section-number-3">4.5.</span> Gas Cost</h3>
+</div>
+</div>
+<div id="outline-container-org4d2220f" class="outline-2">
+<h2 id="org4d2220f"><span class="section-number-2">5.</span> Verification and Validation</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+<i>This section is non-normative.</i>
+</p>
+</div>
+
+<div id="outline-container-org0f720fb" class="outline-3">
+<h3 id="org0f720fb"><span class="section-number-3">5.1.</span> Identity Validation</h3>
+</div>
+<div id="outline-container-org2e6ae2d" class="outline-3">
+<h3 id="org2e6ae2d"><span class="section-number-3">5.2.</span> Bid Validation</h3>
+</div>
+</div>
+
+
+<div id="outline-container-org8f2cf5d" class="outline-2">
+<h2 id="org8f2cf5d"><span class="section-number-2">6.</span> Auction Lifecycle</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+<i>This section is non-normative.</i>
+</p>
+</div>
+
+<div id="outline-container-org7bbcb09" class="outline-3">
+<h3 id="org7bbcb09"><span class="section-number-3">6.1.</span> Commitment of bids.</h3>
+</div>
+<div id="outline-container-org7917619" class="outline-3">
+<h3 id="org7917619"><span class="section-number-3">6.2.</span> Opening the commitments.</h3>
+</div>
+<div id="outline-container-org0fcac3f" class="outline-3">
+<h3 id="org0fcac3f"><span class="section-number-3">6.3.</span> Verification of the winner.</h3>
+</div>
+<div id="outline-container-orge8ce21c" class="outline-3">
+<h3 id="orge8ce21c"><span class="section-number-3">6.4.</span> Finalizing the auction.</h3>
+</div>
+</div>
+
+<div id="outline-container-orge10243e" class="outline-2">
+<h2 id="orge10243e"><span class="section-number-2">7.</span> Security and Privacy</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+<i>This section is non-normative.</i>
+</p>
+</div>
+
+<div id="outline-container-orgd5ce7e2" class="outline-3">
+<h3 id="orgd5ce7e2"><span class="section-number-3">7.1.</span> Bidder anonymity</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+The identity of bidders must remain unknown and the specifics of their bids are
+kept private (this is important when revealing the bidder’s identity could
+influence the auction’s outcome or lead to privacy breaches, e.g., real estate,
+art/collectibles, etc.).
+</p>
+</div>
+</div>
+
+<div id="outline-container-org72c5c15" class="outline-3">
+<h3 id="org72c5c15"><span class="section-number-3">7.2.</span> Secure transactions</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+Ensuring the integrity of the auction process as well as protecting against fraud. Questions to be answered:
+</p>
+
+<ul class="org-ul">
+<li>How to prove the actual worth of the bidder claiming that she has? If
+that's not in the scope of the project, it has to be explicitly stated
+that such a responsibility is delegated to third-party tools.</li>
+<li>Should there be an escrow to guarantee that the bid is held securely?</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgc36a9e9" class="outline-3">
+<h3 id="orgc36a9e9"><span class="section-number-3">7.3.</span> Integrity</h3>
+<div class="outline-text-3" id="text-7-3">
+<p>
+The system must provide a proof that the some bid has won without revealing its value.
+</p>
+<ul class="org-ul">
+<li>Revealing the winning bid is an sensitive information. It shows the
+valuation of item \(i\) by the bidder \(j\). While it may not impact the
+auction at time \(t\), it could still be abused in an auction at time \(t +
+       1\)</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1f95b8a" class="outline-2">
+<h2 id="org1f95b8a"><span class="section-number-2">8.</span> Scalability and Efficiency</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+<i>This section is non-normative.</i>
+</p>
+
+<ol class="org-ol">
+<li>How to compute the winner correctly over ciphertexts while not exposing the bids during the auction?</li>
+<li>How to <i>efficiently</i> execute the auction protocol with multiple participants while the underlying secure circuits mechanically compare bids?</li>
+<li>How to construct a secure auction protocol while allowing</li>
+</ol>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+The “Auction Specification Model” is not normative and is still in a
+heavy editing process.
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Author: Andrew Naguib</p>
+<p class="date">Created: 2024-05-01 Wed 21:48</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
