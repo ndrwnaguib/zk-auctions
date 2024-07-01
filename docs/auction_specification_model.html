@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-05-04 Sat 02:02 -->
+<!-- 2024-07-01 Mon 10:40 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>[[color:navy][_Auction Specification Model v0.1-draft_]]</title>
@@ -930,6 +930,73 @@
                         color:red;
                         text-decoration: none;}
           </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
 <script>
   window.MathJax = {
     tex: {
@@ -973,54 +1040,54 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org35e1721">1. Introduction</a></li>
-<li><a href="#orgc3f46bc">2. What is a zero-knowledge auction?</a></li>
-<li><a href="#orgb91a22a">3. Ecosystem Overview</a>
+<li><a href="#org8fd85a5">1. Introduction</a></li>
+<li><a href="#org13fc8d3">2. What is a zero-knowledge auction?</a></li>
+<li><a href="#org9b6695a">3. Ecosystem Overview</a>
 <ul>
-<li><a href="#org3e6999d">3.1. Bidder</a></li>
-<li><a href="#org27666ec">3.2. Auctioneer (verifier)</a></li>
-<li><a href="#org25c9826">3.3. Bid</a></li>
-<li><a href="#org5ca00e1">3.4. Auction type</a>
+<li><a href="#orgb0cbce6">3.1. Bidder</a></li>
+<li><a href="#org64f3f95">3.2. Auctioneer (verifier)</a></li>
+<li><a href="#orgdd85f6d">3.3. Bid</a></li>
+<li><a href="#org744670c">3.4. Auction type</a>
 <ul>
-<li><a href="#org542aa29">3.4.1. English Auctions</a></li>
-<li><a href="#org80bd91b">3.4.2. Dutch Auctions</a></li>
-<li><a href="#org11eae0a">3.4.3. Sealed-Bid Auctions</a></li>
+<li><a href="#org3599297">3.4.1. English Auctions</a></li>
+<li><a href="#orgd491936">3.4.2. Dutch Auctions</a></li>
+<li><a href="#orge45b262">3.4.3. Sealed-Bid Auctions</a></li>
 </ul>
 </li>
-<li><a href="#org6c5596d">3.5. Assets</a></li>
+<li><a href="#org51de306">3.5. Assets</a></li>
 </ul>
 </li>
-<li><a href="#org9366231">4. Terminology</a>
+<li><a href="#org9ec16aa">4. Terminology</a>
 <ul>
-<li><a href="#org9b8659d">4.1. Bidder</a></li>
-<li><a href="#org5f2b8d9">4.2. Auctioneer (verifier)</a></li>
-<li><a href="#org73aa437">4.3. Bid</a></li>
-<li><a href="#org41c26f6">4.4. Sealed-bid Auction</a></li>
-<li><a href="#org41042cc">4.5. Gas Cost</a></li>
+<li><a href="#org4e6f14a">4.1. Bidder</a></li>
+<li><a href="#orgd96f8f4">4.2. Auctioneer (verifier)</a></li>
+<li><a href="#orgd9de7e8">4.3. Bid</a></li>
+<li><a href="#org3620022">4.4. Sealed-bid Auction</a></li>
+<li><a href="#org15d0c67">4.5. Gas Cost</a></li>
 </ul>
 </li>
-<li><a href="#orgad00360">5. Verification and Validation</a>
+<li><a href="#orgf078617">5. Verification and Validation</a>
 <ul>
-<li><a href="#orgf00cd14">5.1. Identity Validation</a></li>
-<li><a href="#org13f0cc8">5.2. Bid Validation</a></li>
+<li><a href="#org950e6c3">5.1. Identity Validation</a></li>
+<li><a href="#orgb349d70">5.2. Bid Validation</a></li>
 </ul>
 </li>
-<li><a href="#org3cb607b">6. Auction Lifecycle</a>
+<li><a href="#orgf31ce60">6. Auction Lifecycle</a>
 <ul>
-<li><a href="#org9dedac3">6.1. Commitment of bids.</a></li>
-<li><a href="#org7a731ab">6.2. Opening the commitments.</a></li>
-<li><a href="#org4ef412f">6.3. Verification of the winner.</a></li>
-<li><a href="#org1a270f7">6.4. Finalizing the auction.</a></li>
+<li><a href="#orgc129750">6.1. Commitment of bids.</a></li>
+<li><a href="#org84a675f">6.2. Opening the commitments.</a></li>
+<li><a href="#orge9a5404">6.3. Verification of the winner.</a></li>
+<li><a href="#org145fab1">6.4. Finalizing the auction.</a></li>
 </ul>
 </li>
-<li><a href="#org9f9c675">7. Security and Privacy</a>
+<li><a href="#org106480c">7. Security and Privacy</a>
 <ul>
-<li><a href="#orge2f7ebe">7.1. Bidder anonymity</a></li>
-<li><a href="#org67fb5bf">7.2. Secure transactions</a></li>
-<li><a href="#org9064ab5">7.3. Integrity</a></li>
+<li><a href="#orgcf1291f">7.1. Bidder anonymity</a></li>
+<li><a href="#org925aaaf">7.2. Secure transactions</a></li>
+<li><a href="#org4d6ecc8">7.3. Integrity</a></li>
 </ul>
 </li>
-<li><a href="#orgebc1e24">8. Scalability and Efficiency</a></li>
+<li><a href="#orgd077f0c">8. Scalability and Efficiency</a></li>
 </ul>
 </div>
 </div>
@@ -1062,19 +1129,20 @@ Authors:
 
 </details>
 
-<div id="outline-container-org35e1721" class="outline-2">
-<h2 id="org35e1721"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org8fd85a5" class="outline-2">
+<h2 id="org8fd85a5"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <i>This section is non-normative.</i><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
 </p>
 
 <p>
-The Auction Specification Model (ASM) <code>v0.1-draft</code> defines a standardized framework for
-conducting auctions on blockchain platforms, with a particular focus on
-zero-knowledge auctions. Inspired by the principles of transparency, security,
-and privacy, ASM provides a comprehensive blueprint for developers, auctioneers,
-and participants alike to engage in fair and efficient auction processes.
+The Auction Specification Model (ASM) <code>v0.1-draft</code> defines a standardized
+framework for conducting auctions on blockchain platforms, with a particular
+focus on zero-knowledge auctions. Inspired by the principles of transparency,
+security, and privacy, ASM provides a comprehensive blueprint for developers,
+auctioneers, and participants alike to engage in fair and efficient auction
+processes.
 </p>
 
 <p>
@@ -1086,8 +1154,8 @@ participate in auctions while preserving their privacy and anonymity
 </div>
 </div>
 
-<div id="outline-container-orgc3f46bc" class="outline-2">
-<h2 id="orgc3f46bc"><span class="section-number-2">2.</span> What is a zero-knowledge auction?</h2>
+<div id="outline-container-org13fc8d3" class="outline-2">
+<h2 id="org13fc8d3"><span class="section-number-2">2.</span> What is a zero-knowledge auction?</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 <i>This section is non-normative.</i>
@@ -1114,84 +1182,108 @@ maintaining the integrity of the auction process.
 </div>
 </div>
 
-<div id="outline-container-orgb91a22a" class="outline-2">
-<h2 id="orgb91a22a"><span class="section-number-2">3.</span> Ecosystem Overview</h2>
+<div id="outline-container-org9b6695a" class="outline-2">
+<h2 id="org9b6695a"><span class="section-number-2">3.</span> Ecosystem Overview</h2>
 <div class="outline-text-2" id="text-3">
-</div>
-<div id="outline-container-org3e6999d" class="outline-3">
-<h3 id="org3e6999d"><span class="section-number-3">3.1.</span> Bidder</h3>
-</div>
-<div id="outline-container-org27666ec" class="outline-3">
-<h3 id="org27666ec"><span class="section-number-3">3.2.</span> Auctioneer (verifier)</h3>
-</div>
-<div id="outline-container-org25c9826" class="outline-3">
-<h3 id="org25c9826"><span class="section-number-3">3.3.</span> Bid</h3>
-</div>
-<div id="outline-container-org5ca00e1" class="outline-3">
-<h3 id="org5ca00e1"><span class="section-number-3">3.4.</span> Auction type</h3>
-<div class="outline-text-3" id="text-3-4">
-</div>
-<div id="outline-container-org542aa29" class="outline-4">
-<h4 id="org542aa29"><span class="section-number-4">3.4.1.</span> English Auctions</h4>
-</div>
-<div id="outline-container-org80bd91b" class="outline-4">
-<h4 id="org80bd91b"><span class="section-number-4">3.4.2.</span> Dutch Auctions</h4>
-</div>
-<div id="outline-container-org11eae0a" class="outline-4">
-<h4 id="org11eae0a"><span class="section-number-4">3.4.3.</span> Sealed-Bid Auctions</h4>
-<div class="outline-text-4" id="text-3-4-3">
-</div>
-<ol class="org-ol">
-<li><a id="org1ea5d92"></a>First-Price Sealed-Bid Auction<br /></li>
-<li><a id="orgc63282e"></a>Second-Price Sealed-Bid Auction<br /></li>
-</ol>
-</div>
-</div>
-<div id="outline-container-org6c5596d" class="outline-3">
-<h3 id="org6c5596d"><span class="section-number-3">3.5.</span> Assets</h3>
-<div class="outline-text-3" id="text-3-5">
 <p>
 <i>This section is non-normative.</i>
 </p>
 </div>
+
+<div id="outline-container-orgb0cbce6" class="outline-3">
+<h3 id="orgb0cbce6"><span class="section-number-3">3.1.</span> Bidder</h3>
+</div>
+<div id="outline-container-org64f3f95" class="outline-3">
+<h3 id="org64f3f95"><span class="section-number-3">3.2.</span> Auctioneer (verifier)</h3>
+</div>
+<div id="outline-container-orgdd85f6d" class="outline-3">
+<h3 id="orgdd85f6d"><span class="section-number-3">3.3.</span> Bid</h3>
+</div>
+<div id="outline-container-org744670c" class="outline-3">
+<h3 id="org744670c"><span class="section-number-3">3.4.</span> Auction type</h3>
+<div class="outline-text-3" id="text-3-4">
+</div>
+<div id="outline-container-org3599297" class="outline-4">
+<h4 id="org3599297"><span class="section-number-4">3.4.1.</span> English Auctions</h4>
+<div class="outline-text-4" id="text-3-4-1">
+<p>
+<i>Draft: Each bidder broadcasts a commitment (the encrypted bid) to all
+participants including the auctioneer, and using ZK proofs, each bidder verifies
+whether the bid is higher or lower than theirs. If higher, then a bidder who is
+interested in the asset could place a higher one by following the same process.</i>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd491936" class="outline-4">
+<h4 id="orgd491936"><span class="section-number-4">3.4.2.</span> Dutch Auctions</h4>
+<div class="outline-text-4" id="text-3-4-2">
+<p>
+<i>Draft: The auctioneer (or the verifier) repeatedly broadcasts the lowered price
+to the participating bidders until bids are placed.</i>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge45b262" class="outline-4">
+<h4 id="orge45b262"><span class="section-number-4">3.4.3.</span> Sealed-Bid Auctions</h4>
+<div class="outline-text-4" id="text-3-4-3">
+</div>
+<ol class="org-ol">
+<li><a id="orgf6c7ab7"></a>First-Price Sealed-Bid Auction<br /></li>
+<li><a id="org621b721"></a>Second-Price Sealed-Bid Auction<br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org51de306" class="outline-3">
+<h3 id="org51de306"><span class="section-number-3">3.5.</span> Assets</h3>
 </div>
 </div>
 
 
-<div id="outline-container-org9366231" class="outline-2">
-<h2 id="org9366231"><span class="section-number-2">4.</span> Terminology</h2>
+
+
+<div id="outline-container-org9ec16aa" class="outline-2">
+<h2 id="org9ec16aa"><span class="section-number-2">4.</span> Terminology</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 <i>This section is non-normative.</i>
 </p>
 </div>
 
-<div id="outline-container-org9b8659d" class="outline-3">
-<h3 id="org9b8659d"><span class="section-number-3">4.1.</span> Bidder</h3>
+<div id="outline-container-org4e6f14a" class="outline-3">
+<h3 id="org4e6f14a"><span class="section-number-3">4.1.</span> Bidder</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 A participant in an auction who submits bids for items or assets being
 auctioned. Bidders compete with each other by placing bids with the intention of
 acquiring the auctioned item at the best possible price.
 </p>
+
+<p>
+The bidders may engage in the process of deciding the winner by providing ZK
+proofs that said winner's bid in indeed larger or smaller (in case of a
+procurement auction)
+</p>
 </div>
 </div>
 
-<div id="outline-container-org5f2b8d9" class="outline-3">
-<h3 id="org5f2b8d9"><span class="section-number-3">4.2.</span> Auctioneer (verifier)</h3>
+<div id="outline-container-orgd96f8f4" class="outline-3">
+<h3 id="orgd96f8f4"><span class="section-number-3">4.2.</span> Auctioneer (verifier)</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 The entity responsible for overseeing and managing the auction process. The
 auctioneer verifies the validity of bids, ensures compliance with auction rules,
 and ultimately determines the winning bid. In the context of zero-knowledge
 auctions, the auctioneer may also act as a verifier, validating bids without
-gaining knowledge of their content or the identity of the bidders
+gaining knowledge of their content or the identity of the bidders. Moreover, the
+verifier declares the winner of the auction.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org73aa437" class="outline-3">
-<h3 id="org73aa437"><span class="section-number-3">4.3.</span> Bid</h3>
+<div id="outline-container-orgd9de7e8" class="outline-3">
+<h3 id="orgd9de7e8"><span class="section-number-3">4.3.</span> Bid</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 An offer made by a bidder to purchase an item or asset being auctioned. Bids
@@ -1202,8 +1294,8 @@ sealed envelopes in sealed-bid auctions.
 </div>
 </div>
 
-<div id="outline-container-org41c26f6" class="outline-3">
-<h3 id="org41c26f6"><span class="section-number-3">4.4.</span> Sealed-bid Auction</h3>
+<div id="outline-container-org3620022" class="outline-3">
+<h3 id="org3620022"><span class="section-number-3">4.4.</span> Sealed-bid Auction</h3>
 <div class="outline-text-3" id="text-4-4">
 <p>
 An auction format where bidders submit their bids privately without knowledge of
@@ -1215,59 +1307,126 @@ Sealed-Bid auction, wins.
 </div>
 </div>
 
-<div id="outline-container-org41042cc" class="outline-3">
-<h3 id="org41042cc"><span class="section-number-3">4.5.</span> Gas Cost</h3>
+<div id="outline-container-org15d0c67" class="outline-3">
+<h3 id="org15d0c67"><span class="section-number-3">4.5.</span> Gas Cost</h3>
+<div class="outline-text-3" id="text-4-5">
+<p>
+Quoting from (Blass, Erik-Oliver and Kerschbaum, Florian, 2018),
+</p>
+
+<blockquote>
+<p>
+One run of \(\Pi_{\text{strain}}\) requires a total of 4 blocks latency: 1 block
+for suppliers to commit, and then 3 blocks for core comparisons and computation
+of the winning bid.
+</p>
+</blockquote>
 </div>
 </div>
-<div id="outline-container-orgad00360" class="outline-2">
-<h2 id="orgad00360"><span class="section-number-2">5.</span> Verification and Validation</h2>
+</div>
+
+<div id="outline-container-orgf078617" class="outline-2">
+<h2 id="orgf078617"><span class="section-number-2">5.</span> Verification and Validation</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 <i>This section is non-normative.</i>
 </p>
 </div>
 
-<div id="outline-container-orgf00cd14" class="outline-3">
-<h3 id="orgf00cd14"><span class="section-number-3">5.1.</span> Identity Validation</h3>
+<div id="outline-container-org950e6c3" class="outline-3">
+<h3 id="org950e6c3"><span class="section-number-3">5.1.</span> Identity Validation</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+To be discussed in <a href="Proposal.html#MissingReference">&lt;2024-07-01 Mon&gt;</a> meeting&#x2013;it seems to be relevant to some
+work that was recently completed by @0xisk.
+</p>
 </div>
-<div id="outline-container-org13f0cc8" class="outline-3">
-<h3 id="org13f0cc8"><span class="section-number-3">5.2.</span> Bid Validation</h3>
+</div>
+
+<div id="outline-container-orgb349d70" class="outline-3">
+<h3 id="orgb349d70"><span class="section-number-3">5.2.</span> Bid Validation</h3>
 </div>
 </div>
 
 
-<div id="outline-container-org3cb607b" class="outline-2">
-<h2 id="org3cb607b"><span class="section-number-2">6.</span> Auction Lifecycle</h2>
+<div id="outline-container-orgf31ce60" class="outline-2">
+<h2 id="orgf31ce60"><span class="section-number-2">6.</span> Auction Lifecycle</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 <i>This section is non-normative.</i>
 </p>
 </div>
 
-<div id="outline-container-org9dedac3" class="outline-3">
-<h3 id="org9dedac3"><span class="section-number-3">6.1.</span> Commitment of bids.</h3>
+<div id="outline-container-orgc129750" class="outline-3">
+<h3 id="orgc129750"><span class="section-number-3">6.1.</span> Commitment of bids.</h3>
 </div>
-<div id="outline-container-org7a731ab" class="outline-3">
-<h3 id="org7a731ab"><span class="section-number-3">6.2.</span> Opening the commitments.</h3>
+<div id="outline-container-org84a675f" class="outline-3">
+<h3 id="org84a675f"><span class="section-number-3">6.2.</span> Opening the commitments.</h3>
 </div>
-<div id="outline-container-org4ef412f" class="outline-3">
-<h3 id="org4ef412f"><span class="section-number-3">6.3.</span> Verification of the winner.</h3>
+<div id="outline-container-orge9a5404" class="outline-3">
+<h3 id="orge9a5404"><span class="section-number-3">6.3.</span> Verification of the winner.</h3>
 </div>
-<div id="outline-container-org1a270f7" class="outline-3">
-<h3 id="org1a270f7"><span class="section-number-3">6.4.</span> Finalizing the auction.</h3>
+<div id="outline-container-org145fab1" class="outline-3">
+<h3 id="org145fab1"><span class="section-number-3">6.4.</span> Finalizing the auction.</h3>
+<div class="outline-text-3" id="text-6-4">
+<p>
+Quoting from (Blass, Erik-Oliver and Kerschbaum, Florian, 2018),
+</p>
+
+<blockquote>
+<p>
+<b>Ideal Functionality</b>. Our protocol [Strain] emulates a trusted third party TTP that,
+ first, receives all bids from all suppliers. If supplier pseudonymity is
+ required, all participating suppliers \(S_i\) send their bids \(v_i\) via a
+ pseudonymous channel, or else they send it via an authenticated channel. The
+ trusted third party then computes result \(cmp_{i,j}\) of the comparison between
+ each bid. Finally, the trusted third party announces (broadcasts) the results
+ of all comparisons to auctioneer A, each Supplier \(S_i\), and all other
+ participants of the blockchain. Similar to order preserving encryption, this
+ reveals the total order of bids and hence the winner of the auction, but does
+ not reveal the bids themselves.
+</p>
+
+ \begin{align*}
+&\text{for all } S_i \text{ do} \\
+&\quad \text{if Pseudonymity then } S_i \rightarrow \text{TTP}: \mathcal{F}_{\text{Pseu}}(v_i); \text{ else } S_i \rightarrow \text{TTP}: \mathcal{F}_{\text{Auth}}(v_i); \\
+&\text{for } i = 1 \text{ to } s \text{ do} \\
+&\quad \text{for all } j \neq i \text{ do} \\
+&\quad \quad \text{TTP}: \text{Let } \text{cmp}_{i,j} = 1, \text{ if } v_i > v_j \text{ and } \text{cmp}_{i,j} = 0 \text{ otherwise;} \\
+&\quad \text{end for} \\
+&\text{end for} \\
+&\text{TTP} \rightarrow \{A, S_1, \ldots, S_s\}: \mathcal{F}_{\text{BC}}(\{\text{cmp}_{i,j} \mid \forall i, j \in \{1, \ldots, s\}\}); \\
+&\text{TTP} \rightarrow A: \{v_w \mid v_w = \min(v_1, \ldots, v_s)\};
+\end{align*}
+</blockquote>
+
+<p>
+The only difference to our settings is that we would use the \(\max\) function
+instead in the last step.
+</p>
+
+<blockquote>
+<p>
+Imagine that, at some point, \(A\) announces a new auction and uploads a smart
+contract to the blockchain. The smart contract is very simple and allows parties
+to comfortably exchange messages as mentioned before. The contract is signed by
+\(sk_A\), so everybody understands that this is a valid procurement auction
+</p>
+</blockquote>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org9f9c675" class="outline-2">
-<h2 id="org9f9c675"><span class="section-number-2">7.</span> Security and Privacy</h2>
+<div id="outline-container-org106480c" class="outline-2">
+<h2 id="org106480c"><span class="section-number-2">7.</span> Security and Privacy</h2>
 <div class="outline-text-2" id="text-7">
 <p>
-<i>This section is non-normative.</i>
+. <i>This section is non-normative.</i>
 </p>
 </div>
 
-<div id="outline-container-orge2f7ebe" class="outline-3">
-<h3 id="orge2f7ebe"><span class="section-number-3">7.1.</span> Bidder anonymity</h3>
+<div id="outline-container-orgcf1291f" class="outline-3">
+<h3 id="orgcf1291f"><span class="section-number-3">7.1.</span> Bidder anonymity</h3>
 <div class="outline-text-3" id="text-7-1">
 <p>
 The identity of bidders must remain unknown and the specifics of their bids are
@@ -1278,11 +1437,12 @@ art/collectibles, etc.).
 </div>
 </div>
 
-<div id="outline-container-org67fb5bf" class="outline-3">
-<h3 id="org67fb5bf"><span class="section-number-3">7.2.</span> Secure transactions</h3>
+<div id="outline-container-org925aaaf" class="outline-3">
+<h3 id="org925aaaf"><span class="section-number-3">7.2.</span> Secure transactions</h3>
 <div class="outline-text-3" id="text-7-2">
 <p>
-Ensuring the integrity of the auction process as well as protecting against fraud. Questions to be answered:
+Ensuring the integrity of the auction process as well as protecting against
+fraud. Questions to be answered:
 </p>
 
 <ul class="org-ul">
@@ -1294,12 +1454,13 @@ that such a responsibility is delegated to third-party tools.</li>
 </div>
 </div>
 
-<div id="outline-container-org9064ab5" class="outline-3">
-<h3 id="org9064ab5"><span class="section-number-3">7.3.</span> Integrity</h3>
+<div id="outline-container-org4d6ecc8" class="outline-3">
+<h3 id="org4d6ecc8"><span class="section-number-3">7.3.</span> Integrity</h3>
 <div class="outline-text-3" id="text-7-3">
 <p>
 The system must provide a proof that the some bid has won without revealing its value.
 </p>
+
 <ul class="org-ul">
 <li>Revealing the winning bid is an sensitive information. It shows the
 valuation of item \(i\) by the bidder \(j\). While it may not impact the
@@ -1310,17 +1471,18 @@ auction at time \(t\), it could still be abused in an auction at time \(t +
 </div>
 </div>
 
-<div id="outline-container-orgebc1e24" class="outline-2">
-<h2 id="orgebc1e24"><span class="section-number-2">8.</span> Scalability and Efficiency</h2>
+<div id="outline-container-orgd077f0c" class="outline-2">
+<h2 id="orgd077f0c"><span class="section-number-2">8.</span> Scalability and Efficiency</h2>
 <div class="outline-text-2" id="text-8">
 <p>
 <i>This section is non-normative.</i>
 </p>
 
 <ol class="org-ol">
-<li>How to compute the winner correctly over ciphertexts while not exposing the bids during the auction?</li>
-<li>How to <i>efficiently</i> execute the auction protocol with multiple participants while the underlying secure circuits mechanically compare bids?</li>
-<li>How to construct a secure auction protocol while allowing</li>
+<li>How to compute the winner correctly over ciphertexts while not exposing the
+bids during the auction?</li>
+<li>How to <i>efficiently</i> execute the auction protocol with multiple participants
+while the underlying secure circuits mechanically compare bids?</li>
 </ol>
 </div>
 </div>
@@ -1338,7 +1500,7 @@ heavy editing process.
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Andrew Naguib</p>
-<p class="date">Created: 2024-05-04 Sat 02:02</p>
+<p class="date">Created: 2024-07-01 Mon 10:40</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
