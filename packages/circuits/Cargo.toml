@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.81"
 env_logger = "=0.10"
 serde = { version = "=1.0", default-features = false, features = ["derive"] }
 serde_json = "=1.0"
@@ -13,12 +14,14 @@ rand = "=0.8"
 clap = { version = "=4.0", features = ["derive"] }
 clap-num = "=1.0.2"
 cli = { path = "../cli" }
+probabilistic-encryption = { path = "../probabilistic-encryption" }
+num-bigint = "0.4.4"
 
 # halo2
-halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v2023_02_02" }
-
-# Axiom's helper API with basic functions
-halo2-base = { git = "https://github.com/axiom-crypto/halo2-lib", branch = "community-edition" }
+halo2-ecc = { version = "0.4.1", default-features = false, features = ["halo2-axiom"] }
+halo2-base = { version = "0.4.1", default-features = false, features = ["halo2-axiom"] }
+halo2-wasm = { version = "0.3.4" }
+wasm-bindgen = "0.2.89"
 snark-verifier-sdk = { git = "https://github.com/axiom-crypto/snark-verifier.git", branch = "community-edition" }
 
 [dev-dependencies]
