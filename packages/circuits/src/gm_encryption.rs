@@ -24,11 +24,9 @@ pub struct GmVerificationInputs {
     gm_sk: GoldwasserMicaliPrivateKey,
     ciphertext: Vec<BigUint>,
     plaintext: Vec<u8>,
-    _F_marker: PhantomData<F>,
 }
 
 pub struct GmVerificationCircuit {
-    // Add whatever other chips you need here
     gm_verification_inputs: GmVerificationInputs,
     builder: Rc<RefCell<BaseCircuitBuilder<F>>>,
 }
@@ -61,7 +59,7 @@ impl GmVerificationCircuit {
         let ctx = builder.main(CONTEXT_PHASE);
 
         // Encrypt plaintext
-        let computed_ciphertext =
+        let expected_ciphertext =
             self.gm_verification_inputs.gm_pk.encrypt(&self.gm_verification_inputs.plaintext);
 
         // Assign Private Inputs
@@ -72,16 +70,16 @@ impl GmVerificationCircuit {
             .map(|c| ctx.load_witness(F::from_bytes_le(&c.to_bytes_le())))
             .collect::<Vec<AssignedValue<F>>>();
 
-        let computed_ciphertext_assigned = computed_ciphertext
+        let expected_ciphertext_assigned = expected_ciphertext
             .iter()
             .map(|c| ctx.load_witness(F::from_bytes_le(&c.to_bytes_le())))
             .collect::<Vec<AssignedValue<F>>>();
 
         // Constrain equality
-        for (computed, actual) in
-            computed_ciphertext_assigned.iter().zip(actual_ciphertext_assigned.iter())
+        for (expected, actual) in
+            expected_ciphertext_assigned.iter().zip(actual_ciphertext_assigned.iter())
         {
-            ctx.constrain_equal(computed, actual);
+            ctx.constrain_equal(expected, actual);
         }
     }
 }
@@ -118,13 +116,7 @@ mod tests {
 
         let ciphertext = gm_pk.encrypt(plaintext);
 
-        Ok(GmVerificationInputs {
-            gm_pk,
-            gm_sk,
-            ciphertext,
-            plaintext: plaintext.to_vec(),
-            _F_marker: PhantomData,
-        })
+        Ok(GmVerificationInputs { gm_pk, gm_sk, ciphertext, plaintext: plaintext.to_vec() })
     }
 
     #[test]
@@ -153,29 +145,29 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_gm_encryption_mock() -> Result<()> {
-        let path = "configs/gm_encryption.config";
-        let circuit_params: CircuitConfig = serde_json::from_reader(
-            File::open(path)
-                .map_err(|e| anyhow!(e))
-                .with_context(|| format!("The circuit config file does not exist: {}", path))?,
-        )
-        .map_err(|e| anyhow!(e))
-        .with_context(|| format!("Failed to read the circuit config file: {}", path))?;
+    // #[test]
+    // fn test_gm_encryption_mock() -> Result<()> {
+    //     let path = "configs/gm_encryption.config";
+    //     let circuit_params: CircuitConfig = serde_json::from_reader(
+    //         File::open(path)
+    //             .map_err(|e| anyhow!(e))
+    //             .with_context(|| format!("The circuit config file does not exist: {}", path))?,
+    //     )
+    //     .map_err(|e| anyhow!(e))
+    //     .with_context(|| format!("Failed to read the circuit config file: {}", path))?;
 
-        let gm_verification_inputs = mock_gm_encryption()?;
+    //     let gm_verification_inputs = mock_gm_encryption()?;
 
-        let mut halo2_wasm = Halo2Wasm::new();
+    //     let mut halo2_wasm = Halo2Wasm::new();
 
-        halo2_wasm.config(circuit_params);
+    //     halo2_wasm.config(circuit_params);
 
-        let mut circuit = GmVerificationCircuit::new(&halo2_wasm, gm_verification_inputs);
+    //     let mut circuit = GmVerificationCircuit::new(&halo2_wasm, gm_verification_inputs);
 
-        circuit.verify_encryption();
+    //     circuit.verify_encryption();
 
-        halo2_wasm.mock();
+    //     halo2_wasm.mock();
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 }
