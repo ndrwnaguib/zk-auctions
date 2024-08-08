@@ -1,10 +1,10 @@
 #![allow(non_snake_case)]
 use halo2_base::gates::circuit::builder::BaseCircuitBuilder;
-use halo2_base::gates::flex_gate::{GateChip, GateInstructions};
-use halo2_base::halo2_proofs::halo2curves::bn256::{self, Fr};
-use halo2_base::utils::{BigPrimeField, ScalarField};
+
+use halo2_base::halo2_proofs::halo2curves::bn256::{self};
+use halo2_base::utils::{ScalarField};
 use halo2_base::AssignedValue;
-use halo2_ecc::bn254;
+
 use halo2_wasm::Halo2Wasm;
 use num_bigint::BigUint;
 use probabilistic_encryption::goldwasser_micali::{
@@ -12,7 +12,7 @@ use probabilistic_encryption::goldwasser_micali::{
 };
 use probabilistic_encryption::key::{PrivateKey, PublicKey};
 use std::cell::RefCell;
-use std::marker::PhantomData;
+
 use std::rc::Rc;
 
 use crate::consts::CONTEXT_PHASE;
@@ -86,7 +86,7 @@ impl GmVerificationCircuit {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs::File, marker::PhantomData};
+    use std::{fs::File};
 
     use anyhow::{anyhow, Context, Ok, Result};
     use halo2_ecc::fields::FpStrategy;

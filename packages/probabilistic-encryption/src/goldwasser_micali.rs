@@ -92,7 +92,7 @@ impl PrivateKey for GoldwasserMicaliPrivateKey {
         let mut bits: BitVec<Msb0, u8> = BitVec::with_capacity(ciphertext.len());
 
         for c in ciphertext {
-            let m = match number::jacobi_symbol(&c, &self.p) {
+            let m = match number::jacobi_symbol(c, &self.p) {
                 number::JacobiSymbol::One => false,
                 _ => true,
             };
@@ -168,8 +168,8 @@ fn generate_primes(p_bits: u64, q_bits: u64) -> (BigUint, BigUint) {
 ///
 /// See remark 8.54 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
 fn find_pseudosquare_mod(p: &BigUint, q: &BigUint) -> Option<BigUint> {
-    let a = find_quadratic_nonresidue_mod(&p);
-    let b = find_quadratic_nonresidue_mod(&q);
+    let a = find_quadratic_nonresidue_mod(p);
+    let b = find_quadratic_nonresidue_mod(q);
 
     let crt = vec![(&a, p), (&b, q)];
     number::gauss_algorithm_for_crt(&crt)
@@ -188,9 +188,9 @@ fn find_quadratic_nonresidue_mod(n: &BigUint) -> BigUint {
     let mut rng = thread_rng();
 
     loop {
-        let a = rng.gen_biguint_range(&BigUint::one(), &n);
+        let a = rng.gen_biguint_range(&BigUint::one(), n);
 
-        match number::jacobi_symbol(&a, &n) {
+        match number::jacobi_symbol(&a, n) {
             number::JacobiSymbol::MinusOne => break a,
             _ => continue,
         }

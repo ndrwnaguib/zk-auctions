@@ -16,7 +16,7 @@ fn main() {
         }
         Err(err) => {
             eprintln!("{}", err);
-            panic!(err)
+            std::panic::panic_any(err)
         }
     };
 }

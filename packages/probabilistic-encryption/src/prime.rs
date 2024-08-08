@@ -29,12 +29,10 @@ pub fn is_probably_prime(n: &BigUint) -> bool {
         _ => {
             if is_multiple_of_prime_under_3000(n) {
                 false
+            } else if fermat_primality_test(50usize, n) {
+                miller_rabin_primality_test(30usize, n)
             } else {
-                if fermat_primality_test(50usize, n) {
-                    miller_rabin_primality_test(30usize, &n)
-                } else {
-                    false
-                }
+                false
             }
         }
     }
@@ -135,7 +133,7 @@ fn miller_rabin_primality_test(iterations: usize, n: &BigUint) -> bool {
 
         while !y.is_one() && y != high {
             let mut j = 1u64;
-            while j <= pw - 1 && y != high {
+            while j < pw && y != high {
                 y = y.modpow(&two, n);
                 if y.is_one() {
                     return false;

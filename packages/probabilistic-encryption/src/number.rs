@@ -34,7 +34,7 @@ pub fn as_power_of_two_and_odd(n: &BigUint) -> (u64, BigUint) {
 
         while m.is_even() {
             m = m.div_floor(&two);
-            pw = pw + 1;
+            pw += 1;
         }
 
         (pw, m)
@@ -164,7 +164,7 @@ pub fn jacobi_symbol(a: &BigUint, n: &BigUint) -> JacobiSymbol {
             1
         } else {
             let mut s;
-            let (e, a1) = as_power_of_two_and_odd(&a);
+            let (e, a1) = as_power_of_two_and_odd(a);
             if e.is_even() {
                 s = 1;
             } else {

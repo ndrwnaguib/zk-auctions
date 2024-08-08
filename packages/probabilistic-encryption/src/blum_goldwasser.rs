@@ -64,8 +64,8 @@ impl PublicKey for BlumGoldwasserPublicKey {
         let mut ciphertext = Vec::with_capacity(8 * plaintext.len());
         let bits = BitVec::<Msb0, u8>::from_vec(plaintext.to_vec());
 
-        let mut chunks = bits.chunks(h);
-        while let Some(chunk) = chunks.next() {
+        let chunks = bits.chunks(h);
+        for chunk in chunks {
             x = x.modpow(&two, &self.n);
             let p = &x & &mask;
             let m = to_biguint(chunk);
@@ -233,7 +233,7 @@ fn generate_primes(p_bits: u64, q_bits: u64) -> (BigUint, BigUint) {
 /// See algorithm 8.55 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
 fn find_quadratic_residue_mod(n: &BigUint) -> BigUint {
     let mut rng = thread_rng();
-    let r = rng.gen_biguint_range(&BigUint::one(), &n);
+    let r = rng.gen_biguint_range(&BigUint::one(), n);
     r.modpow(&BigUint::from(2usize), n)
 }
 
