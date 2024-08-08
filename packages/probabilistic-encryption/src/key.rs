@@ -1,4 +1,4 @@
-use num_bigint::{BigUint};
+use num_bigint::BigUint;
 
 /// Generic trait for operations on a public key.
 pub trait PublicKey {

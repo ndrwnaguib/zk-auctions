@@ -1,8 +1,8 @@
 extern crate probabilistic_encryption;
 
-use std::str;
 use probabilistic_encryption::blum_goldwasser;
-use probabilistic_encryption::key::{PublicKey, PrivateKey};
+use probabilistic_encryption::key::{PrivateKey, PublicKey};
+use std::str;
 
 fn main() {
     let plaintext = b"hello world";
@@ -11,9 +11,9 @@ fn main() {
         Ok((public_key, private_key)) => {
             let cyphertext = public_key.encrypt(plaintext);
             let decrypted_plaintext = private_key.decrypt(&cyphertext);
-            
+
             println!("{}", str::from_utf8(&decrypted_plaintext).unwrap());
-        },
+        }
         Err(err) => {
             eprintln!("{}", err);
             panic!(err)
