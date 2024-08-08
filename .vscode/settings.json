@@ -4,6 +4,6 @@
         "ciphertext",
         "Goldwasser",
         "Micali",
-        "probabilisticpubkey"
+        "probabilistic-encryption"
     ]
 }

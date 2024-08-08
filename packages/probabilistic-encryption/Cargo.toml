@@ -3,7 +3,7 @@ name = "probabilistic-encryption"
 version = "0.1.0"
 authors = ["Carlos Rodriguez-Vega <crodveg@yahoo.es>"]
 edition = "2018"
-src = "https://github.com/crodriguezvega/probabilisticpubkey?tab=readme-ov-file"
+src = "https://github.com/crodriguezvega/probabilistic-encryption?tab=readme-ov-file"
 
 [dependencies]
 bitvec = "0.20"

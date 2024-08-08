@@ -10,7 +10,7 @@ use num_traits::{One, Zero};
 /// # extern crate num_bigint;
 /// # fn main() {
 /// use num_bigint::BigUint;
-/// use probabilisticpubkey::number;
+/// use probabilistic_encryption::number;
 ///
 /// assert_eq!(number::as_power_of_two_and_odd(&BigUint::from(256usize)), (8, BigUint::from(1usize)));
 /// assert_eq!(number::as_power_of_two_and_odd(&BigUint::from(137usize)), (0, BigUint::from(137usize)));
@@ -67,7 +67,7 @@ fn is_power_of_two(n: &BigUint) -> bool {
 /// # extern crate num_bigint;
 /// # fn main() {
 /// use num_bigint::{BigUint, BigInt};
-/// use probabilisticpubkey::number;
+/// use probabilistic_encryption::number;
 ///
 /// let a = BigUint::from(73usize);
 /// let b = BigUint::from(56usize);
@@ -143,7 +143,7 @@ pub enum JacobiSymbol {
 /// # extern crate num_bigint;
 /// # fn main() {
 /// use num_bigint::BigUint;
-/// use probabilisticpubkey::number;
+/// use probabilistic_encryption::number;
 ///
 /// let a = BigUint::from(256usize);
 /// let n = BigUint::from(4211usize);
@@ -220,7 +220,7 @@ pub fn jacobi_symbol(a: &BigUint, n: &BigUint) -> JacobiSymbol {
 /// # extern crate num_bigint;
 /// # fn main() {
 /// use num_bigint::BigUint;
-/// use probabilisticpubkey::number;
+/// use probabilistic_encryption::number;
 ///
 /// let a1 = BigUint::from(128usize);
 /// let n1 = BigUint::from(3253usize);

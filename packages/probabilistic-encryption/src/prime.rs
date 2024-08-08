@@ -17,7 +17,7 @@ use rand::thread_rng;
 /// # extern crate num_bigint;
 /// # fn main() {
 /// use num_bigint::BigUint;
-/// use probabilisticpubkey::prime;
+/// use probabilistic_encryption::prime;
 ///
 /// assert_eq!(prime::is_probably_prime(&BigUint::from(128usize)), false);
 /// assert_eq!(prime::is_probably_prime(&BigUint::from(2969usize)), true);

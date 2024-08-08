@@ -1,6 +1,6 @@
 //! # Probabilistic publick-key cryptography
 //!
-//! `probabilisticpubkey` consists of implementations for the Goldwasser-Micali
+//! `probabilistic-encryption` consists of implementations for the Goldwasser-Micali
 //! and Blum-Goldwasser probabilistic public-key systems.
 
 extern crate bitvec;
