@@ -92,10 +92,7 @@ impl PrivateKey for GoldwasserMicaliPrivateKey {
         let mut bits: BitVec<Msb0, u8> = BitVec::with_capacity(ciphertext.len());
 
         for c in ciphertext {
-            let m = match number::jacobi_symbol(c, &self.p) {
-                number::JacobiSymbol::One => false,
-                _ => true,
-            };
+            let m = !matches!(number::jacobi_symbol(c, &self.p), number::JacobiSymbol::One);
             bits.push(m);
         }
         let plaintext: Vec<u8> = bits.into();

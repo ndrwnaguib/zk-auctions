@@ -2,7 +2,7 @@
 use halo2_base::gates::circuit::builder::BaseCircuitBuilder;
 
 use halo2_base::halo2_proofs::halo2curves::bn256::{self};
-use halo2_base::utils::{ScalarField};
+use halo2_base::utils::ScalarField;
 use halo2_base::AssignedValue;
 
 use halo2_wasm::Halo2Wasm;
@@ -86,7 +86,7 @@ impl GmVerificationCircuit {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs::File};
+    use std::fs::File;
 
     use anyhow::{anyhow, Context, Ok, Result};
     use halo2_ecc::fields::FpStrategy;

@@ -1,2 +1,2 @@
 pub(crate) mod consts;
-mod gm_encryption;
+pub mod gm_encryption;
