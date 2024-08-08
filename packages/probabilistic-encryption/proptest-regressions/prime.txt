@@ -1,0 +1,22 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+xs 3883105507 239323232 2959776356 1896467332 # shrinks to iterations = 10, i = 0
+xs 2594834531 571313627 2866167041 1590635620 # shrinks to iterations = 52, i = 28
+xs 14394513 3099133408 3215833022 537863826 # shrinks to iterations = 23, i = 0
+xs 3181324687 3085020776 641082570 1764339680 # shrinks to iterations = 10, n = 0
+xs 1498937384 2251397969 2091668562 3497940981 # shrinks to iterations = 10, (n, is_prime) = (3, true)
+xs 52008840 431110301 3585653857 1181668330 # shrinks to size = 6
+xs 4245440922 1975550976 368857769 3904572993 # shrinks to size = 6
+xs 2528309683 3369101629 754671189 1342026648 # shrinks to size = 6
+xs 4158573963 1018046946 4020036413 1832401247 # shrinks to size = 12
+xs 1170632718 2200684548 1260829737 2763942456 # shrinks to bit_size = 8
+xs 2392426587 2434034417 3590457138 1568400100 # shrinks to bit_size = 15
+xs 1486807814 119056748 3742107053 1790011485 # shrinks to bit_size = 6
+xs 2466660213 3923946498 3897938244 1294799756 # shrinks to bit_size = 9
+xs 1838445630 91945583 2275137215 445371072 # shrinks to bit_size = 6
+xs 779734217 1632605702 1881987310 4033238364 # shrinks to bit_size = 8
+xs 888236702 2390797935 697900316 856836150 # shrinks to bit_size = 6
