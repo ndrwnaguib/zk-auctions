@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-06 Tue 11:06 -->
+<!-- 2024-08-27 Tue 10:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ZK-Auctions Toolkit Grant Proposal and Progress Tracking</title>
@@ -396,6 +396,1011 @@
                         text-decoration: none;}
           </style>
           
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
+          <style>
+          /* From: https://endlessparentheses.com/public/css/endless.css */
+          /* See also: https://meta.superuser.com/questions/4788/css-for-the-new-kbd-style */
+          kbd
+          {
+            -moz-border-radius: 6px;
+            -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            -webkit-border-radius: 6px;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+            color: #333;
+            display: inline-block;
+            font-family: 'Droid Sans Mono', monospace;
+            font-size: 80%;
+            font-weight: normal;
+            line-height: inherit;
+            margin: 0 .1em;
+            padding: .08em .4em;
+            text-shadow: 0 1px 0 #fff;
+            word-spacing: -4px;
+        
+            box-shadow: 2px 2px 2px #222; /* MA: An extra I've added. */
+          }
+          </style>
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/tooltipster.bundle.min.css"/>
+        
+          <link rel="stylesheet" type="text/css" href="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-punk.min.css" />
+        
+          <script type="text/javascript">
+              if (typeof jQuery == 'undefined') {
+                  document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-1.10.0.min.js"%3E%3C/script%3E'));
+              }
+          </script>
+        
+           <script type="text/javascript"            src="https://alhassy.github.io/org-special-block-extras/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        
+            <script>
+                   $(document).ready(function() {
+                       $('.tooltip').tooltipster({
+                           theme: 'tooltipster-punk',
+                           contentAsHTML: true,
+                           animation: 'grow',
+                           delay: [100,500],
+                           // trigger: 'click'
+                           trigger: 'custom',
+                           triggerOpen: {
+                               mouseenter: true
+                           },
+                           triggerClose: {
+                               originClick: true,
+                               scroll: true
+                           }
+           });
+                   });
+               </script>
+        
+          <style>
+             abbr {color: red;}
+        
+             .tooltip { border-bottom: 1px dotted #000;
+                        color:red;
+                        text-decoration: none;}
+          </style>
+          
 <script src="https://orgmode.org/org-info.js">
 // @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&amp;dn=gpl-3.0.txt GPL-v3-or-Later
 // @license-end
@@ -455,97 +1460,110 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org9c6da19">1. Project Overview</a>
+<li><a href="#orgd4b29b6">1. Project Overview</a>
 <ul>
-<li><a href="#orge54e5f5">1.1. Overview</a></li>
-<li><a href="#org851a679">1.2. Short Rationale</a></li>
-<li><a href="#org0d7ce39">1.3. Project Details and Motivation </a>
+<li><a href="#orgbc0bbf2">1.1. Overview</a></li>
+<li><a href="#org2685a5b">1.2. Short Rationale</a></li>
+<li><a href="#orgb28ec7a">1.3. Project Details and Motivation </a>
 <ul>
-<li><a href="#orgf6cb425">1.3.1. Backend</a></li>
+<li><a href="#org6bd6eec">1.3.1. Backend</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgc455456">2. Team</a>
+<li><a href="#orgda31fd7">2. Team</a>
 <ul>
-<li><a href="#org1e842cb">2.1. Team members</a></li>
-<li><a href="#orgdf3264f">2.2. Team Code Repos</a></li>
+<li><a href="#org5b6db8f">2.1. Team members</a></li>
+<li><a href="#orgd9f74c2">2.2. Team Code Repos</a></li>
 </ul>
 </li>
-<li><a href="#orgf87081d">3. Development Roadmap</a>
+<li><a href="#org08098d8">3. Development Roadmap</a>
 <ul>
-<li><a href="#org9ce0005">3.1. Milestone 1: Research, Proof-sketching, and Algorithm Design </a>
+<li><a href="#orgaca1ed7">3.1. Milestone 1: Research, Proof-sketching, and Algorithm Design </a>
 <ul>
-<li><a href="#orgf17dc75">3.1.1. Objectives</a></li>
+<li><a href="#org1020fa1">3.1.1. Objectives</a></li>
 </ul>
 </li>
-<li><a href="#orgb038df2">3.2. <span class="done DONE">DONE</span> Milestone 1 Tasks (2-month period) <code>[4/4]</code></a>
+<li><a href="#org068e77d">3.2. <span class="done DONE">DONE</span> Milestone 1 Tasks (2-month period) <code>[4/4]</code></a>
 <ul>
-<li><a href="#orge302114">3.2.1. <span class="done DONE">DONE</span> Milestone 1: (Sprint 1) <code>[2/2]</code></a>
+<li><a href="#org1fe0d83">3.2.1. <span class="done DONE">DONE</span> Milestone 1: (Sprint 1) <code>[2/2]</code></a>
 <ul>
-<li><a href="#org9ad3048">3.2.1.1. <span class="done DONE">DONE</span> Milestone 1: Research</a>
+<li><a href="#org8ce0384">3.2.1.1. <span class="done DONE">DONE</span> Milestone 1: Research</a>
 <ul>
-<li><a href="#orgb6f26b2">3.2.1.1.1. In (Galal, Hisham S. and Youssef, Amr M., 2019),</a></li>
-<li><a href="#org5586ff8">3.2.1.1.2. \(\star\) In (Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Hao and Zhu, Liehuang and Liu, Yong and Liu, Jiamou and Khoussainov, Bakh, 2024),</a></li>
-<li><a href="#orgf94b4a2">3.2.1.1.3. \(\star\) In (Blass, Erik-Oliver and Kerschbaum, Florian, 2018) ,</a></li>
+<li><a href="#orgfde506a">3.2.1.1.1. In (Galal, Hisham S. and Youssef, Amr M., 2019),</a></li>
+<li><a href="#org4102239">3.2.1.1.2. \(\star\) In (Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Hao and Zhu, Liehuang and Liu, Yong and Liu, Jiamou and Khoussainov, Bakh, 2024),</a></li>
+<li><a href="#org7fcc4a9">3.2.1.1.3. \(\star\) In (Blass, Erik-Oliver and Kerschbaum, Florian, 2018) ,</a></li>
 </ul>
 </li>
-<li><a href="#orgbbb2a6e">3.2.1.2. Questions</a></li>
-<li><a href="#org8eacbc2">3.2.1.3. <span class="done DONE">DONE</span> Milestone 1: Development environment setup</a></li>
+<li><a href="#org2327c80">3.2.1.2. Questions</a></li>
+<li><a href="#org4fae80b">3.2.1.3. <span class="done DONE">DONE</span> Milestone 1: Development environment setup</a></li>
 </ul>
 </li>
-<li><a href="#org7d02926">3.2.2. <span class="done DONE">DONE</span> Milestone 1: (Sprint 2) <code>[2/2]</code></a>
+<li><a href="#orgc356a03">3.2.2. <span class="done DONE">DONE</span> Milestone 1: (Sprint 2) <code>[2/2]</code></a>
 <ul>
-<li><a href="#orgaba6cce">3.2.2.1. <span class="done DONE">DONE</span> Milestone 1: (Sprint 2): Technical specification</a></li>
-<li><a href="#org01e5298">3.2.2.2. <span class="done DONE">DONE</span> Milestone 1: (Sprint 2): Test suite development</a></li>
+<li><a href="#org701ed58">3.2.2.1. <span class="done DONE">DONE</span> Milestone 1: (Sprint 2): Technical specification</a></li>
+<li><a href="#orga43371a">3.2.2.2. <span class="done DONE">DONE</span> Milestone 1: (Sprint 2): Test suite development</a></li>
 </ul>
 </li>
-<li><a href="#org394da93">3.2.3. <span class="done DONE">DONE</span> Milestone 1: (Sprint 3) <code>[2/2]</code></a>
+<li><a href="#org2c9f42b">3.2.3. <span class="done DONE">DONE</span> Milestone 1: (Sprint 3) <code>[2/2]</code></a>
 <ul>
-<li><a href="#org77ffdda">3.2.3.1. <span class="done DONE">DONE</span> Milestone 1: (Sprint 3): Test suite development (cont'd) </a></li>
-<li><a href="#orgfe20a28">3.2.3.2. <span class="done DONE">DONE</span> Milestone1 1: (Sprint 3): Sketching the Pseudo-code</a></li>
+<li><a href="#org5ab0024">3.2.3.1. <span class="done DONE">DONE</span> Milestone 1: (Sprint 3): Test suite development (cont'd) </a></li>
+<li><a href="#orgf6f1b4e">3.2.3.2. <span class="done DONE">DONE</span> Milestone1 1: (Sprint 3): Sketching the Pseudo-code</a></li>
 </ul>
 </li>
-<li><a href="#org503d9eb">3.2.4. <span class="done DONE">DONE</span> Milestone 1: (Sprint 4) <code>[0/0]</code></a></li>
-<li><a href="#org22359f3">3.2.5. Logistics</a></li>
+<li><a href="#org71ceddc">3.2.4. <span class="done DONE">DONE</span> Milestone 1: (Sprint 4) <code>[0/0]</code></a></li>
+<li><a href="#org7e17347">3.2.5. Logistics</a></li>
 </ul>
 </li>
-<li><a href="#org1e89ae9">3.3. Milestone 2: Development </a>
+<li><a href="#org36a162a">3.3. Milestone 2: Development </a>
 <ul>
-<li><a href="#org5f6d828">3.3.1. Objectives</a></li>
-<li><a href="#orgd3b7e35">3.3.2. Tasks</a></li>
-<li><a href="#org2e70513">3.3.3. Logistics</a></li>
+<li><a href="#org1398b9f">3.3.1. Objectives</a></li>
+<li><a href="#org98dd37a">3.3.2. Tasks</a></li>
+<li><a href="#orgddacf9b">3.3.3. Logistics</a></li>
 </ul>
 </li>
-<li><a href="#org893f4f8">3.4. Milestone 3: Optimization, Testing, and Documentation</a>
+<li><a href="#orged6fdcc">3.4. Milestone 3: Optimization, Testing, and Documentation</a>
 <ul>
-<li><a href="#org2868040">3.4.1. Objectives</a></li>
-<li><a href="#orgf332703">3.4.2. Tasks</a></li>
-<li><a href="#org7fee273">3.4.3. Logistics</a></li>
+<li><a href="#org26a2eb6">3.4.1. Objectives</a></li>
+<li><a href="#orgf3462db">3.4.2. Tasks</a></li>
+<li><a href="#org044000d">3.4.3. Logistics</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgf98c6cd">4. Additional Information</a>
+<li><a href="#orge3bcbd9">4. Additional Information</a>
 <ul>
-<li><a href="#orgb193195">4.1. Meetings</a>
+<li><a href="#org06390cf">4.1. Meetings</a>
 <ul>
-<li><a href="#org033aa35">4.1.1. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span></a></li>
-<li><a href="#orga240e98">4.1.2. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></a></li>
-<li><a href="#orgf5c7b5d">4.1.3. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span></a></li>
-<li><a href="#org830be05">4.1.4. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-31 Sun&gt;</span></span></a></li>
-<li><a href="#org35401e1">4.1.5. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-04-28 Sun&gt;</span></span></a></li>
-<li><a href="#orgac0dae5">4.1.6. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-01 Mon&gt;</span></span></a></li>
-<li><a href="#org821c801">4.1.7. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-16 Tue&gt;</span></span></a></li>
-<li><a href="#org717cc3a">4.1.8. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-30 Tue&gt;</span></span></a></li>
-<li><a href="#org991cfe0">4.1.9. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-08-06 Tue&gt;</span></span></a></li>
+<li><a href="#org2e0f259">4.1.1. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span></a></li>
+<li><a href="#org9753ff9">4.1.2. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></a></li>
+<li><a href="#orgeeb8d32">4.1.3. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span></a></li>
+<li><a href="#org40aa36a">4.1.4. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-31 Sun&gt;</span></span></a></li>
+<li><a href="#org40c5105">4.1.5. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-04-28 Sun&gt;</span></span></a></li>
+<li><a href="#orgf187473">4.1.6. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-01 Mon&gt;</span></span></a></li>
+<li><a href="#orgf098eb0">4.1.7. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-16 Tue&gt;</span></span></a></li>
+<li><a href="#org345cf51">4.1.8. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-30 Tue&gt;</span></span></a></li>
+<li><a href="#orga526bfa">4.1.9. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-08-06 Tue&gt;</span></span></a></li>
+<li><a href="#orgec299a8">4.1.10. <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-08-22 Thu&gt;</span></span></a></li>
 </ul>
 </li>
-<li><a href="#orgd68ef4f">4.2. Resources</a></li>
-<li><a href="#org34e0286">4.3. Technical Notes</a></li>
 </ul>
 </li>
-<li><a href="#orgcf9e9ec">5. Bibliography</a></li>
+<li><a href="#org47b579f">5. Future Work</a>
+<ul>
+<li><a href="#org163a366">5.1. Strain</a>
+<ul>
+<li><a href="#orgb95bc10">5.1.1. Preparation of Pseudonyms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgf03ce55">6. Technical Notes</a>
+<ul>
+<li><a href="#org7140ddf">6.1. Resources</a></li>
+</ul>
+</li>
+<li><a href="#org3f7b01d">7. Bibliography</a></li>
 </ul>
 </div>
 </div>
@@ -672,12 +1690,12 @@ org_html_manager.setup();  // activate after the parameters are set
 <i>(This document is powered by the <a href="https://orgmode.org/">greatest mode</a> of the <a href="https://www.gnu.org/software/emacs/">greatest software of all time</a>)</i>
 </p>
 </div>
-<div id="outline-container-org9c6da19" class="outline-2">
-<h2 id="org9c6da19"><span class="section-number-2">1.</span> Project Overview</h2>
+<div id="outline-container-orgd4b29b6" class="outline-2">
+<h2 id="orgd4b29b6"><span class="section-number-2">1.</span> Project Overview</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orge54e5f5" class="outline-3">
-<h3 id="orge54e5f5"><span class="section-number-3">1.1.</span> Overview</h3>
+<div id="outline-container-orgbc0bbf2" class="outline-3">
+<h3 id="orgbc0bbf2"><span class="section-number-3">1.1.</span> Overview</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 The proposed idea is to develop a toolkit called <code>zk-auctions</code> (which stands for
@@ -700,7 +1718,7 @@ The toolkit seeks to address the need for bidder anonymity, transaction
 security, and decentralized auction processes while ensuring modularity and
 efficient integration with blockchain platforms. However, the final product is
 not at all only targeted at the so-called HTTP/3 world. But, the properties
-described in <a href="#org9a658fb">Project Motivation</a> are the imperative contribution of this toolkit,
+described in <a href="#orgfa8f897">Project Motivation</a> are the imperative contribution of this toolkit,
 let it be deployed on a blockchain, message-queue, REST APIs, etc.
 </p>
 
@@ -711,8 +1729,8 @@ consequently, allows for exploitation).
 </p>
 </div>
 </div>
-<div id="outline-container-org851a679" class="outline-3">
-<h3 id="org851a679"><span class="section-number-3">1.2.</span> Short Rationale</h3>
+<div id="outline-container-org2685a5b" class="outline-3">
+<h3 id="org2685a5b"><span class="section-number-3">1.2.</span> Short Rationale</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 A zero-knowledge-proof-based contract library for First-Bid, Second-Bid,
@@ -721,8 +1739,8 @@ and integrity while particularly avoiding neopotism.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d7ce39" class="outline-3">
-<h3 id="org0d7ce39"><span class="section-number-3">1.3.</span> Project Details and Motivation <a id="org9a658fb"></a></h3>
+<div id="outline-container-orgb28ec7a" class="outline-3">
+<h3 id="orgb28ec7a"><span class="section-number-3">1.3.</span> Project Details and Motivation <a id="orgfa8f897"></a></h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 The output of the project will be a Rust-based toolkit that simulates a
@@ -776,8 +1794,8 @@ auction at time \(t\), it could still be abused in an auction at time \(t +
 </ul></li>
 </ul>
 </div>
-<div id="outline-container-orgf6cb425" class="outline-4">
-<h4 id="orgf6cb425"><span class="section-number-4">1.3.1.</span> Backend</h4>
+<div id="outline-container-org6bd6eec" class="outline-4">
+<h4 id="org6bd6eec"><span class="section-number-4">1.3.1.</span> Backend</h4>
 <div class="outline-text-4" id="text-1-3-1">
 <p>
 The backend will be developed using Rust programming language for the following
@@ -793,12 +1811,12 @@ reasons:
 </div>
 </div>
 </div>
-<div id="outline-container-orgc455456" class="outline-2">
-<h2 id="orgc455456"><span class="section-number-2">2.</span> Team</h2>
+<div id="outline-container-orgda31fd7" class="outline-2">
+<h2 id="orgda31fd7"><span class="section-number-2">2.</span> Team</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org1e842cb" class="outline-3">
-<h3 id="org1e842cb"><span class="section-number-3">2.1.</span> Team members</h3>
+<div id="outline-container-org5b6db8f" class="outline-3">
+<h3 id="org5b6db8f"><span class="section-number-3">2.1.</span> Team members</h3>
 <div class="outline-text-3" id="text-2-1">
 <ul class="org-ul">
 <li>ndrwnaguib (<code class="src src-sh">base64 --decode &lt;&lt;&lt; <span style="color: #305f5e;">"bmRyd25hZ3VpYkBnbWFpbC5jb20="</span></code>)</li>
@@ -819,8 +1837,8 @@ undergraduate studies, Andrew majored in Computer Science at Helwan University.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdf3264f" class="outline-3">
-<h3 id="orgdf3264f"><span class="section-number-3">2.2.</span> Team Code Repos</h3>
+<div id="outline-container-orgd9f74c2" class="outline-3">
+<h3 id="orgd9f74c2"><span class="section-number-3">2.2.</span> Team Code Repos</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 <a href="https://github.com/ndrwnaguib/zk-auctions">https://github.com/ndrwnaguib/zk-auctions</a>
@@ -828,16 +1846,16 @@ undergraduate studies, Andrew majored in Computer Science at Helwan University.
 </div>
 </div>
 </div>
-<div id="outline-container-orgf87081d" class="outline-2">
-<h2 id="orgf87081d"><span class="section-number-2">3.</span> Development Roadmap</h2>
+<div id="outline-container-org08098d8" class="outline-2">
+<h2 id="org08098d8"><span class="section-number-2">3.</span> Development Roadmap</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org9ce0005" class="outline-3">
-<h3 id="org9ce0005"><span class="section-number-3">3.1.</span> Milestone 1: Research, Proof-sketching, and Algorithm Design <a id="org16fbd80"></a></h3>
+<div id="outline-container-orgaca1ed7" class="outline-3">
+<h3 id="orgaca1ed7"><span class="section-number-3">3.1.</span> Milestone 1: Research, Proof-sketching, and Algorithm Design <a id="org1896284"></a></h3>
 <div class="outline-text-3" id="text-3-1">
 </div>
-<div id="outline-container-orgf17dc75" class="outline-4">
-<h4 id="orgf17dc75"><span class="section-number-4">3.1.1.</span> Objectives</h4>
+<div id="outline-container-org1020fa1" class="outline-4">
+<h4 id="org1020fa1"><span class="section-number-4">3.1.1.</span> Objectives</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <ul class="org-ul">
 <li>Establish the core technical framework.</li>
@@ -846,18 +1864,18 @@ undergraduate studies, Andrew majored in Computer Science at Helwan University.
 </div>
 </div>
 </div>
-<div id="outline-container-orgb038df2" class="outline-3">
-<h3 id="orgb038df2"><span class="section-number-3">3.2.</span> <span class="done DONE">DONE</span> Milestone 1 Tasks (2-month period) <code>[4/4]</code></h3>
+<div id="outline-container-org068e77d" class="outline-3">
+<h3 id="org068e77d"><span class="section-number-3">3.2.</span> <span class="done DONE">DONE</span> Milestone 1 Tasks (2-month period) <code>[4/4]</code></h3>
 <div class="outline-text-3" id="text-3-2">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-07-16 Tue 10:33] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-04-14 Sun&gt;</span></span></p>
 </div>
-<div id="outline-container-orge302114" class="outline-4">
-<h4 id="orge302114"><span class="section-number-4">3.2.1.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 1) <code>[2/2]</code></h4>
+<div id="outline-container-org1fe0d83" class="outline-4">
+<h4 id="org1fe0d83"><span class="section-number-4">3.2.1.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 1) <code>[2/2]</code></h4>
 <div class="outline-text-4" id="text-3-2-1">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-03-24 Sun 00:46] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></p>
 </div>
-<div id="outline-container-org9ad3048" class="outline-5">
-<h5 id="org9ad3048"><span class="section-number-5">3.2.1.1.</span> <span class="done DONE">DONE</span> Milestone 1: Research</h5>
+<div id="outline-container-org8ce0384" class="outline-5">
+<h5 id="org8ce0384"><span class="section-number-5">3.2.1.1.</span> <span class="done DONE">DONE</span> Milestone 1: Research</h5>
 <div class="outline-text-5" id="text-3-2-1-1">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-02-28 Wed 15:43] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-02-27 Tue&gt;</span></span></p>
 <p>
@@ -866,8 +1884,8 @@ zero-knowledge proofs and their intersection with auction theory. What is
 the current progress on zero-knowledge auctions?
 </p>
 </div>
-<div id="outline-container-orgb6f26b2" class="outline-6">
-<h6 id="orgb6f26b2"><span class="section-number-6">3.2.1.1.1.</span> In (Galal, Hisham S. and Youssef, Amr M., 2019),</h6>
+<div id="outline-container-orgfde506a" class="outline-6">
+<h6 id="orgfde506a"><span class="section-number-6">3.2.1.1.1.</span> In (Galal, Hisham S. and Youssef, Amr M., 2019),</h6>
 <div class="outline-text-6" id="text-3-2-1-1-1">
 <ul class="org-ul">
 <li>the bidders submit their sealed-bid as homomorphic commitments on the contract.</li>
@@ -884,9 +1902,9 @@ proof of interval membership to create the underlying protocol.</li>
 </ul>
 </div>
 <ol class="org-ol">
-<li><a id="org12e9daf"></a>Phases of Deployment<br />
+<li><a id="org13919a1"></a>Phases of Deployment<br />
 <ol class="org-ol">
-<li><a id="orgfd93e43"></a>Contract Deployment and Parameters Setup<br />
+<li><a id="org3bf772f"></a>Contract Deployment and Parameters Setup<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-1">
 <ul class="org-ul">
 <li>Decide \(T_1, T_2, T_3, T_4\), which are the time intervals for four phases:
@@ -904,7 +1922,7 @@ against malicious parties.</li>
 </ul>
 </div>
 </li>
-<li><a id="org308c54a"></a>Commitment of Bids<br />
+<li><a id="org3427071"></a>Commitment of Bids<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-2">
 <ul class="org-ul">
 <li>“Each bidder submits a bid commitment using Pedersen commitment scheme along with the initial deposit \(F\) in ethers”
@@ -916,7 +1934,7 @@ commitment--<i>the authors instead use Chaum-Pedersen non-interactive ZKP, detai
 </ul>
 </div>
 </li>
-<li><a id="org0eb0d93"></a>Opening the commitments<br />
+<li><a id="orgf32633d"></a>Opening the commitments<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-3">
 <blockquote>
 <p>
@@ -925,7 +1943,7 @@ Each bidder \(B_i\) sends the outcome of ciphertext of encrypting \((x_i, r_i)\)
 </blockquote>
 </div>
 </li>
-<li><a id="org8a7f310"></a>Verification of Comparison Proofs<br />
+<li><a id="org8160638"></a>Verification of Comparison Proofs<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-4">
 <blockquote>
 <p>
@@ -935,7 +1953,7 @@ associated account address \(B_w\) and commitment \(C_w\)"
 </blockquote>
 </div>
 </li>
-<li><a id="orgf55536b"></a>Finalizing the auction<br />
+<li><a id="orgacbdd05"></a>Finalizing the auction<br />
 <div class="outline-text-8" id="text-3-2-1-1-1-1-5">
 <blockquote>
 <p>
@@ -948,7 +1966,7 @@ auction contract so that the winner can pay the winning bid.
 </li>
 </ol>
 </li>
-<li><a id="orgc730894"></a>Gas Cost<br />
+<li><a id="org0a43fe0"></a>Gas Cost<br />
 <div class="outline-text-7" id="text-3-2-1-1-1-2">
 <blockquote>
 <p>
@@ -962,8 +1980,8 @@ that represent two points on the elliptic curve.
 </li>
 </ol>
 </div>
-<div id="outline-container-org5586ff8" class="outline-6">
-<h6 id="org5586ff8"><span class="section-number-6">3.2.1.1.2.</span> \(\star\) In (Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Hao and Zhu, Liehuang and Liu, Yong and Liu, Jiamou and Khoussainov, Bakh, 2024),</h6>
+<div id="outline-container-org4102239" class="outline-6">
+<h6 id="org4102239"><span class="section-number-6">3.2.1.1.2.</span> \(\star\) In (Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Hao and Zhu, Liehuang and Liu, Yong and Liu, Jiamou and Khoussainov, Bakh, 2024),</h6>
 <div class="outline-text-6" id="text-3-2-1-1-2">
 <ul class="org-ul">
 <li><p>
@@ -1024,8 +2042,8 @@ mechanism, should it be needed, will be designed accordingly.
 <hr />
 </div>
 </div>
-<div id="outline-container-orgf94b4a2" class="outline-6">
-<h6 id="orgf94b4a2"><span class="section-number-6">3.2.1.1.3.</span> \(\star\) In (Blass, Erik-Oliver and Kerschbaum, Florian, 2018) <a id="orga18e008"></a>,</h6>
+<div id="outline-container-org7fcc4a9" class="outline-6">
+<h6 id="org7fcc4a9"><span class="section-number-6">3.2.1.1.3.</span> \(\star\) In (Blass, Erik-Oliver and Kerschbaum, Florian, 2018) <a id="orgd47fadb"></a>,</h6>
 <div class="outline-text-6" id="text-3-2-1-1-3">
 <p>
 The authors propose a maliciously-secure blockchain-based auction where
@@ -1107,8 +2125,8 @@ formulation)
 </div>
 </div>
 </div>
-<div id="outline-container-orgbbb2a6e" class="outline-5">
-<h5 id="orgbbb2a6e"><span class="section-number-5">3.2.1.2.</span> Questions</h5>
+<div id="outline-container-org2327c80" class="outline-5">
+<h5 id="org2327c80"><span class="section-number-5">3.2.1.2.</span> Questions</h5>
 <div class="outline-text-5" id="text-3-2-1-2">
 <p>
 <i>(some of which will possibly be answered in later phases of the project)</i>
@@ -1129,8 +2147,8 @@ particular attribute that a participant must have? E.g., age.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org8eacbc2" class="outline-5">
-<h5 id="org8eacbc2"><span class="section-number-5">3.2.1.3.</span> <span class="done DONE">DONE</span> Milestone 1: Development environment setup</h5>
+<div id="outline-container-org4fae80b" class="outline-5">
+<h5 id="org4fae80b"><span class="section-number-5">3.2.1.3.</span> <span class="done DONE">DONE</span> Milestone 1: Development environment setup</h5>
 <div class="outline-text-5" id="text-3-2-1-3">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-03-24 Sun 00:46] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-02-27 Tue&gt;</span></span></p>
 <p>
@@ -1145,13 +2163,13 @@ other blocks necessary for the toolkit.
 </div>
 </div>
 </div>
-<div id="outline-container-org7d02926" class="outline-4">
-<h4 id="org7d02926"><span class="section-number-4">3.2.2.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 2) <code>[2/2]</code></h4>
+<div id="outline-container-orgc356a03" class="outline-4">
+<h4 id="orgc356a03"><span class="section-number-4">3.2.2.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 2) <code>[2/2]</code></h4>
 <div class="outline-text-4" id="text-3-2-2">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-06-30 Sun 20:02] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-05-06 Mon&gt;</span></span></p>
 </div>
-<div id="outline-container-orgaba6cce" class="outline-5">
-<h5 id="orgaba6cce"><span class="section-number-5">3.2.2.1.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 2): Technical specification</h5>
+<div id="outline-container-org701ed58" class="outline-5">
+<h5 id="org701ed58"><span class="section-number-5">3.2.2.1.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 2): Technical specification</h5>
 <div class="outline-text-5" id="text-3-2-2-1">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-05-03 Fri 23:16] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-05-01 Wed&gt;</span></span></p>
 <p>
@@ -1169,18 +2187,18 @@ We use the synopsis of the literature review phase to write the <a href="auction
 </p>
 </div>
 </div>
-<div id="outline-container-org01e5298" class="outline-5">
-<h5 id="org01e5298"><span class="section-number-5">3.2.2.2.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 2): Test suite development</h5>
+<div id="outline-container-orga43371a" class="outline-5">
+<h5 id="orga43371a"><span class="section-number-5">3.2.2.2.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 2): Test suite development</h5>
 <div class="outline-text-5" id="text-3-2-2-2">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-06-30 Sun 20:01] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-05-06 Mon&gt;</span></span></p>
 <ul class="org-ul">
 <li>assess the possibility of following TDD for the remaining milestones.
 <ul class="org-ul">
 <li><span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span>: If we use Halo2's <a href="https://zcash.github.io/halo2/user/simple-example.html">simple example</a>, we should be able to
-follow TDD the moment we complete the <a href="#org16fbd80">Milestone 1</a>, since we will have
+follow TDD the moment we complete the <a href="#org1896284">Milestone 1</a>, since we will have
 the equations used in the verifier ready.</li>
 <li><span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span>: Since we've decided the first protocol prototype to be
-Strain (<a href="#orgf5c7b5d">meeting on &lt;2024-03-08 Fri&gt;</a>); following TDD is much more doable
+Strain (<a href="#orgeeb8d32">meeting on &lt;2024-03-08 Fri&gt;</a>); following TDD is much more doable
 and is effective for a more accurate progress in Milestone 2.</li>
 </ul></li>
 <li>check other open-source projects that could be relevant.</li>
@@ -1188,18 +2206,18 @@ and is effective for a more accurate progress in Milestone 2.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org394da93" class="outline-4">
-<h4 id="org394da93"><span class="section-number-4">3.2.3.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 3) <code>[2/2]</code></h4>
+<div id="outline-container-org2c9f42b" class="outline-4">
+<h4 id="org2c9f42b"><span class="section-number-4">3.2.3.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 3) <code>[2/2]</code></h4>
 <div class="outline-text-4" id="text-3-2-3">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-06-30 Sun 21:08] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-05-25 Sat&gt;</span></span></p>
 </div>
-<div id="outline-container-org77ffdda" class="outline-5">
-<h5 id="org77ffdda"><span class="section-number-5">3.2.3.1.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 3): Test suite development (cont'd) <a id="org8069b7b"></a></h5>
+<div id="outline-container-org5ab0024" class="outline-5">
+<h5 id="org5ab0024"><span class="section-number-5">3.2.3.1.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 3): Test suite development (cont'd) <a id="orge3d536a"></a></h5>
 <div class="outline-text-5" id="text-3-2-3-1">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-06-30 Sun 20:01] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-05-15 Wed&gt;</span></span></p>
 <ul class="org-ul">
 <li>writing the tests of the circuits which are to be
-developed in <a href="#org7547de4">Milestone 2</a>.
+developed in <a href="#org38e25b2">Milestone 2</a>.
 <ul class="org-ul">
 <li><p>
 Tests that are expected to work for any auction type.
@@ -1305,8 +2323,8 @@ wallet addresses (potential support for HTTP/2 IP addresses in Milestone 3).</li
 </ul>
 </div>
 </div>
-<div id="outline-container-orgfe20a28" class="outline-5">
-<h5 id="orgfe20a28"><span class="section-number-5">3.2.3.2.</span> <span class="done DONE">DONE</span> Milestone1 1: (Sprint 3): Sketching the Pseudo-code</h5>
+<div id="outline-container-orgf6f1b4e" class="outline-5">
+<h5 id="orgf6f1b4e"><span class="section-number-5">3.2.3.2.</span> <span class="done DONE">DONE</span> Milestone1 1: (Sprint 3): Sketching the Pseudo-code</h5>
 <div class="outline-text-5" id="text-3-2-3-2">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-06-30 Sun 20:01] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-05-25 Sat&gt;</span></span></p>
 <ul class="org-ul">
@@ -1397,8 +2415,8 @@ auction accepting bids from valid suppliers only.
 </div>
 </div>
 </div>
-<div id="outline-container-org503d9eb" class="outline-4">
-<h4 id="org503d9eb"><span class="section-number-4">3.2.4.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 4) <code>[0/0]</code></h4>
+<div id="outline-container-org71ceddc" class="outline-4">
+<h4 id="org71ceddc"><span class="section-number-4">3.2.4.</span> <span class="done DONE">DONE</span> Milestone 1: (Sprint 4) <code>[0/0]</code></h4>
 <div class="outline-text-4" id="text-3-2-4">
 <p><span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED:</span> <span class="timestamp">[2024-07-16 Tue 10:33] </span> <span class="timestamp-kwd">SCHEDULED:</span> <span class="timestamp">&lt;2024-05-28 Tue&gt;</span></span></p>
 <p>
@@ -1418,8 +2436,8 @@ auction accepting bids from valid suppliers only.
 </p>
 </div>
 </div>
-<div id="outline-container-org22359f3" class="outline-4">
-<h4 id="org22359f3"><span class="section-number-4">3.2.5.</span> Logistics</h4>
+<div id="outline-container-org7e17347" class="outline-4">
+<h4 id="org7e17347"><span class="section-number-4">3.2.5.</span> Logistics</h4>
 <div class="outline-text-4" id="text-3-2-5">
 <p class="verse">
 Estimated Duration: 1 month<br />
@@ -1430,12 +2448,12 @@ Estimated delivery date: May (20-30)th 2024<br />
 </div>
 </div>
 </div>
-<div id="outline-container-org1e89ae9" class="outline-3">
-<h3 id="org1e89ae9"><span class="section-number-3">3.3.</span> Milestone 2: Development <a id="org7547de4"></a></h3>
+<div id="outline-container-org36a162a" class="outline-3">
+<h3 id="org36a162a"><span class="section-number-3">3.3.</span> Milestone 2: Development <a id="org38e25b2"></a></h3>
 <div class="outline-text-3" id="text-3-3">
 </div>
-<div id="outline-container-org5f6d828" class="outline-4">
-<h4 id="org5f6d828"><span class="section-number-4">3.3.1.</span> Objectives</h4>
+<div id="outline-container-org1398b9f" class="outline-4">
+<h4 id="org1398b9f"><span class="section-number-4">3.3.1.</span> Objectives</h4>
 <div class="outline-text-4" id="text-3-3-1">
 <ul class="org-ul">
 <li>Develop the core functionality of zk-auctions (e.g., circuits, the various
@@ -1448,8 +2466,8 @@ proof systems.
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd3b7e35" class="outline-4">
-<h4 id="orgd3b7e35"><span class="section-number-4">3.3.2.</span> Tasks</h4>
+<div id="outline-container-org98dd37a" class="outline-4">
+<h4 id="org98dd37a"><span class="section-number-4">3.3.2.</span> Tasks</h4>
 <div class="outline-text-4" id="text-3-3-2">
 <ol class="org-ol">
 <li>Core module development: build the main auction system modules, focusing on
@@ -1475,7 +2493,7 @@ zk_auction<span style="color: #525252;">[</span><span style="color: #305f5e;">"p
 </div></li>
 </ul></li>
 <li>Implementation of the auction circuits as specified by the pseudo-code
-written in <a href="#org16fbd80">Milestone 1</a>.</li>
+written in <a href="#org1896284">Milestone 1</a>.</li>
 <li>Modular architecture enhancement: refine the system architecture to easily
 integrate alternative proof systems.
 <ul class="org-ul">
@@ -1494,8 +2512,8 @@ the potential of the system for being a victim of a DDOS-attack?</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org2e70513" class="outline-4">
-<h4 id="org2e70513"><span class="section-number-4">3.3.3.</span> Logistics</h4>
+<div id="outline-container-orgddacf9b" class="outline-4">
+<h4 id="orgddacf9b"><span class="section-number-4">3.3.3.</span> Logistics</h4>
 <div class="outline-text-4" id="text-3-3-3">
 <p class="verse">
 Estimated Duration: 1 month<br />
@@ -1506,12 +2524,12 @@ Estimated delivery date: July (10-20)th 2024<br />
 </div>
 </div>
 </div>
-<div id="outline-container-org893f4f8" class="outline-3">
-<h3 id="org893f4f8"><span class="section-number-3">3.4.</span> Milestone 3: Optimization, Testing, and Documentation</h3>
+<div id="outline-container-orged6fdcc" class="outline-3">
+<h3 id="orged6fdcc"><span class="section-number-3">3.4.</span> Milestone 3: Optimization, Testing, and Documentation</h3>
 <div class="outline-text-3" id="text-3-4">
 </div>
-<div id="outline-container-org2868040" class="outline-4">
-<h4 id="org2868040"><span class="section-number-4">3.4.1.</span> Objectives</h4>
+<div id="outline-container-org26a2eb6" class="outline-4">
+<h4 id="org26a2eb6"><span class="section-number-4">3.4.1.</span> Objectives</h4>
 <div class="outline-text-4" id="text-3-4-1">
 <ul class="org-ul">
 <li>Revise the codebase for performance and privacy.</li>
@@ -1521,8 +2539,8 @@ Estimated delivery date: July (10-20)th 2024<br />
 </ul>
 </div>
 </div>
-<div id="outline-container-orgf332703" class="outline-4">
-<h4 id="orgf332703"><span class="section-number-4">3.4.2.</span> Tasks</h4>
+<div id="outline-container-orgf3462db" class="outline-4">
+<h4 id="orgf3462db"><span class="section-number-4">3.4.2.</span> Tasks</h4>
 <div class="outline-text-4" id="text-3-4-2">
 <ol class="org-ol">
 <li>Code optimization: revise code for performance, focusing on the auction logic
@@ -1565,8 +2583,8 @@ including a review of all documentation and code.</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org7fee273" class="outline-4">
-<h4 id="org7fee273"><span class="section-number-4">3.4.3.</span> Logistics</h4>
+<div id="outline-container-org044000d" class="outline-4">
+<h4 id="org044000d"><span class="section-number-4">3.4.3.</span> Logistics</h4>
 <div class="outline-text-4" id="text-3-4-3">
 <p class="verse">
 Estimated Duration: 1 month<br />
@@ -1578,19 +2596,19 @@ Estimated delivery date: September (20-30)th 2024<br />
 </div>
 </div>
 </div>
-<div id="outline-container-orgf98c6cd" class="outline-2">
-<h2 id="orgf98c6cd"><span class="section-number-2">4.</span> Additional Information</h2>
+<div id="outline-container-orge3bcbd9" class="outline-2">
+<h2 id="orge3bcbd9"><span class="section-number-2">4.</span> Additional Information</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgb193195" class="outline-3">
-<h3 id="orgb193195"><span class="section-number-3">4.1.</span> Meetings</h3>
+<div id="outline-container-org06390cf" class="outline-3">
+<h3 id="org06390cf"><span class="section-number-3">4.1.</span> Meetings</h3>
 <div class="outline-text-3" id="text-4-1">
 </div>
-<div id="outline-container-org033aa35" class="outline-4">
-<h4 id="org033aa35"><span class="section-number-4">4.1.1.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span></h4>
+<div id="outline-container-org2e0f259" class="outline-4">
+<h4 id="org2e0f259"><span class="section-number-4">4.1.1.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-24 Sat&gt;</span></span></h4>
 </div>
-<div id="outline-container-orga240e98" class="outline-4">
-<h4 id="orga240e98"><span class="section-number-4">4.1.2.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></h4>
+<div id="outline-container-org9753ff9" class="outline-4">
+<h4 id="org9753ff9"><span class="section-number-4">4.1.2.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-02-28 Wed&gt;</span></span></h4>
 <div class="outline-text-4" id="text-4-1-2">
 <ul class="org-ul">
 <li>We went over the progress of the literature review phase (particularly
@@ -1599,11 +2617,11 @@ supported and the engineering design of the toolkit.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgf5c7b5d" class="outline-4">
-<h4 id="orgf5c7b5d"><span class="section-number-4">4.1.3.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span></h4>
+<div id="outline-container-orgeeb8d32" class="outline-4">
+<h4 id="orgeeb8d32"><span class="section-number-4">4.1.3.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-08 Fri&gt;</span></span></h4>
 </div>
-<div id="outline-container-org830be05" class="outline-4">
-<h4 id="org830be05"><span class="section-number-4">4.1.4.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-31 Sun&gt;</span></span></h4>
+<div id="outline-container-org40aa36a" class="outline-4">
+<h4 id="org40aa36a"><span class="section-number-4">4.1.4.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-03-31 Sun&gt;</span></span></h4>
 <div class="outline-text-4" id="text-4-1-4">
 <ul class="org-ul">
 <li>Revised and merged the pull requests regarding the engineering aspect of the repository.</li>
@@ -1615,8 +2633,8 @@ to be verified by the circuit as a warm up for Milestone 2.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org35401e1" class="outline-4">
-<h4 id="org35401e1"><span class="section-number-4">4.1.5.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-04-28 Sun&gt;</span></span></h4>
+<div id="outline-container-org40c5105" class="outline-4">
+<h4 id="org40c5105"><span class="section-number-4">4.1.5.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-04-28 Sun&gt;</span></span></h4>
 <div class="outline-text-4" id="text-4-1-5">
 <ul class="org-ul">
 <li>Rescheduled the timeline of the milestones.</li>
@@ -1644,12 +2662,12 @@ Notes:
 implementation of at least one protocol.</li>
 <li><code>@0xisk</code>: it'd be very nice if we could leverage mobile devices in our
 framework.</li>
-<li>We will start by implementing <a href="#orga18e008"><code>Strain</code></a>.</li>
+<li>We will start by implementing <a href="#orgd47fadb"><code>Strain</code></a>.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgac0dae5" class="outline-4">
-<h4 id="orgac0dae5"><span class="section-number-4">4.1.6.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-01 Mon&gt;</span></span></h4>
+<div id="outline-container-orgf187473" class="outline-4">
+<h4 id="orgf187473"><span class="section-number-4">4.1.6.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-01 Mon&gt;</span></span></h4>
 <div class="outline-text-4" id="text-4-1-6">
 <ul class="org-ul">
 <li>Agenda <code>[0/0]</code>
@@ -1663,7 +2681,7 @@ implementation of GM to avoid potential mistakes in implementations from scratch
 </ul></li>
 </ul></li>
 
-<li>Reviewing the <a href="#org8069b7b">tests</a>.</li>
+<li>Reviewing the <a href="#orge3d536a">tests</a>.</li>
 <li>Reviewing the specification model.</li>
 <li><code>Strain</code> assumes that the judge \(A\) (or the auctioneer) must be semi-honest,
 and does not collude with any malicious supplier. Engineering-wise, how the
@@ -1689,8 +2707,8 @@ signature.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org821c801" class="outline-4">
-<h4 id="org821c801"><span class="section-number-4">4.1.7.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-16 Tue&gt;</span></span></h4>
+<div id="outline-container-orgf098eb0" class="outline-4">
+<h4 id="orgf098eb0"><span class="section-number-4">4.1.7.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-16 Tue&gt;</span></span></h4>
 <div class="outline-text-4" id="text-4-1-7">
 <p>
 Notes:
@@ -1701,15 +2719,15 @@ Notes:
 <li>@0xisk and @ndrwnaguib will both review the Strain paper again to decide if
 custom software engineering is expected to implement the Strain protocol.</li>
 <li>@ndrwnaguib will implement the primitives contained in the
-<a id="org5bcdcfa"></a> as structs and traits. Initially, they are not expected to be
+<a id="org9cd6326"></a> as structs and traits. Initially, they are not expected to be
 located anywhere only until the main skeleton is decided</li>
 <li>@ndrwnaguib will try to implement the Goldwasser-Micali encryption algorithm
 if the current implementations (e.g., <a href="https://github.com/crodriguezvega/probabilisticpubkey">https://github.com/crodriguezvega/probabilisticpubkey</a>) are not mature enough.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org717cc3a" class="outline-4">
-<h4 id="org717cc3a"><span class="section-number-4">4.1.8.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-30 Tue&gt;</span></span></h4>
+<div id="outline-container-org345cf51" class="outline-4">
+<h4 id="org345cf51"><span class="section-number-4">4.1.8.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-07-30 Tue&gt;</span></span></h4>
 <div class="outline-text-4" id="text-4-1-8">
 <p>
 Notes:
@@ -1730,8 +2748,8 @@ inside zk-auctions.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org991cfe0" class="outline-4">
-<h4 id="org991cfe0"><span class="section-number-4">4.1.9.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-08-06 Tue&gt;</span></span></h4>
+<div id="outline-container-orga526bfa" class="outline-4">
+<h4 id="orga526bfa"><span class="section-number-4">4.1.9.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-08-06 Tue&gt;</span></span></h4>
 <div class="outline-text-4" id="text-4-1-9">
 <p>
 Notes:
@@ -1748,10 +2766,75 @@ place.</li>
 </ul>
 </div>
 </div>
+<div id="outline-container-orgec299a8" class="outline-4">
+<h4 id="orgec299a8"><span class="section-number-4">4.1.10.</span> <span class="timestamp-wrapper"><span class="timestamp">&lt;2024-08-22 Thu&gt;</span></span></h4>
+<div class="outline-text-4" id="text-4-1-10">
+<p>
+Questions for Prof. Florian Kerschbaum regarding Strain:
+</p>
+
+<ul class="org-ul">
+<li>How does the communication between the suppliers \(S_i\) and \(S_j\) take place?
+<ul class="org-ul">
+<li>Are there \(n^2\) comparisons and eventually a single supplier provide a proof
+that their bid is higher/lower than all the other?</li>
+</ul></li>
+<li>“In reality, one could use the blockchain's broadcast feature to efficiently
+and reliably publish data to all parties or to just send a private
+(automatically signed) message”&#x2013;How much expensive is this?</li>
+<li>Is step 2 of the "Details" of the extended Fischlin protocol, is it a typo?
+Should it be \(m\) instead of \(\lambda^{\prime\prime}\)?</li>
+<li>Check Katz's “Efficient and non-malleable proofs of plaintext knowledge and
+applications.”</li>
+<li>Check Ogata's “Fault tolerant anonymous channel.”</li>
+<li>In Section 5.2 of (Blass, Erik-Oliver and Kerschbaum, Florian, 2018), it seems that there is a typo in
+the paragraph preceding the last regarding all the terms being 0 and still
+\(v_i > v_j\) still.</li>
+<li>What proving system was used? E.g., SNARK, STARK, etc.</li>
+<li>Is it possible to get a copy of the source code?</li>
+</ul>
 </div>
-<div id="outline-container-orgd68ef4f" class="outline-3">
-<h3 id="orgd68ef4f"><span class="section-number-3">4.2.</span> Resources</h3>
-<div class="outline-text-3" id="text-4-2">
+</div>
+</div>
+</div>
+<div id="outline-container-org47b579f" class="outline-2">
+<h2 id="org47b579f"><span class="section-number-2">5.</span> Future Work</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org163a366" class="outline-3">
+<h3 id="org163a366"><span class="section-number-3">5.1.</span> Strain</h3>
+<div class="outline-text-3" id="text-5-1">
+</div>
+<div id="outline-container-orgb95bc10" class="outline-4">
+<h4 id="orgb95bc10"><span class="section-number-4">5.1.1.</span> Preparation of Pseudonyms</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<p>
+“To pseudonymously place a bid in Strain, suppliers must decouple their
+blockchain transactions from their regular key pair \((pk_i, sk_i)\). Ideally for
+each auction, supplier \(S_i\) generates a fresh random key pair \((rpk_i, rsk_i)\)
+for bidding. In practice, e.g., with Ethereum, this turns out to be a challenge.
+To interact with smart contract, \(S_i\) must send a transaction. Yet, to mitigate
+DoS attacks in Ethereum, transactions cost money of the blockchain's virtual
+currency. If a fresh key pair wants to send a transaction, someone must send
+funds to it. \(S_i\) cannt send funds to their fresh key, as this would create a
+visible link between \(S_i\) and \((rpk_i, rsk_i)\)&#x2026;”
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf03ce55" class="outline-2">
+<h2 id="orgf03ce55"><span class="section-number-2">6.</span> Technical Notes</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+During the development of this project, technical notes were developed in a
+separate <a href="Notes.html#MissingReference">document</a> as to supplement the current one and in order to have a
+self-contained documentation of the workflow since day one.
+</p>
+</div>
+<div id="outline-container-org7140ddf" class="outline-3">
+<h3 id="org7140ddf"><span class="section-number-3">6.1.</span> Resources</h3>
+<div class="outline-text-3" id="text-6-1">
 <ul class="org-ul">
 <li><a href="https://zcash.github.io/halo2/">https://zcash.github.io/halo2/</a></li>
 <li><a href="https://github.com/privacy-scaling-explorations/halo2-solidity-verifier">https://github.com/privacy-scaling-explorations/halo2-solidity-verifier</a></li>
@@ -1759,20 +2842,10 @@ place.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org34e0286" class="outline-3">
-<h3 id="org34e0286"><span class="section-number-3">4.3.</span> Technical Notes</h3>
-<div class="outline-text-3" id="text-4-3">
-<p>
-During the development of this project, technical notes were developed in a
-separate <a href="Notes.html#MissingReference">document</a> as to supplement the current one and in order to have a
-self-contained documentation of the workflow since day one.
-</p>
 </div>
-</div>
-</div>
-<div id="outline-container-orgcf9e9ec" class="outline-2">
-<h2 id="orgcf9e9ec"><span class="section-number-2">5.</span> Bibliography</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-org3f7b01d" class="outline-2">
+<h2 id="org3f7b01d"><span class="section-number-2">7.</span> Bibliography</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 Bag, Samiran and Hao, Feng and Shahandashti, Siamak F. and Ray, Indranil Ghosh (2020). <i>SEAL: Sealed-Bid Auction Without Auctioneers</i>, IEEE Transactions on Information Forensics and Security.</p>
 
@@ -1806,7 +2879,7 @@ Zhang, Zijian and Lu, Xin and Li, Meng and An, Jincheng and Yu, Yang and Yin, Ha
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: ndrwnaguib and 0xisk</p>
-<p class="date">Created: 2024-08-06 Tue 11:06</p>
+<p class="date">Created: 2024-08-27 Tue 10:17</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
