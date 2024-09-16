@@ -29,7 +29,7 @@ git clone --recurse-submodules https://github.com/crodriguezvega/probabilisticpu
 - If there any uncommitted changes, either commit them or stash them using `git stash`.
 - Apply the patch changes by using ``
 ```bash
-git am submodules-changes.patch
+git apply submodules-changes.patch
 ```
 
 #### 3. Making changes in a Submodule
