@@ -18,29 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Attempt Submodule Update (ignore errors)
-        run: git submodule update --init --recursive || echo "Submodule update failed, attempting manual clone..."
-
-      - name: Manual Submodule Clone (if needed)
-        run: |
-          if [ ! -d "packages/probabilistic-encryption" ]; then
-            git clone --recurse-submodules https://github.com/crodriguezvega/probabilisticpubkey
-            cd packages/probabilistic-encryption
-            git checkout master
-            cd ../..
-          fi
+      - name: Clone submodule up to the origin latest changes
+        run: git submodule foreach --recursive git reset --hard || echo "Submodule update failed, attempting manual clone..."
         
-      - name: Debug - Print Working Directory
-        run: pwd
-
-      - name: Debug - List Files in Current Directory
-        run: ls -al
-
-      - name: Debug - List Files in Parent Directory
-        run: ls -al ..
-
-      - name: Apply Patch Changes
-        run: git apply ../../submodules-changes.patch
+      - name: Apply Patch Changes to the submodule
+        run: |
+          cd packages/probabilistic-encryption
+          git am ../../submodules-changes.patch || echo "No patch file found or no changes to apply"
         
       - uses: actions/setup-python@v4
 
