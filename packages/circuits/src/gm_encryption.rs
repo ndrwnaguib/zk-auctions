@@ -144,30 +144,4 @@ mod tests {
 
         Ok(())
     }
-
-    // #[test]
-    // fn test_gm_encryption_mock() -> Result<()> {
-    //     let path = "configs/gm_encryption.config";
-    //     let circuit_params: CircuitConfig = serde_json::from_reader(
-    //         File::open(path)
-    //             .map_err(|e| anyhow!(e))
-    //             .with_context(|| format!("The circuit config file does not exist: {}", path))?,
-    //     )
-    //     .map_err(|e| anyhow!(e))
-    //     .with_context(|| format!("Failed to read the circuit config file: {}", path))?;
-
-    //     let gm_verification_inputs = mock_gm_encryption()?;
-
-    //     let mut halo2_wasm = Halo2Wasm::new();
-
-    //     halo2_wasm.config(circuit_params);
-
-    //     let mut circuit = GmVerificationCircuit::new(&halo2_wasm, gm_verification_inputs);
-
-    //     circuit.verify_encryption();
-
-    //     halo2_wasm.mock();
-
-    //     Ok(())
-    // }
 }

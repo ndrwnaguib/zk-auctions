@@ -38,7 +38,7 @@ jobs:
         run: cargo llvm-cov --all-features --workspace --html --output-dir=target/llvm-cov/html
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-report
           path: target/llvm-cov/html
