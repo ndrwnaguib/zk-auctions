@@ -1,0 +1,1314 @@
+From 0a6dd9e8776681b2d2c8ec3ea3811e1f9ad39d7b Mon Sep 17 00:00:00 2001
+From: isk <0xisk@proton.me>
+Date: Mon, 16 Sep 2024 09:29:15 +0200
+Subject: [PATCH] refactor: update most of the  dependences versions
+
+---
+ examples/blum_goldwasser.rs   |  14 +--
+ examples/goldwasser_micali.rs |  16 ++--
+ src/blum_goldwasser.rs        |  91 +++++++++---------
+ src/errors.rs                 |   2 +-
+ src/goldwasser_micali.rs      |  91 +++++++++---------
+ src/key.rs                    |   4 +-
+ src/lib.rs                    |  20 ++--
+ src/number.rs                 | 121 ++++++++++++------------
+ src/prime.rs                  | 170 +++++++++++++++-------------------
+ 9 files changed, 258 insertions(+), 271 deletions(-)
+
+diff --git a/examples/blum_goldwasser.rs b/examples/blum_goldwasser.rs
+index 060f94f..d0d3fb0 100644
+--- a/examples/blum_goldwasser.rs
++++ b/examples/blum_goldwasser.rs
+@@ -1,8 +1,8 @@
+-extern crate probabilisticpubkey;
++extern crate probabilistic_encryption;
+ 
++use probabilistic_encryption::blum_goldwasser;
++use probabilistic_encryption::key::{PrivateKey, PublicKey};
+ use std::str;
+-use probabilisticpubkey::blum_goldwasser;
+-use probabilisticpubkey::key::{PublicKey, PrivateKey};
+ 
+ fn main() {
+     let plaintext = b"hello world";
+@@ -11,12 +11,12 @@ fn main() {
+         Ok((public_key, private_key)) => {
+             let cyphertext = public_key.encrypt(plaintext);
+             let decrypted_plaintext = private_key.decrypt(&cyphertext);
+-            
++
+             println!("{}", str::from_utf8(&decrypted_plaintext).unwrap());
+-        },
++        }
+         Err(err) => {
+             eprintln!("{}", err);
+-            panic!(err)
++            std::panic::panic_any(err)
+         }
+     };
+-}
+\ No newline at end of file
++}
+diff --git a/examples/goldwasser_micali.rs b/examples/goldwasser_micali.rs
+index 8b34923..d0d3fb0 100644
+--- a/examples/goldwasser_micali.rs
++++ b/examples/goldwasser_micali.rs
+@@ -1,22 +1,22 @@
+-extern crate probabilisticpubkey;
++extern crate probabilistic_encryption;
+ 
++use probabilistic_encryption::blum_goldwasser;
++use probabilistic_encryption::key::{PrivateKey, PublicKey};
+ use std::str;
+-use probabilisticpubkey::goldwasser_micali;
+-use probabilisticpubkey::key::{PublicKey, PrivateKey};
+ 
+ fn main() {
+     let plaintext = b"hello world";
+ 
+-    match goldwasser_micali::generate_keys(8) {
++    match blum_goldwasser::generate_keys(8) {
+         Ok((public_key, private_key)) => {
+             let cyphertext = public_key.encrypt(plaintext);
+             let decrypted_plaintext = private_key.decrypt(&cyphertext);
+-            
++
+             println!("{}", str::from_utf8(&decrypted_plaintext).unwrap());
+-        },
++        }
+         Err(err) => {
+             eprintln!("{}", err);
+-            panic!(err)
++            std::panic::panic_any(err)
+         }
+     };
+-}
+\ No newline at end of file
++}
+diff --git a/src/blum_goldwasser.rs b/src/blum_goldwasser.rs
+index dd2c7f1..502c91c 100644
+--- a/src/blum_goldwasser.rs
++++ b/src/blum_goldwasser.rs
+@@ -1,21 +1,21 @@
+-use crate::errors::{Error};
+-use crate::key::{PublicKey, PrivateKey};
++use crate::errors::Error;
++use crate::key::{PrivateKey, PublicKey};
+ use crate::number;
+ use crate::prime;
+ 
+ use bitvec::order::Msb0;
+-use bitvec::vec::BitVec;
+ use bitvec::slice::BitSlice;
+-use num_bigint::{BigUint, BigInt, RandBigInt, ToBigInt};
++use bitvec::vec::BitVec;
++use num_bigint::{BigInt, BigUint, RandBigInt, ToBigInt};
+ use num_integer::Integer;
+ use num_traits::One;
+ use rand::thread_rng;
+-use std::ops::{Div, BitXor};
++use std::ops::{BitXor, Div};
+ 
+ /// Represents the public key of the Blum-Goldwasser scheme.
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub struct BlumGoldwasserPublicKey {
+-    n: BigUint
++    n: BigUint,
+ }
+ 
+ /// Represents the private key of the Blum-Goldwasser scheme.
+@@ -24,7 +24,7 @@ pub struct BlumGoldwasserPrivateKey {
+     p: BigUint,
+     q: BigUint,
+     a: BigInt,
+-    b: BigInt
++    b: BigInt,
+ }
+ 
+ impl BlumGoldwasserPublicKey {
+@@ -35,13 +35,13 @@ impl BlumGoldwasserPublicKey {
+ 
+ impl PublicKey for BlumGoldwasserPublicKey {
+     /// Encryption algorithm.
+-    /// 
++    ///
+     /// # Arguments
+     ///
+     /// * `plaintext` - Plaintext to encrypt.
+-    /// 
++    ///
+     /// # Reference
+-    /// 
++    ///
+     /// See algorithm 8.56 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+     fn encrypt(&self, plaintext: &[u8]) -> Vec<BigUint> {
+         let two = BigUint::from(2usize);
+@@ -64,10 +64,10 @@ impl PublicKey for BlumGoldwasserPublicKey {
+         let mut ciphertext = Vec::with_capacity(8 * plaintext.len());
+         let bits = BitVec::<Msb0, u8>::from_vec(plaintext.to_vec());
+ 
+-        let mut chunks = bits.chunks(h);
+-        while let Some(chunk) = chunks.next() {
++        let chunks = bits.chunks(h);
++        for chunk in chunks {
+             x = x.modpow(&two, &self.n);
+-            let p = &x & &mask;            
++            let p = &x & &mask;
+             let m = to_biguint(chunk);
+             let c = p.bitxor(&m);
+             ciphertext.push(c);
+@@ -99,13 +99,13 @@ impl BlumGoldwasserPrivateKey {
+ 
+ impl PrivateKey for BlumGoldwasserPrivateKey {
+     /// Decryption algorithm.
+-    /// 
++    ///
+     /// # Arguments
+     ///
+     /// * `ciphertext` - Ciphertext to decrypt.
+-    /// 
++    ///
+     /// # Reference
+-    /// 
++    ///
+     /// See algorithm 8.56 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+     fn decrypt(&self, ciphertext: &[BigUint]) -> Vec<u8> {
+         let one = BigUint::one();
+@@ -118,7 +118,7 @@ impl PrivateKey for BlumGoldwasserPrivateKey {
+         let h = BigUint::from_usize(k).unwrap().bits() - 1;
+         */
+         let h = 4usize;
+-        
++
+         let mask = BigUint::from(h.pow(2) - 1);
+         match ciphertext.last() {
+             None => Vec::new(),
+@@ -133,7 +133,8 @@ impl PrivateKey for BlumGoldwasserPrivateKey {
+                 let _p = self.p.to_bigint().unwrap();
+                 let _q = self.q.to_bigint().unwrap();
+                 let _n = n.to_bigint().unwrap();
+-                let mut x = (v * &self.a * _p + u * &self.b * _q).mod_floor(&_n).to_biguint().unwrap();
++                let mut x =
++                    (v * &self.a * _p + u * &self.b * _q).mod_floor(&_n).to_biguint().unwrap();
+ 
+                 let mut bits: BitVec<Msb0, u8> = BitVec::new();
+                 for c in &ciphertext[..len] {
+@@ -142,8 +143,10 @@ impl PrivateKey for BlumGoldwasserPrivateKey {
+                     let m = p.bitxor(c);
+ 
+                     let bit_vec = to_bitvec(&m);
+-                    let chunk = bit_vec.split_at(bit_vec.len() - h); 
+-                    for bit in chunk.1 { bits.push(*bit); }
++                    let chunk = bit_vec.split_at(bit_vec.len() - h);
++                    for bit in chunk.1 {
++                        bits.push(*bit);
++                    }
+                 }
+                 let plaintext: Vec<u8> = bits.into_vec();
+                 plaintext
+@@ -153,15 +156,17 @@ impl PrivateKey for BlumGoldwasserPrivateKey {
+ }
+ 
+ /// Generates public and private keys.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `byte_size` - Size of public key in bytes.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 8.55 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+-pub fn generate_keys(byte_size: usize) -> Result<(BlumGoldwasserPublicKey, BlumGoldwasserPrivateKey), Error> {
++pub fn generate_keys(
++    byte_size: u64,
++) -> Result<(BlumGoldwasserPublicKey, BlumGoldwasserPrivateKey), Error> {
+     if byte_size < 2 {
+         Err(Error::LengthPublicKeyModulus)
+     } else {
+@@ -183,21 +188,21 @@ pub fn generate_keys(byte_size: usize) -> Result<(BlumGoldwasserPublicKey, BlumG
+ }
+ 
+ /// Generates primes `p` and `q` for private/public key generation.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `p_bits` - Number of bits for prime `p`.
+ /// * `q_bits` - Number of bits for prime `q`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 8.55 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+-/// 
++///
+ /// # Panics
+-/// 
++///
+ /// Panics if either `p_bits` or `q_bits` is `< 2`.
+-fn generate_primes(p_bits: usize, q_bits: usize) -> (BigUint, BigUint) {
+-    fn generate_prime_congruente_3mod4(bit_size: usize) -> BigUint {
++fn generate_primes(p_bits: u64, q_bits: u64) -> (BigUint, BigUint) {
++    fn generate_prime_congruente_3mod4(bit_size: u64) -> BigUint {
+         let three = BigUint::from(3usize);
+         let four = BigUint::from(4usize);
+         let mut prime = prime::generate_prime(bit_size);
+@@ -218,35 +223,33 @@ fn generate_primes(p_bits: usize, q_bits: usize) -> (BigUint, BigUint) {
+ }
+ 
+ /// Finds a quadratic residue modulo `n`.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `n` - Modulo `n`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 8.55 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ fn find_quadratic_residue_mod(n: &BigUint) -> BigUint {
+     let mut rng = thread_rng();
+-    let r = rng.gen_biguint_range(&BigUint::one(), &n); 
++    let r = rng.gen_biguint_range(&BigUint::one(), n);
+     r.modpow(&BigUint::from(2usize), n)
+ }
+ 
+ /// Converts a `BitSlice` into a `BigUint`.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `bits` - input `BitSlice`.
+ fn to_biguint(bits: &BitSlice<Msb0, u8>) -> BigUint {
+-    let n = bits.iter().fold(0usize, |acc, bit| {
+-        acc*2 + if *bit { 1 } else { 0 } 
+-    });
++    let n = bits.iter().fold(0usize, |acc, bit| acc * 2 + if *bit { 1 } else { 0 });
+ 
+     BigUint::from(n)
+ }
+ 
+ /// Converts a `BigUint` into a `BitVec`.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `number` - input `BigUint`.
+@@ -257,7 +260,7 @@ fn to_bitvec(number: &BigUint) -> BitVec<Msb0, u8> {
+ #[cfg(test)]
+ mod test {
+     use super::*;
+-    use crate::key::{PublicKey, PrivateKey};
++    use crate::key::{PrivateKey, PublicKey};
+     use proptest::prelude::*;
+ 
+     proptest! {
+@@ -266,7 +269,7 @@ mod test {
+             match generate_keys(8) {
+                 Ok((public_key, private_key)) => {
+                     let cyphertext = public_key.encrypt(&plaintext);
+-                    let decrypted_plaintext = private_key.decrypt(&cyphertext); 
++                    let decrypted_plaintext = private_key.decrypt(&cyphertext);
+ 
+                     prop_assert_eq!(decrypted_plaintext, plaintext)
+                 },
+@@ -275,10 +278,10 @@ mod test {
+         }
+ 
+         #[test]
+-        fn test_generate_primes(bit_size in 8usize..32) {
++        fn test_generate_primes(bit_size in 8u64..32) {
+             let three = BigUint::from(3usize);
+             let four = BigUint::from(4usize);
+-            
++
+             let (p, q) = generate_primes(bit_size, bit_size);
+ 
+             prop_assert_ne!(&p, &q);
+diff --git a/src/errors.rs b/src/errors.rs
+index 2681bf3..0e8a32f 100644
+--- a/src/errors.rs
++++ b/src/errors.rs
+@@ -5,4 +5,4 @@ pub enum Error {
+     LengthPublicKeyModulus,
+     #[fail(display = "could not generate private/public keys")]
+     CouldNotGenerateKeys,
+-}
+\ No newline at end of file
++}
+diff --git a/src/goldwasser_micali.rs b/src/goldwasser_micali.rs
+index 0787783..68a904c 100644
+--- a/src/goldwasser_micali.rs
++++ b/src/goldwasser_micali.rs
+@@ -1,5 +1,5 @@
+-use crate::errors::{Error};
+-use crate::key::{PublicKey, PrivateKey};
++use crate::errors::Error;
++use crate::key::{PrivateKey, PublicKey};
+ use crate::number;
+ use crate::prime;
+ 
+@@ -15,14 +15,7 @@ use std::ops::Div;
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub struct GoldwasserMicaliPublicKey {
+     n: BigUint,
+-    y: BigUint
+-}
+-
+-/// Represents the private key of the Goldwasser-Micali scheme.
+-#[derive(Debug, Clone, PartialEq, Eq)]
+-pub struct GoldwasserMicaliPrivateKey {
+-    p: BigUint,
+-    q: BigUint
++    y: BigUint,
+ }
+ 
+ impl GoldwasserMicaliPublicKey {
+@@ -37,13 +30,13 @@ impl GoldwasserMicaliPublicKey {
+ 
+ impl PublicKey for GoldwasserMicaliPublicKey {
+     /// Encryption algorithm.
+-    /// 
++    ///
+     /// # Arguments
+     ///
+     /// * `plaintext` - Plaintext to encrypt.
+-    /// 
++    ///
+     /// # Reference
+-    /// 
++    ///
+     /// See algorithm 8.51 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+     fn encrypt(&self, plaintext: &[u8]) -> Vec<BigUint> {
+         let one = BigUint::one();
+@@ -68,6 +61,13 @@ impl PublicKey for GoldwasserMicaliPublicKey {
+     }
+ }
+ 
++/// Represents the private key of the Goldwasser-Micali scheme.
++#[derive(Debug, Clone, PartialEq, Eq)]
++pub struct GoldwasserMicaliPrivateKey {
++    p: BigUint,
++    q: BigUint,
++}
++
+ impl GoldwasserMicaliPrivateKey {
+     pub fn p(&self) -> &BigUint {
+         &self.p
+@@ -80,22 +80,19 @@ impl GoldwasserMicaliPrivateKey {
+ 
+ impl PrivateKey for GoldwasserMicaliPrivateKey {
+     /// Decryption algorithm.
+-    /// 
++    ///
+     /// # Arguments
+     ///
+     /// * `ciphertext` - Ciphertext to decrypt.
+-    /// 
++    ///
+     /// # Reference
+-    /// 
++    ///
+     /// See algorithm 8.51 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+     fn decrypt(&self, ciphertext: &[BigUint]) -> Vec<u8> {
+         let mut bits: BitVec<Msb0, u8> = BitVec::with_capacity(ciphertext.len());
+-        
++
+         for c in ciphertext {
+-            let m = match number::jacobi_symbol(&c, &self.p) {
+-                number::JacobiSymbol::One => false,
+-                _                         => true
+-            };
++            let m = !matches!(number::jacobi_symbol(c, &self.p), number::JacobiSymbol::One);
+             bits.push(m);
+         }
+         let plaintext: Vec<u8> = bits.into();
+@@ -104,15 +101,17 @@ impl PrivateKey for GoldwasserMicaliPrivateKey {
+ }
+ 
+ /// Generates public and private keys.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `byte_size` - Size of public key in bytes.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 8.50 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+-pub fn generate_keys(byte_size: usize) -> Result<(GoldwasserMicaliPublicKey, GoldwasserMicaliPrivateKey), Error> {
++pub fn generate_keys(
++    byte_size: u64,
++) -> Result<(GoldwasserMicaliPublicKey, GoldwasserMicaliPrivateKey), Error> {
+     if byte_size < 2 {
+         Err(Error::LengthPublicKeyModulus)
+     } else {
+@@ -135,62 +134,62 @@ pub fn generate_keys(byte_size: usize) -> Result<(GoldwasserMicaliPublicKey, Gol
+ }
+ 
+ /// Generates primes `p` and `q` for private/public key generation.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `p_bits` - Number of bits for prime `p`.
+ /// * `q_bits` - Number of bits for prime `q`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 8.50 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+-fn generate_primes(p_bits: usize, q_bits: usize) -> (BigUint, BigUint) {
++fn generate_primes(p_bits: u64, q_bits: u64) -> (BigUint, BigUint) {
+     let p = prime::generate_prime(p_bits);
+     let mut q = prime::generate_prime(q_bits);
+ 
+     while p == q {
+         q = prime::generate_prime(q_bits);
+-    } 
+-        
++    }
++
+     (p, q)
+ }
+ 
+ /// Finds a pseudosquare modulo `p * q`.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `p` - Prime `p`.
+ /// * `q` - Prime `q`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See remark 8.54 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ fn find_pseudosquare_mod(p: &BigUint, q: &BigUint) -> Option<BigUint> {
+-    let a = find_quadratic_nonresidue_mod(&p);
+-    let b = find_quadratic_nonresidue_mod(&q);
++    let a = find_quadratic_nonresidue_mod(p);
++    let b = find_quadratic_nonresidue_mod(q);
+ 
+     let crt = vec![(&a, p), (&b, q)];
+     number::gauss_algorithm_for_crt(&crt)
+ }
+ 
+ /// Finds a quadratic non-residue modulo `n`.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `n` - Module `n`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See remark 8.54 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ fn find_quadratic_nonresidue_mod(n: &BigUint) -> BigUint {
+     let mut rng = thread_rng();
+ 
+     loop {
+-        let a = rng.gen_biguint_range(&BigUint::one(), &n);  
++        let a = rng.gen_biguint_range(&BigUint::one(), n);
+ 
+-        match number::jacobi_symbol(&a, &n) {
++        match number::jacobi_symbol(&a, n) {
+             number::JacobiSymbol::MinusOne => break a,
+-            _                              => continue
++            _ => continue,
+         }
+     }
+ }
+@@ -198,7 +197,7 @@ fn find_quadratic_nonresidue_mod(n: &BigUint) -> BigUint {
+ #[cfg(test)]
+ mod test {
+     use super::*;
+-    use crate::key::{PublicKey, PrivateKey};
++    use crate::key::{PrivateKey, PublicKey};
+     use num_traits::ToPrimitive;
+     use proptest::prelude::*;
+ 
+@@ -213,7 +212,7 @@ mod test {
+             match generate_keys(8) {
+                 Ok((public_key, private_key)) => {
+                     let cyphertext = public_key.encrypt(&plaintext);
+-                    let decrypted_plaintext = private_key.decrypt(&cyphertext); 
++                    let decrypted_plaintext = private_key.decrypt(&cyphertext);
+ 
+                     prop_assert_eq!(decrypted_plaintext, plaintext)
+                 },
+@@ -226,7 +225,7 @@ mod test {
+             fn is_quadratic_residue_module(a: usize, n: usize) -> bool {
+                 let mut b = 1usize;
+                 let mut result = false;
+-                while !result && b < n {             
++                while !result && b < n {
+                     result = b.pow(2).mod_floor(&n) == a;
+                     b += 1;
+                 }
+@@ -237,4 +236,4 @@ mod test {
+             prop_assert_eq!(false, is_quadratic_residue_module(a.to_usize().unwrap(), n))
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/key.rs b/src/key.rs
+index 6c8ac4a..5e402f0 100644
+--- a/src/key.rs
++++ b/src/key.rs
+@@ -1,4 +1,4 @@
+-use num_bigint::{BigUint};
++use num_bigint::BigUint;
+ 
+ /// Generic trait for operations on a public key.
+ pub trait PublicKey {
+@@ -8,4 +8,4 @@ pub trait PublicKey {
+ /// Generic trait for operations on a private key.
+ pub trait PrivateKey {
+     fn decrypt(&self, ciphertext: &[BigUint]) -> Vec<u8>;
+-}
+\ No newline at end of file
++}
+diff --git a/src/lib.rs b/src/lib.rs
+index a2c49b7..a6d26d2 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,7 +1,7 @@
+ //! # Probabilistic publick-key cryptography
+ //!
+-//! `probabilisticpubkey` consists of implementations for the Goldwasser-Micali
+-//! and Blum-Goldwasser probabilistic public-key systems. 
++//! `probabilistic-encryption` consists of implementations for the Goldwasser-Micali
++//! and Blum-Goldwasser probabilistic public-key systems.
+ 
+ extern crate bitvec;
+ 
+@@ -17,15 +17,15 @@ extern crate primal;
+ #[cfg(test)]
+ extern crate proptest;
+ 
++/// Blum-Goldwasser probabilistic public-key scheme.
++pub mod blum_goldwasser;
++/// Errors during key generation.
++pub mod errors;
++/// Goldwasser-Micali probabilistic public-key scheme.
++pub mod goldwasser_micali;
++/// Generic traits for operations on keys.
++pub mod key;
+ /// Number theoric functions.
+ pub mod number;
+ /// Prime generation and primality testing functions.
+ pub mod prime;
+-/// Errors during key generation. 
+-pub mod errors;
+-/// Generic traits for operations on keys.
+-pub mod key;
+-/// Goldwasser-Micali probabilistic public-key scheme.
+-pub mod goldwasser_micali;
+-/// Blum-Goldwasser probabilistic public-key scheme.
+-pub mod blum_goldwasser;
+\ No newline at end of file
+diff --git a/src/number.rs b/src/number.rs
+index f5234a4..ac010bf 100644
+--- a/src/number.rs
++++ b/src/number.rs
+@@ -1,6 +1,6 @@
+-use num_bigint::{BigUint, BigInt, ToBigInt};
++use num_bigint::{BigInt, BigUint, ToBigInt};
+ use num_integer::Integer;
+-use num_traits::{Zero, One};
++use num_traits::{One, Zero};
+ 
+ /// Calculates the values needed to represent `n` as the product of a power of 2 and an odd number.
+ ///
+@@ -10,31 +10,31 @@ use num_traits::{Zero, One};
+ /// # extern crate num_bigint;
+ /// # fn main() {
+ /// use num_bigint::BigUint;
+-/// use probabilisticpubkey::number;
+-/// 
++/// use probabilistic_encryption::number;
++///
+ /// assert_eq!(number::as_power_of_two_and_odd(&BigUint::from(256usize)), (8, BigUint::from(1usize)));
+ /// assert_eq!(number::as_power_of_two_and_odd(&BigUint::from(137usize)), (0, BigUint::from(137usize)));
+ /// assert_eq!(number::as_power_of_two_and_odd(&BigUint::from(1_1776usize)), (9, BigUint::from(23usize)));
+ /// # }
+ /// ```
+-pub fn as_power_of_two_and_odd(n: &BigUint) -> (usize, BigUint) {
++pub fn as_power_of_two_and_odd(n: &BigUint) -> (u64, BigUint) {
+     let zero = BigUint::zero();
+     let one = BigUint::one();
+     let two = BigUint::from(2usize);
+ 
+     if n.is_zero() {
+         (0, zero)
+-    } else if n.is_odd() {        
++    } else if n.is_odd() {
+         (0, n.clone())
+     } else if is_power_of_two(n) {
+         (n.bits() - 1, one)
+     } else {
+         let mut m = n.clone();
+-        let mut pw = 0usize;
+-        
++        let mut pw = 0u64;
++
+         while m.is_even() {
+-            m = m.div_floor(&two);            
+-            pw = pw + 1;
++            m = m.div_floor(&two);
++            pw += 1;
+         }
+ 
+         (pw, m)
+@@ -47,7 +47,7 @@ pub fn as_power_of_two_and_odd(n: &BigUint) -> (usize, BigUint) {
+ ///
+ /// ```rust,ignore
+ /// use num_bigint::BigUint;
+-/// 
++///
+ /// assert_eq!(is_power_of_two(&BigUint::from(256usize)), true);
+ /// assert_eq!(is_power_of_two(&BigUint::from(37usize)), false);
+ /// ```
+@@ -56,9 +56,9 @@ fn is_power_of_two(n: &BigUint) -> bool {
+ }
+ 
+ /// Calculates integers `x` and `y` such that `ax + by = d`, where `d = gcd(a, b)`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 2.107 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ ///
+ /// # Examples
+@@ -67,13 +67,13 @@ fn is_power_of_two(n: &BigUint) -> bool {
+ /// # extern crate num_bigint;
+ /// # fn main() {
+ /// use num_bigint::{BigUint, BigInt};
+-/// use probabilisticpubkey::number;
+-/// 
++/// use probabilistic_encryption::number;
++///
+ /// let a = BigUint::from(73usize);
+ /// let b = BigUint::from(56usize);
+ /// let x = BigInt::from(-23isize);
+ /// let y = BigInt::from(30isize);
+-/// 
++///
+ /// assert_eq!(number::extended_euclidean_algorithm(&a, &b), Some((x, y)));
+ /// # }
+ /// ```
+@@ -124,17 +124,17 @@ pub fn extended_euclidean_algorithm(a: &BigUint, b: &BigUint) -> Option<(BigInt,
+ pub enum JacobiSymbol {
+     MinusOne = -1,
+     Zero = 0,
+-    One = 1
++    One = 1,
+ }
+ 
+ /// Jacobi symbol computation. Same as Legendre symbol if `n` is prime.
+-/// 
++///
+ /// # Assumptions
+-/// 
++///
+ /// `n` is an odd integer `≥ 3` and `0 ≤ a < n`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 2.149 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ ///
+ /// # Examples
+@@ -143,11 +143,11 @@ pub enum JacobiSymbol {
+ /// # extern crate num_bigint;
+ /// # fn main() {
+ /// use num_bigint::BigUint;
+-/// use probabilisticpubkey::number;
+-/// 
++/// use probabilistic_encryption::number;
++///
+ /// let a = BigUint::from(256usize);
+ /// let n = BigUint::from(4211usize);
+-/// 
++///
+ /// assert_eq!(number::jacobi_symbol(&a, &n), number::JacobiSymbol::One);
+ /// # }
+ /// ```
+@@ -164,7 +164,7 @@ pub fn jacobi_symbol(a: &BigUint, n: &BigUint) -> JacobiSymbol {
+             1
+         } else {
+             let mut s;
+-            let (e, a1) = as_power_of_two_and_odd(&a);
++            let (e, a1) = as_power_of_two_and_odd(a);
+             if e.is_even() {
+                 s = 1;
+             } else {
+@@ -180,38 +180,38 @@ pub fn jacobi_symbol(a: &BigUint, n: &BigUint) -> JacobiSymbol {
+             let z = a1.mod_floor(&four);
+             if y == three && z == three {
+                 s = -s;
+-            } 
+-             
++            }
++
+             let n1 = n.mod_floor(&a1);
+             if a1.is_one() {
+                 s
+             } else {
+-                s*calculate(&n1, &a1)
++                s * calculate(&n1, &a1)
+             }
+         }
+-    } 
+-    
++    }
++
+     let result = calculate(a, n);
+     match result {
+         -1 => JacobiSymbol::MinusOne,
+-        0  => JacobiSymbol::Zero,
+-        _  => JacobiSymbol::One
++        0 => JacobiSymbol::Zero,
++        _ => JacobiSymbol::One,
+     }
+ }
+- 
++
+ /// Finds solution to the simultaneous congruences in the Chinese remainder theorem.
+ ///
+ /// # Arguments
+-/// 
++///
+ /// * `ans` - list of tuples with values of `a` and `n` for each congruence in the Chinese remainder theorem.
+-/// 
++///
+ /// # Assumptions
+-/// 
++///
+ /// Each `n` is an odd integer `≥ 3` and each `a` satisfies that `0 ≤ a < n`.
+ /// All values of `n` are pairwise relatively prime.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 2.121 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ ///
+ /// # Examples
+@@ -220,13 +220,13 @@ pub fn jacobi_symbol(a: &BigUint, n: &BigUint) -> JacobiSymbol {
+ /// # extern crate num_bigint;
+ /// # fn main() {
+ /// use num_bigint::BigUint;
+-/// use probabilisticpubkey::number;
+-/// 
++/// use probabilistic_encryption::number;
++///
+ /// let a1 = BigUint::from(128usize);
+ /// let n1 = BigUint::from(3253usize);
+ /// let a2 = BigUint::from(256usize);
+ /// let n2 = BigUint::from(4211usize);
+-/// 
++///
+ /// assert_eq!(number::gauss_algorithm_for_crt(&[(&a1, &n1), (&a2, &n2)]), Some(BigUint::from(2173132usize)));
+ /// # }
+ /// ```
+@@ -248,23 +248,23 @@ pub fn gauss_algorithm_for_crt(ans: &[(&BigUint, &BigUint)]) -> Option<BigUint>
+ 
+ /// Calculation of multiplicative inverses in ℤn.
+ /// The multiplicative inverse of `a mod n` is an integer `x` of ℤn such that `ax ≡ 1 (mod n)`.
+-/// 
++///
+ /// # Assumptions
+-/// 
++///
+ /// `a < n`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 2.142 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ ///
+ /// # Examples
+ ///
+ /// ```rust,ignore
+ /// use num_bigint::BigUint;
+-/// 
++///
+ /// let a = BigUint::from(256usize);
+ /// let n = BigUint::from(4211usize);
+-/// 
++///
+ /// assert_eq!(mod_inv(&a, &n), Some(BigUint::from(1135usize)));
+ /// ```
+ fn mod_inv(a: &BigUint, n: &BigUint) -> Option<BigUint> {
+@@ -277,14 +277,13 @@ fn mod_inv(a: &BigUint, n: &BigUint) -> Option<BigUint> {
+     // holds, there is exactly one solution.
+     if d > one {
+         None
+-    }
+-    else {
++    } else {
+         let (x, _) = extended_euclidean_algorithm(a, n)?;
+         if x < zero {
+             (x + n.to_bigint()?).to_biguint()
+         } else {
+             x.to_biguint()
+-        }        
++        }
+     }
+ }
+ 
+@@ -295,10 +294,14 @@ mod test {
+     use primal;
+     use proptest::prelude::*;
+ 
+-    fn strategy_for_integer_and_prime(lower_bound: usize, upper_bound: usize) -> impl Strategy<Value = (usize, usize)> {
++    fn strategy_for_integer_and_prime(
++        lower_bound: usize,
++        upper_bound: usize,
++    ) -> impl Strategy<Value = (usize, usize)> {
+         let sieve = primal::Sieve::new(upper_bound);
+-        (lower_bound..upper_bound).prop_filter("is_prime", move |&n| sieve.is_prime(n))
+-                                  .prop_perturb(|n, mut rng| (rng.gen_range(0, n), n))
++        (lower_bound..upper_bound)
++            .prop_filter("is_prime", move |&n| sieve.is_prime(n))
++            .prop_perturb(|n, mut rng| (rng.gen_range(0, n), n))
+     }
+ 
+     proptest! {
+@@ -321,11 +324,11 @@ mod test {
+             match extended_euclidean_algorithm(&a, &b) {
+                 Some((x, y)) => {
+                     let d = a.gcd(&b);
+-                    prop_assert_eq!(a.to_bigint().unwrap() * x + b.to_bigint().unwrap() * y, d.to_bigint().unwrap());              
+-                },                    
++                    prop_assert_eq!(a.to_bigint().unwrap() * x + b.to_bigint().unwrap() * y, d.to_bigint().unwrap());
++                },
+                 None => prop_assert_eq!(false, true)
+             }
+-        } 
++        }
+ 
+         #[test]
+         fn test_jacobi_symbol((a, n) in strategy_for_integer_and_prime(3, 10_000)) {
+@@ -333,7 +336,7 @@ mod test {
+             fn is_quadratic_residue_module(a: usize, n: usize) -> bool {
+                 let mut b = 1usize;
+                 let mut result = false;
+-                while !result && b < n {             
++                while !result && b < n {
+                     result = b.pow(2).mod_floor(&n) == a;
+                     b += 1;
+                 }
+@@ -364,7 +367,7 @@ mod test {
+                     prop_assert_eq!(x.mod_floor(&n2), a2)
+                 }
+                 None => prop_assert_eq!(false, true)
+-            }                                  
++            }
+         }
+ 
+         #[test]
+@@ -379,7 +382,7 @@ mod test {
+             } else {
+                 match mod_inv(&a, &n) {
+                     Some(x) => {
+-                        // multiplicative inverse x satisfies that n divides ax - 1 
++                        // multiplicative inverse x satisfies that n divides ax - 1
+                         let y = a * x - one;
+                         prop_assert_eq!(y.is_multiple_of(&n), true)
+                     },
+diff --git a/src/prime.rs b/src/prime.rs
+index d187d24..968d494 100644
+--- a/src/prime.rs
++++ b/src/prime.rs
+@@ -10,15 +10,15 @@ use rand::thread_rng;
+ /// # Arguments
+ ///
+ /// * `n` - number to test for primality.
+-/// 
++///
+ /// # Examples
+ ///
+ /// ```
+ /// # extern crate num_bigint;
+ /// # fn main() {
+ /// use num_bigint::BigUint;
+-/// use probabilisticpubkey::prime;
+-/// 
++/// use probabilistic_encryption::prime;
++///
+ /// assert_eq!(prime::is_probably_prime(&BigUint::from(128usize)), false);
+ /// assert_eq!(prime::is_probably_prime(&BigUint::from(2969usize)), true);
+ /// # }
+@@ -26,16 +26,15 @@ use rand::thread_rng;
+ pub fn is_probably_prime(n: &BigUint) -> bool {
+     match n.to_usize() {
+         Some(_n) if _n < 3000 => PRIMES_UNDER_3000.contains(&_n),
+-        _ =>
++        _ => {
+             if is_multiple_of_prime_under_3000(n) {
+                 false
++            } else if fermat_primality_test(50usize, n) {
++                miller_rabin_primality_test(30usize, n)
+             } else {
+-                if fermat_primality_test(50usize, n) {
+-                    miller_rabin_primality_test(30usize, &n)
+-                } else {
+-                    false
+-                }
+-            }    
++                false
++            }
++        }
+     }
+ }
+ 
+@@ -60,13 +59,13 @@ fn is_multiple_of_prime_under_3000(n: &BigUint) -> bool {
+ /// # Arguments
+ ///
+ /// * `n` - number to test for primality.
+-/// 
++///
+ /// # Assumptions:
+-/// 
++///
+ /// `n` is an odd integer `> 3` and `iterations > 0`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 4.9 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ ///
+ /// # Examples
+@@ -75,10 +74,10 @@ fn is_multiple_of_prime_under_3000(n: &BigUint) -> bool {
+ /// assert_eq!(fermat_primality_test(10, &BigUint::from(6_700_417usize)), true);
+ /// assert_eq!(fermat_primality_test(10, &BigUint::from(6_700_419usize)), false);
+ /// ```
+-/// 
++///
+ /// # Panics
+-/// 
+-/// Panics if `n` is an even integer or `< 2`. 
++///
++/// Panics if `n` is an even integer or `< 2`.
+ fn fermat_primality_test(iterations: usize, n: &BigUint) -> bool {
+     let mut rng = thread_rng();
+ 
+@@ -86,10 +85,10 @@ fn fermat_primality_test(iterations: usize, n: &BigUint) -> bool {
+     let high = n - BigUint::one();
+ 
+     for _ in 0..iterations {
+-        let a = rng.gen_biguint_range(&low, &high);       
++        let a = rng.gen_biguint_range(&low, &high);
+         let r = a.modpow(&high, n);
+         if !r.is_one() {
+-            return false
++            return false;
+         }
+     }
+ 
+@@ -97,17 +96,17 @@ fn fermat_primality_test(iterations: usize, n: &BigUint) -> bool {
+ }
+ 
+ /// Miller-Rabin probabilistic primality test.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `n` - number to test for primality.
+-/// 
++///
+ /// # Assumptions:
+-/// 
++///
+ /// `n` is an odd integer `> 3` and `iterations > 0`.
+-/// 
++///
+ /// # Reference
+-/// 
++///
+ /// See algorithm 4.24 in "Handbook of Applied Cryptography" by Alfred J. Menezes et al.
+ ///
+ /// # Examples
+@@ -116,14 +115,14 @@ fn fermat_primality_test(iterations: usize, n: &BigUint) -> bool {
+ /// assert_eq!(miller_rabin_primality_test(10, &BigUint::from(6_700_417usize)), true);
+ /// assert_eq!(miller_rabin_primality_test(10, &BigUint::from(6_700_419usize)), false);
+ /// ```
+-/// 
++///
+ /// # Panics
+-/// 
+-/// Panics if `n` is an even integer or `< 2`. 
++///
++/// Panics if `n` is an even integer or `< 2`.
+ fn miller_rabin_primality_test(iterations: usize, n: &BigUint) -> bool {
+     let mut rng = thread_rng();
+ 
+-    let two = BigUint::from(2usize);
++    let two = BigUint::from(2u64);
+     let low = &two;
+     let high = n - BigUint::one();
+     let (pw, odd) = number::as_power_of_two_and_odd(&high);
+@@ -133,18 +132,18 @@ fn miller_rabin_primality_test(iterations: usize, n: &BigUint) -> bool {
+         let mut y = a.modpow(&odd, n);
+ 
+         while !y.is_one() && y != high {
+-            let mut j = 1usize;
+-            while j <= pw - 1 && y != high {
++            let mut j = 1u64;
++            while j < pw && y != high {
+                 y = y.modpow(&two, n);
+                 if y.is_one() {
+-                    return false
++                    return false;
+                 } else {
+                     j += 1;
+                 }
+             }
+ 
+             if y != high {
+-                return false
++                return false;
+             }
+         }
+     }
+@@ -153,19 +152,19 @@ fn miller_rabin_primality_test(iterations: usize, n: &BigUint) -> bool {
+ }
+ 
+ /// Generates a random prime number of the given bit size.
+-/// 
++///
+ /// # Arguments
+ ///
+ /// * `bit_size` - number of bits of the generated prime.
+-/// 
++///
+ /// # Assumptions
+-/// 
++///
+ /// `bit_size > 1`.
+-/// 
++///
+ /// # Panics
+-/// 
++///
+ /// Panics if `bit_size < 2`.
+-pub fn generate_prime(bit_size: usize) -> BigUint {
++pub fn generate_prime(bit_size: u64) -> BigUint {
+     let mut n = generate_random_number(bit_size);
+     let two = BigUint::from(2usize);
+ 
+@@ -185,15 +184,15 @@ pub fn generate_prime(bit_size: usize) -> BigUint {
+ /// # Arguments
+ ///
+ /// * `bit_size` - number of bits of the generated number.
+-/// 
++///
+ /// # Assumptions
+-/// 
++///
+ /// `bit_size > 1`.
+-/// 
++///
+ /// # Panics
+-/// 
++///
+ /// Panics if `bit_size < 2`.
+-fn generate_random_number(bit_size: usize) -> BigUint {
++fn generate_random_number(bit_size: u64) -> BigUint {
+     let mut rng = thread_rng();
+ 
+     let n = rng.gen_biguint(bit_size);
+@@ -202,62 +201,45 @@ fn generate_random_number(bit_size: usize) -> BigUint {
+ }
+ 
+ const PRIMES_UNDER_3000: [usize; 430] = [
+-       2,    3,    5,    7,   11,   13,   17,   19,   23,   29,
+-      31,   37,   41,   43,   47,   53,   59,   61,   67,   71,
+-      73,   79,   83,   89,   97,  101,  103,  107,  109,  113,
+-     127,  131,  137,  139,  149,  151,  157,  163,  167,  173,
+-     179,  181,  191,  193,  197,  199,  211,  223,  227,  229,
+-     233,  239,  241,  251,  257,  263,  269,  271,  277,  281,
+-     283,  293,  307,  311,  313,  317,  331,  337,  347,  349,
+-     353,  359,  367,  373,  379,  383,  389,  397,  401,  409,
+-     419,  421,  431,  433,  439,  443,  449,  457,  461,  463,
+-     467,  479,  487,  491,  499,  503,  509,  521,  523,  541,
+-     547,  557,  563,  569,  571,  577,  587,  593,  599,  601,
+-     607,  613,  617,  619,  631,  641,  643,  647,  653,  659,
+-     661,  673,  677,  683,  691,  701,  709,  719,  727,  733,
+-     739,  743,  751,  757,  761,  769,  773,  787,  797,  809,
+-     811,  821,  823,  827,  829,  839,  853,  857,  859,  863,
+-     877,  881,  883,  887,  907,  911,  919,  929,  937,  941,
+-     947,  953,  967,  971,  977,  983,  991,  997, 1009, 1013,
+-    1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061, 1063, 1069,
+-    1087, 1091, 1093, 1097, 1103, 1109, 1117, 1123, 1129, 1151,
+-    1153, 1163, 1171, 1181, 1187, 1193, 1201, 1213, 1217, 1223,
+-    1229, 1231, 1237, 1249, 1259, 1277, 1279, 1283, 1289, 1291,
+-    1297, 1301, 1303, 1307, 1319, 1321, 1327, 1361, 1367, 1373,
+-    1381, 1399, 1409, 1423, 1427, 1429, 1433, 1439, 1447, 1451,
+-    1453, 1459, 1471, 1481, 1483, 1487, 1489, 1493, 1499, 1511,
+-    1523, 1531, 1543, 1549, 1553, 1559, 1567, 1571, 1579, 1583,
+-    1597, 1601, 1607, 1609, 1613, 1619, 1621, 1627, 1637, 1657,
+-    1663, 1667, 1669, 1693, 1697, 1699, 1709, 1721, 1723, 1733,
+-    1741, 1747, 1753, 1759, 1777, 1783, 1787, 1789, 1801, 1811,
+-    1823, 1831, 1847, 1861, 1867, 1871, 1873, 1877, 1879, 1889,
+-    1901, 1907, 1913, 1931, 1933, 1949, 1951, 1973, 1979, 1987,
+-    1993, 1997, 1999, 2003, 2011, 2017, 2027, 2029, 2039, 2053,
+-    2063, 2069, 2081, 2083, 2087, 2089, 2099, 2111, 2113, 2129,
+-    2131, 2137, 2141, 2143, 2153, 2161, 2179, 2203, 2207, 2213,
+-    2221, 2237, 2239, 2243, 2251, 2267, 2269, 2273, 2281, 2287,
+-    2293, 2297, 2309, 2311, 2333, 2339, 2341, 2347, 2351, 2357,
+-    2371, 2377, 2381, 2383, 2389, 2393, 2399, 2411, 2417, 2423,
+-    2437, 2441, 2447, 2459, 2467, 2473, 2477, 2503, 2521, 2531,
+-    2539, 2543, 2549, 2551, 2557, 2579, 2591, 2593, 2609, 2617,
+-    2621, 2633, 2647, 2657, 2659, 2663, 2671, 2677, 2683, 2687,
+-    2689, 2693, 2699, 2707, 2711, 2713, 2719, 2729, 2731, 2741,
+-    2749, 2753, 2767, 2777, 2789, 2791, 2797, 2801, 2803, 2819,
+-    2833, 2837, 2843, 2851, 2857, 2861, 2879, 2887, 2897, 2903,
+-    2909, 2917, 2927, 2939, 2953, 2957, 2963, 2969, 2971, 2999
++    2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
++    101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193,
++    197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307,
++    311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421,
++    431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 503, 509, 521, 523, 541, 547,
++    557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641, 643, 647, 653, 659,
++    661, 673, 677, 683, 691, 701, 709, 719, 727, 733, 739, 743, 751, 757, 761, 769, 773, 787, 797,
++    809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881, 883, 887, 907, 911, 919, 929,
++    937, 941, 947, 953, 967, 971, 977, 983, 991, 997, 1009, 1013, 1019, 1021, 1031, 1033, 1039,
++    1049, 1051, 1061, 1063, 1069, 1087, 1091, 1093, 1097, 1103, 1109, 1117, 1123, 1129, 1151, 1153,
++    1163, 1171, 1181, 1187, 1193, 1201, 1213, 1217, 1223, 1229, 1231, 1237, 1249, 1259, 1277, 1279,
++    1283, 1289, 1291, 1297, 1301, 1303, 1307, 1319, 1321, 1327, 1361, 1367, 1373, 1381, 1399, 1409,
++    1423, 1427, 1429, 1433, 1439, 1447, 1451, 1453, 1459, 1471, 1481, 1483, 1487, 1489, 1493, 1499,
++    1511, 1523, 1531, 1543, 1549, 1553, 1559, 1567, 1571, 1579, 1583, 1597, 1601, 1607, 1609, 1613,
++    1619, 1621, 1627, 1637, 1657, 1663, 1667, 1669, 1693, 1697, 1699, 1709, 1721, 1723, 1733, 1741,
++    1747, 1753, 1759, 1777, 1783, 1787, 1789, 1801, 1811, 1823, 1831, 1847, 1861, 1867, 1871, 1873,
++    1877, 1879, 1889, 1901, 1907, 1913, 1931, 1933, 1949, 1951, 1973, 1979, 1987, 1993, 1997, 1999,
++    2003, 2011, 2017, 2027, 2029, 2039, 2053, 2063, 2069, 2081, 2083, 2087, 2089, 2099, 2111, 2113,
++    2129, 2131, 2137, 2141, 2143, 2153, 2161, 2179, 2203, 2207, 2213, 2221, 2237, 2239, 2243, 2251,
++    2267, 2269, 2273, 2281, 2287, 2293, 2297, 2309, 2311, 2333, 2339, 2341, 2347, 2351, 2357, 2371,
++    2377, 2381, 2383, 2389, 2393, 2399, 2411, 2417, 2423, 2437, 2441, 2447, 2459, 2467, 2473, 2477,
++    2503, 2521, 2531, 2539, 2543, 2549, 2551, 2557, 2579, 2591, 2593, 2609, 2617, 2621, 2633, 2647,
++    2657, 2659, 2663, 2671, 2677, 2683, 2687, 2689, 2693, 2699, 2707, 2711, 2713, 2719, 2729, 2731,
++    2741, 2749, 2753, 2767, 2777, 2789, 2791, 2797, 2801, 2803, 2819, 2833, 2837, 2843, 2851, 2857,
++    2861, 2879, 2887, 2897, 2903, 2909, 2917, 2927, 2939, 2953, 2957, 2963, 2969, 2971, 2999,
+ ];
+ 
+ #[cfg(test)]
+ mod test {
+     use super::*;
+     use num_traits::Zero;
+-    use primal;    
++    use primal;
+     use proptest::prelude::*;
+ 
+     fn strategy_for_odd_integer(upper_bound: usize) -> impl Strategy<Value = (usize, bool)> {
+         let sieve = primal::Sieve::new(upper_bound);
+-        (5..upper_bound).prop_filter("is_odd", move |&n| n.is_odd())
+-                        .prop_map(move |n| (n, sieve.is_prime(n)))
++        (5..upper_bound)
++            .prop_filter("is_odd", move |&n| n.is_odd())
++            .prop_map(move |n| (n, sieve.is_prime(n)))
+     }
+ 
+     proptest! {
+@@ -282,18 +264,18 @@ mod test {
+         }
+ 
+         #[test]
+-        fn test_generate_prime(bit_size in 16usize..64) {
++        fn test_generate_prime(bit_size in 16u64..64) {
+             let prime = generate_prime(bit_size);
+             prop_assert_eq!(prime.bits(), bit_size);
+             prop_assert_eq!(is_probably_prime(&prime), true);
+         }
+ 
+         #[test]
+-        fn test_generate_random_number(size in 5usize..1024) {
++        fn test_generate_random_number(size in 5u64..1024) {
+             let shift = size - 2;
+-            let three = BigUint::from(3usize);
++            let three = BigUint::from(3u64);
+             let mask = &three << shift;
+-            
++
+             let n = generate_random_number(size);
+             let msb = (&n & &mask) >> shift;
+ 
+@@ -302,4 +284,4 @@ mod test {
+             prop_assert_eq!(n > BigUint::zero(), true);
+         }
+     }
+-}
+\ No newline at end of file
++}
+-- 
+2.46.0
+
+From 2ffbdefcccf25cee02364159b278635c3636c360 Mon Sep 17 00:00:00 2001
+From: isk <0xisk@proton.me>
+Date: Mon, 16 Sep 2024 09:57:38 +0200
+Subject: [PATCH] refactor: update cargo.toml
+
+---
+ Cargo.toml | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index c6d0e5c..bd12323 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,26 +1,24 @@
+ [package]
+-name = "probabilisticpubkey"
++name = "probabilistic-encryption"
+ version = "0.1.0"
+ authors = ["Carlos Rodriguez-Vega <crodveg@yahoo.es>"]
+ edition = "2018"
++src = "https://github.com/crodriguezvega/probabilistic-encryption?tab=readme-ov-file"
+ 
+ [dependencies]
+ bitvec = "0.20"
+ failure = "0.1.5"
++num-bigint = { version = "0.4.6", features = ["rand"]}
+ num-integer = "0.1"
+ num-traits = "0.2"
+ primal = "0.3.0"
+-rand = "0.6"
++rand = "0.8.5"
+ 
+ [dev-dependencies]
+ proptest = "0.10.1"
+ 
+-[dependencies.num-bigint]
+-version = "0.2.2"
+-features = ["rand"]
+-
+ [package.metadata.docs.rs]
+ rustdoc-args = [
+     "--html-in-header",
+     ".cargo/registry/src/github.com-1ecc6299db9ec823/katex-doc-0.1.0/katex.html",
+-]
+\ No newline at end of file
++]
+-- 
+2.46.0
+

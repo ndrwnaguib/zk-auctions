@@ -17,6 +17,43 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 npm install -g @commitlint/cli @commitlint/config-conventional
 ```
 
+### Submodules
+#### 1. Clone a Submodule
+
+```bash
+git clone --recurse-submodules https://github.com/crodriguezvega/probabilisticpubkey
+```
+
+#### 2. Applying Patch Changes
+- Ensure a clean work directory before applying any patches, by using `git status`.
+- If there any uncommitted changes, either commit them or stash them using `git stash`.
+- Apply the patch changes by using ``
+```bash
+git am submodules-changes.patch
+```
+
+#### 3. Making changes in a Submodule
+- Navigate to the submodule directory:
+```bash
+cd packages/probabilistic-encryption
+```
+- Make your changes.
+- Commit your changes:
+```bash
+# pwd: packages/probabilistic-encryption
+git add .
+git commit -m "Your descriptive commit message"
+```
+- Update the Patch File: To update the patch file with your new changes, generate a patch that includes all changes from the initial commit `0a6dd9e` to the current `HEAD`:
+```bash
+git format-patch 0a6dd9e..HEAD --stdout > ../../submodules-changes.patch
+```
+#### 4. Additional Notes
+- Checking Submodule Status:
+```bash
+git submodule status
+```
+
 ## Quick start with `halo2-lib`
 
 To write your first ZK circuit, copy [`examples/halo2_lib.rs`](examples/halo2_lib.rs) to a new file in `examples` directory. Now you can fill in the `some_function_in_zk` function with your desired computation.
