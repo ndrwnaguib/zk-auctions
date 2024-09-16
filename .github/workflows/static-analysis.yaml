@@ -18,12 +18,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Update Submodules
-        run: git submodule update --init --recursive
+      - name: Attempt Submodule Update (ignore errors)
+        run: git submodule update --init --recursive || echo "Submodule update failed, attempting manual clone..."
+
+      - name: Manual Submodule Clone (if needed)
+        run: |
+          if [ ! -d "packages/probabilistic-encryption" ]; then
+            git clone https://github.com/crodriguezvega/probabilisticpubkey packages/probabilistic-encryption
+            cd packages/probabilistic-encryption
+            git checkout main # Or any specific branch/commit you want
+            cd ../..
+          fi
 
       - name: Apply Patch Changes
         run: git apply ../../submodules-changes.patch || echo "No patch file found or no changes to apply"
-
+        
       - uses: actions/setup-python@v4
 
       - name: Install Rust toolchain 1.74 (with clippy and rustfmt)
