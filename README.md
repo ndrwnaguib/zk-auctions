@@ -21,7 +21,7 @@ npm install -g @commitlint/cli @commitlint/config-conventional
 #### 1. Clone a Submodule
 
 ```bash
-git clone --recurse-submodules https://github.com/crodriguezvega/probabilisticpubkey
+git submodule update --init --recursive 
 ```
 
 #### 2. Applying Patch Changes
@@ -29,7 +29,8 @@ git clone --recurse-submodules https://github.com/crodriguezvega/probabilisticpu
 - If there any uncommitted changes, either commit them or stash them using `git stash`.
 - Apply the patch changes by using ``
 ```bash
-git apply submodules-changes.patch
+# pwd: packages/probabilistic-encryption
+git apply ../../submodules-changes.patch
 ```
 
 #### 3. Making changes in a Submodule
@@ -38,15 +39,9 @@ git apply submodules-changes.patch
 cd packages/probabilistic-encryption
 ```
 - Make your changes.
-- Commit your changes:
-```bash
-# pwd: packages/probabilistic-encryption
-git add .
-git commit -m "Your descriptive commit message"
-```
 - Update the Patch File: To update the patch file with your new changes, generate a patch that includes all changes from the initial commit `0a6dd9e` to the current `HEAD`:
 ```bash
-git format-patch 0a6dd9e..HEAD --stdout > ../../submodules-changes.patch
+git diff > ../../submodules-changes.patch
 ```
 #### 4. Additional Notes
 - Checking Submodule Status:
