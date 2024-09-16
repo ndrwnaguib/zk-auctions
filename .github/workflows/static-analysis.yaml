@@ -27,6 +27,7 @@ jobs:
             git clone --recurse-submodules https://github.com/crodriguezvega/probabilisticpubkey
             cd packages/probabilistic-encryption
             git checkout master
+            cd ../..
           fi
         
       - name: Debug - Print Working Directory
