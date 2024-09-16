@@ -15,6 +15,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Clone submodules
+        run: git submodule update --init --recursive
+        
+      - name: Set Git Identity
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+      
+      - name: Apply Patch Changes to the submodule
+        run: |
+          cd packages/probabilistic-encryption
+          git apply ../../submodules-changes.patch
+
       - name: Install Rust toolchain 1.74
         run: rustup toolchain install nightly-2023-12-21
 
