@@ -29,7 +29,7 @@ jobs:
       - name: Apply Patch Changes to the submodule
         run: |
           cd packages/probabilistic-encryption
-          git am ../../submodules-changes.patch
+          git apply ../../submodules-changes.patch
         
       - uses: actions/setup-python@v4
 
