@@ -1,0 +1,3 @@
+[submodule "packages/probabilistic-encryption"]
+	path = packages/probabilistic-encryption
+	url = https://github.com/crodriguezvega/probabilisticpubkey

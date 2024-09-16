@@ -1,7 +1,0 @@
-# Seeds for failure cases proptest has generated in the past. It is
-# automatically read and these particular cases re-run before any
-# novel cases are generated.
-#
-# It is recommended to check this file in to source control so that
-# everyone who runs the test benefits from these saved cases.
-xs 3297591017 1556420267 1230460756 1416769220 # shrinks to bit_vector = BitVec<BigEndian, u8> [00000000, 11001110]
