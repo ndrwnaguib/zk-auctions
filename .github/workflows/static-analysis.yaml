@@ -18,9 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Clone submodule up to the origin latest changes
-        run: git submodule foreach --recursive git reset --hard || echo "Submodule update failed, attempting manual clone..."
-
+      - name: Clone submodules
+        run: git submodule update --init --recursive
+        
       - name: Set Git Identity
         run: |
           git config --global user.name "GitHub Actions"
@@ -29,7 +29,7 @@ jobs:
       - name: Apply Patch Changes to the submodule
         run: |
           cd packages/probabilistic-encryption
-          git am ../../submodules-changes.patch || echo "No patch file found or no changes to apply"
+          git am ../../submodules-changes.patch
         
       - uses: actions/setup-python@v4
 
