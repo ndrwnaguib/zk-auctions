@@ -1,20 +1,40 @@
-From 0a6dd9e8776681b2d2c8ec3ea3811e1f9ad39d7b Mon Sep 17 00:00:00 2001
-From: isk <0xisk@proton.me>
-Date: Mon, 16 Sep 2024 09:29:15 +0200
-Subject: [PATCH] refactor: update most of the  dependences versions
-
----
- examples/blum_goldwasser.rs   |  14 +--
- examples/goldwasser_micali.rs |  16 ++--
- src/blum_goldwasser.rs        |  91 +++++++++---------
- src/errors.rs                 |   2 +-
- src/goldwasser_micali.rs      |  91 +++++++++---------
- src/key.rs                    |   4 +-
- src/lib.rs                    |  20 ++--
- src/number.rs                 | 121 ++++++++++++------------
- src/prime.rs                  | 170 +++++++++++++++-------------------
- 9 files changed, 258 insertions(+), 271 deletions(-)
-
+diff --git a/Cargo.toml b/Cargo.toml
+index c6d0e5c..bd12323 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,26 +1,24 @@
+ [package]
+-name = "probabilisticpubkey"
++name = "probabilistic-encryption"
+ version = "0.1.0"
+ authors = ["Carlos Rodriguez-Vega <crodveg@yahoo.es>"]
+ edition = "2018"
++src = "https://github.com/crodriguezvega/probabilistic-encryption?tab=readme-ov-file"
+ 
+ [dependencies]
+ bitvec = "0.20"
+ failure = "0.1.5"
++num-bigint = { version = "0.4.6", features = ["rand"]}
+ num-integer = "0.1"
+ num-traits = "0.2"
+ primal = "0.3.0"
+-rand = "0.6"
++rand = "0.8.5"
+ 
+ [dev-dependencies]
+ proptest = "0.10.1"
+ 
+-[dependencies.num-bigint]
+-version = "0.2.2"
+-features = ["rand"]
+-
+ [package.metadata.docs.rs]
+ rustdoc-args = [
+     "--html-in-header",
+     ".cargo/registry/src/github.com-1ecc6299db9ec823/katex-doc-0.1.0/katex.html",
+-]
+\ No newline at end of file
++]
 diff --git a/examples/blum_goldwasser.rs b/examples/blum_goldwasser.rs
 index 060f94f..d0d3fb0 100644
 --- a/examples/blum_goldwasser.rs
@@ -1260,55 +1280,3 @@ index d187d24..968d494 100644
 -}
 \ No newline at end of file
 +}
--- 
-2.46.0
-
-From 2ffbdefcccf25cee02364159b278635c3636c360 Mon Sep 17 00:00:00 2001
-From: isk <0xisk@proton.me>
-Date: Mon, 16 Sep 2024 09:57:38 +0200
-Subject: [PATCH] refactor: update cargo.toml
-
----
- Cargo.toml | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/Cargo.toml b/Cargo.toml
-index c6d0e5c..bd12323 100644
---- a/Cargo.toml
-+++ b/Cargo.toml
-@@ -1,26 +1,24 @@
- [package]
--name = "probabilisticpubkey"
-+name = "probabilistic-encryption"
- version = "0.1.0"
- authors = ["Carlos Rodriguez-Vega <crodveg@yahoo.es>"]
- edition = "2018"
-+src = "https://github.com/crodriguezvega/probabilistic-encryption?tab=readme-ov-file"
- 
- [dependencies]
- bitvec = "0.20"
- failure = "0.1.5"
-+num-bigint = { version = "0.4.6", features = ["rand"]}
- num-integer = "0.1"
- num-traits = "0.2"
- primal = "0.3.0"
--rand = "0.6"
-+rand = "0.8.5"
- 
- [dev-dependencies]
- proptest = "0.10.1"
- 
--[dependencies.num-bigint]
--version = "0.2.2"
--features = ["rand"]
--
- [package.metadata.docs.rs]
- rustdoc-args = [
-     "--html-in-header",
-     ".cargo/registry/src/github.com-1ecc6299db9ec823/katex-doc-0.1.0/katex.html",
--]
-\ No newline at end of file
-+]
--- 
-2.46.0
-
