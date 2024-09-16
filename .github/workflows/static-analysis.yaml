@@ -28,6 +28,15 @@ jobs:
             cd packages/probabilistic-encryption
             git checkout master
           fi
+        
+      - name: Debug - Print Working Directory
+        run: pwd
+
+      - name: Debug - List Files in Current Directory
+        run: ls -al
+
+      - name: Debug - List Files in Parent Directory
+        run: ls -al ..
 
       - name: Apply Patch Changes
         run: git apply ../../submodules-changes.patch
