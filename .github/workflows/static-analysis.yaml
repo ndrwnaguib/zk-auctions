@@ -26,8 +26,7 @@ jobs:
           if [ ! -d "packages/probabilistic-encryption" ]; then
             git clone https://github.com/crodriguezvega/probabilisticpubkey packages/probabilistic-encryption
             cd packages/probabilistic-encryption
-            git checkout main # Or any specific branch/commit you want
-            cd ../..
+            git checkout master
           fi
 
       - name: Apply Patch Changes
