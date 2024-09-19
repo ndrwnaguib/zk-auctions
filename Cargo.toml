@@ -5,6 +5,7 @@ resolver = "2"
 members = [
     "packages/circuits",
     "packages/cli",
+    "packages/probabilistic-encryption"
 ]
 
 # Dev / testing mode. We make opt-level = 3 to improve proving times (otherwise it is really slow)
