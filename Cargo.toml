@@ -3,8 +3,8 @@
 resolver = "2"
 
 members = [
-    "packages/circuits",
-    "packages/cli",
+    "hello-world/host",
+    "hello-world/methods",
 ]
 
 # Dev / testing mode. We make opt-level = 3 to improve proving times (otherwise it is really slow)
