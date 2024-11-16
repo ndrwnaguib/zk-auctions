@@ -13,3 +13,7 @@ Cargo.lock
 # Added by cargo
 
 /target
+
+methods/guest/Cargo.lock
+
+.DS_Store
