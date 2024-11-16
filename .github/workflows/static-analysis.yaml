@@ -31,7 +31,7 @@ jobs:
           rustup component add clippy --toolchain nightly-2023-12-21
           rustup component add rustfmt --toolchain nightly-2023-12-21
           curl -L https://risczero.com/install | bash
-          rzup install
+          ~/.risc0/bin/rzup install
           cargo risczero --version
 
       # Run pre-commit hooks

@@ -1,19 +1,24 @@
+cargo-features = ["edition2024"]
+
 [package]
 name = "zk-auctions"
 version = "0.1.0"
-edition = "2024"
 
 [dependencies]
 zk-auctions-methods = { path = "methods" }
 risc0-zkvm = "v1.1.3"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
+[features]
+cuda = ["risc0-zkvm/cuda"]
+default = []
+prove = ["risc0-zkvm/prove"]
+
 [workspace]
 
 resolver = "2"
 
 members = [
-    "host",
     "methods",
 ]
 

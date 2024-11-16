@@ -13,16 +13,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Install Rust toolchain 1.74
-        run: rustup toolchain install nightly-2023-12-21
+      - name: Install Rust nightly (edition 2024 support)
+        run: |
+          rustup install nightly
+          rustup default nightly
+
+      - name: Set Rust nightly for edition 2024
+        run: rustup override set nightly
 
       - name: Install cargo-llvm-cov
-        run: cargo install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
 
       - name: Run tests with coverage
-        run: cargo llvm-cov --all-features --workspace --html --output-dir=target/llvm-cov/html
+        run: cargo llvm-cov --all-features --workspace --html
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
