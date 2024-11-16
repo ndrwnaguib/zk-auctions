@@ -1,0 +1,9 @@
+[package]
+name = "guest"
+version = "0.1.0"
+edition = "2023"
+
+[workspace]
+
+[dependencies]
+risc0-zkvm = { version = "1.1.2", default-features = false, features = ['std'] }

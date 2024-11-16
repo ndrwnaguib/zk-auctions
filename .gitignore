@@ -12,6 +12,7 @@ Cargo.lock
 
 # Added by cargo
 
+methods/guest/target
 /target
 
 methods/guest/Cargo.lock
