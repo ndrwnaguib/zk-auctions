@@ -50,7 +50,7 @@ fn gm_eval_honest(
 
 /// Called by supplier 2, w.r.t. the document of gm_eval_honest
 /// Returns True if myNumber <= otherNumber
-///                 (number2 <= number1)    
+///                 (number2 <= number1)
 fn compare_leq_honest(eval_res: &Vec<Integer>, priv_key: &Integer) -> bool {
     let mut one_cnt = 0;
     for cipher in eval_res {
