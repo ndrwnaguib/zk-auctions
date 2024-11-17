@@ -1,50 +1,13 @@
-cargo-features = ["edition2024"]
-
 [package]
 name = "zk-auctions"
 version = "0.1.0"
 
 [dependencies]
 zk-auctions-methods = { path = "methods" }
-risc0-zkvm = "v1.1.3"
+risc0-zkvm = "1.1.3"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [features]
 cuda = ["risc0-zkvm/cuda"]
 default = []
 prove = ["risc0-zkvm/prove"]
-
-[workspace]
-
-resolver = "2"
-
-members = [
-    "methods",
-]
-
-# Dev / testing mode. We make opt-level = 3 to improve proving times (otherwise it is really slow)
-opt-level = 3
-debug = 1 # change to 0 or 2 for more or less debug info
-overflow-checks = true # default
-incremental = true # default
-
-# Local "release" mode, more optimized than dev but faster to compile than release
-[profile.local]
-inherits = "dev"
-opt-level = 3
-# Set this to 1 or 2 to get more useful backtraces
-debug = 1
-debug-assertions = false
-panic = 'unwind'
-# better recompile times
-incremental = true
-lto = "thin"
-codegen-units = 16
-
-[profile.release]
-opt-level = 3
-debug = false
-debug-assertions = false
-lto = "fat"
-panic = "abort"
-incremental = false
