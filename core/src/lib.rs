@@ -4,3 +4,8 @@ use serde::{Deserialize, Serialize};
 pub struct Outputs {
     pub position: f32,
 }
+
+pub mod gm;
+
+pub mod proofs;
+
