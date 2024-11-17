@@ -1,13 +1,10 @@
 use rand::{rngs::StdRng, Rng, SeedableRng};
-use rug::{Integer, RandState};
+use rug::Integer;
 use sha2::{Digest, Sha256};
-use std::collections::VecDeque;
 
-mod GM;
-
-use GM::{
+use crate::gm::{
     decrypt_bit_and, decrypt_bit_gm, decrypt_gm, dot_mod, embed_and, embed_bit_and,
-    encrypt_bit_and, encrypt_bit_gm, encrypt_gm, generate_keys,
+    encrypt_bit_and, encrypt_bit_gm, encrypt_bit_gm_coin, encrypt_gm, generate_keys,
 };
 
 /// Called by supplier 1, who bids number1
@@ -27,9 +24,9 @@ fn gm_eval_honest(
     let n = pub_key2.clone();
 
     let neg_cipher1: Vec<Integer> = cipher1.iter().map(|x| x * (&n - 1) % &n).collect();
-    let c_neg_xor = dot_mod(&neg_cipher1, cipher2, &n);
+    let c_neg_xor = dot_mod(&neg_cipher1, &cipher2, n);
 
-    let cipher1_and = embed_and(cipher1, pub_key2, rand1);
+    let cipher1_and = embed_and(&cipher1, pub_key2, rand1);
     let cipher2_and = embed_and(cipher2, pub_key2, rand2);
     let neg_cipher1_and = embed_and(&neg_cipher1, pub_key2, rand3);
     let c_neg_xor_and = embed_and(&c_neg_xor, pub_key2, rand4);
@@ -209,4 +206,211 @@ fn verify_eval(
         }
     }
     Some(())
+}
+
+#[cfg(test)] // This module is included only during testing
+mod tests {
+    use super::*;
+
+    fn rand32(n: &BigUint) -> Vec<BigUint> {
+        let mut result = Vec::new();
+        for _ in 0..32 {
+            result.push(get_next_random(n));
+        }
+        result
+    }
+
+    fn generate_rand_matrix(n: &BigUint, rows: usize, cols: usize) -> Vec<Vec<BigUint>> {
+        let mut matrix = Vec::new();
+        for _ in 0..rows {
+            let mut row = Vec::new();
+            for _ in 0..cols {
+                row.push(get_next_random(n));
+            }
+            matrix.push(row);
+        }
+        matrix
+    }
+
+    #[test]
+    fn strain_main() {
+        let keys1 = generate_keys();
+        let n1 = &keys1.pub_key;
+        let keys2 = generate_keys();
+        let n2 = &keys2.pub_key;
+
+        let mut rng = thread_rng();
+        let v1 = rng.gen_biguint_range(&BigUint::from(0u32), &(BigUint::from(1u32) << 31));
+        let r1 = rand32(n1);
+        let c1 = encrypt_gm_coin(&v1, n1, &r1);
+
+        let v2 = rng.gen_biguint_range(&BigUint::from(0u32), &(BigUint::from(1u32) << 31));
+        let r2 = rand32(n2);
+        let c2 = encrypt_gm_coin(&v2, n2, &r2);
+
+        let r12 = rand32(n2);
+        println!("Encryption timings...");
+        let mut timings = Vec::new();
+        for _ in 0..10 {
+            let start_time = Instant::now();
+            let _c12 = encrypt_gm_coin(&v1, n2, &r12);
+            timings.push(start_time.elapsed().as_secs_f64());
+        }
+        let avg = timings.iter().sum::<f64>() / timings.len() as f64;
+        let rstd = 100.0
+            * (timings.iter().map(|t| (t - avg).powi(2)).sum::<f64>() / timings.len() as f64)
+                .sqrt()
+            / avg;
+        println!("Avg: {:.3}ms, rel. std. dev.: {:.2}%", avg * 1000.0, rstd);
+
+        println!("Decryption timings...");
+        let mut decrypt_timings = Vec::new();
+        for _ in 0..10 {
+            let start_time = Instant::now();
+            decrypt_gm(&encrypt_gm_coin(&v1, n2, &r12), &keys2.priv_key);
+            decrypt_timings.push(start_time.elapsed().as_secs_f64());
+        }
+        let avg = decrypt_timings.iter().sum::<f64>() / decrypt_timings.len() as f64;
+        let rstd = 100.0
+            * (decrypt_timings.iter().map(|t| (t - avg).powi(2)).sum::<f64>()
+                / decrypt_timings.len() as f64)
+                .sqrt()
+            / avg;
+        println!("Avg: {:.2}ms, rel. std. dev.: {:.2}%", avg * 1000.0, rstd);
+
+        println!("Eval computation timings...");
+        let mut eval_timings = Vec::new();
+        let rand1 = generate_rand_matrix(n2, 32, 128);
+        let rand2 = generate_rand_matrix(n2, 32, 128);
+        let rand3 = generate_rand_matrix(n2, 32, 128);
+        let rand4 = generate_rand_matrix(n2, 32, 128);
+
+        for _ in 0..10 {
+            let start_time = Instant::now();
+            let eval_res = gm_eval_honest(&v1, &c2, n2, &rand1, &rand2, &rand3, &rand4);
+            eval_timings.push(start_time.elapsed().as_secs_f64());
+        }
+        let avg = eval_timings.iter().sum::<f64>() / eval_timings.len() as f64;
+        let rstd = 100.0
+            * (eval_timings.iter().map(|t| (t - avg).powi(2)).sum::<f64>()
+                / eval_timings.len() as f64)
+                .sqrt()
+            / avg;
+        println!("avg: {:.2}s, rel. std. dev.: {:.2}%", avg, rstd);
+
+        assert_eq!(
+            (v2 <= v1),
+            compare_leq_honest(
+                &gm_eval_honest(&v1, &c2, n2, &rand1, &rand2, &rand3, &rand4),
+                &keys2.priv_key
+            )
+        );
+    }
+
+    #[test]
+    fn test_gm_eval_honest() {
+        let keys1 = generate_keys();
+        let n1 = &keys1.pub_key;
+
+        let mut rng = thread_rng();
+        let v1 = rng.gen_biguint_range(&BigUint::from(0u32), &(BigUint::from(1u32) << 31));
+        let r1 = rand32(n1);
+        let c1 = encrypt_gm_coin(&v1, n1, &r1);
+
+        let v2 = rng.gen_biguint_range(&BigUint::from(0u32), &(BigUint::from(1u32) << 31));
+        let r2 = rand32(n1);
+        let c2 = encrypt_gm_coin(&v2, n1, &r2);
+
+        let rand1 = generate_rand_matrix(n1, 32, 128);
+        let rand2 = generate_rand_matrix(n1, 32, 128);
+        let rand3 = generate_rand_matrix(n1, 32, 128);
+        let rand4 = generate_rand_matrix(n1, 32, 128);
+
+        let eval_res = gm_eval_honest(&v1, &c2, n1, &rand1, &rand2, &rand3, &rand4);
+
+        assert_eq!((v2 <= v1), compare_leq_honest(&eval_res, &keys1.priv_key), "Evaluation failed");
+    }
+
+    #[test]
+    fn test_proof_eval() {
+        let keys = generate_keys();
+        let n = &keys.pub_key;
+
+        let mut rng = thread_rng();
+        let v1 = rng.gen_biguint_range(&BigUint::from(0u32), &(BigUint::from(1u32) << 31));
+        let r1 = rand32(n);
+        let c1 = encrypt_gm_coin(&v1, n, &r1);
+
+        let rand1 = generate_rand_matrix(n, 32, 128);
+        let rand2 = generate_rand_matrix(n, 32, 128);
+        let rand3 = generate_rand_matrix(n, 32, 128);
+        let rand4 = generate_rand_matrix(n, 32, 128);
+
+        let eval_res = gm_eval_honest(&v1, &c1, n, &rand1, &rand2, &rand3, &rand4);
+
+        let proof = proof_eval(&eval_res, &keys.priv_key, n);
+        assert!(verify_eval(&eval_res, &proof, n), "Proof verification failed");
+    }
+
+    #[test]
+    fn test_proof_dlog_eq() {
+        let keys = generate_keys();
+        let n = &keys.pub_key;
+
+        let mut rng = thread_rng();
+        let r1 = rand32(n);
+        let r2 = rand32(n);
+
+        let v = rng.gen_biguint_range(&BigUint::from(0u32), &(BigUint::from(1u32) << 31));
+        let c1 = encrypt_gm_coin(&v, n, &r1);
+        let c2 = encrypt_gm_coin(&v, n, &r2);
+
+        let proof = proof_dlog_eq(&v, &r1, &r2, n);
+
+        assert!(
+            verify_dlog_eq(&c1, &c2, &proof, n),
+            "Discrete logarithm equality proof verification failed"
+        );
+    }
+
+    #[test]
+    fn test_proof_shuffle() {
+        let keys = generate_keys();
+        let n = &keys.pub_key;
+
+        let mut rng = thread_rng();
+        let v = rand32(n);
+
+        let c = v.iter().map(|val| encrypt_gm(val, n)).collect::<Vec<BigUint>>();
+
+        let shuffled = {
+            let mut s = c.clone();
+            s.shuffle(&mut rng);
+            s
+        };
+
+        let (proof, perm, rand_vals) = compute_proof_shuffle(&c, &shuffled, n);
+
+        assert!(verify_shuffle(&c, &shuffled, &proof, n), "Shuffle proof verification failed");
+
+        for (i, val) in v.iter().enumerate() {
+            let decrypted = decrypt_gm(&shuffled[perm[i]], &keys.priv_key);
+            assert_eq!(decrypted, *val, "Shuffled value does not match original");
+        }
+    }
+
+    #[test]
+    fn test_proof_enc() {
+        let keys = generate_keys();
+        let n = &keys.pub_key;
+
+        let mut rng = thread_rng();
+        let v = rng.gen_biguint_range(&BigUint::from(0u32), &(BigUint::from(1u32) << 31));
+        let r = rand32(n);
+        let c = encrypt_gm_coin(&v, n, &r);
+
+        let proof = compute_proof_enc(&v, &r, n);
+
+        assert!(verify_proof_enc(&c, &proof, n), "Encryption proof verification failed");
+    }
 }
