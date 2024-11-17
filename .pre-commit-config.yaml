@@ -1,35 +1,18 @@
 repos:
-  - repo: local
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.3.0
     hooks:
-      - id: commit-msg
-        name: commit lint
-        entry: commitlint --edit
-        language: system
-        stages: [commit-msg]
-      
-      - id: cargo-fmt
-        name: cargo format
-        entry: cargo fmt
-        language: rust
-        args: ["--", "--check"]
-        types: [rust]
-        stages: [pre-commit]
-      
-      - id: cargo-clippy
-        name: cargo clippy
-        description: Lint rust sources
-        entry: cargo clippy
-        language: rust
-        args: ["--", "-D", "warnings"]
-        types: [rust]
-        pass_filenames: false
-        stages: [pre-commit]
-
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: master
+    hooks:
+      - id: fmt
+      - id: clippy
       - id: cargo-check
-        name: cargo check
-        description: Check the package for errors.
-        entry: cargo check
-        language: rust
-        types: [rust]
-        pass_filenames: false
-        stages: [pre-commit]
