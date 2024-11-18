@@ -2,6 +2,8 @@
 // The ELF is used for proving and the ID is used for verification.
 extern crate risc0_zkvm;
 
+use zk_auctions_core::gm;
+
 fn main() {
     println!("Verifying ...",);
 }
