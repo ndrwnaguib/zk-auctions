@@ -8,4 +8,3 @@ pub struct Outputs {
 pub mod gm;
 
 pub mod proofs;
-

@@ -7,9 +7,31 @@ use rug::Integer;
 
 const AND_SIZE_FACTOR: usize = 40;
 
+/* the following generator is created to match the original implementation of
+ * `getNextRandom`, there is a good chance that it will be replaced */
+pub struct StrainRandomGenerator {
+    counter: u64,
+}
+
+impl StrainRandomGenerator {
+    // Create a new RandomGenerator with an initial counter value
+    pub fn new() -> Self {
+        Self { counter: 0 }
+    }
+
+    // Get the next random number based on `n`
+    pub fn get_next_random(&mut self, n: &Integer) -> Integer {
+        self.counter += 1;
+        n - Integer::from(self.counter)
+    }
+}
+
+/**/
+
 struct Keys {
-    pub_key: Integer,
-    priv_key: (Integer, Integer),
+    pub pub_key: Integer,
+    // TODO: this is only made `pub` for the tests
+    pub priv_key: (Integer, Integer),
 }
 
 pub fn generate_keys(prime_size: Option<u32>) -> Keys {
@@ -97,7 +119,7 @@ pub fn encrypt_bit_and(bit: u8, pub_key: Integer) -> Vec<Integer> {
     }
 }
 
-pub fn decrypt_bit_and(cipher: &[Integer], priv_key: (Integer, Integer)) -> u8 {
+pub fn decrypt_bit_and(cipher: &Vec<Integer>, priv_key: (Integer, Integer)) -> u8 {
     let (p, q) = priv_key;
     let n = p * q;
     let sk_gm = ((p - 1) * (q - 1)) / 4;
@@ -156,8 +178,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_gen_keys(iters: usize) {
+    fn test_gen_keys() {
         println!("test_gen_keys:");
+        let iters = 10;
         for _ in 0..iters {
             let keys = generate_keys();
 

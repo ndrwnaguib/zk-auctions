@@ -1,10 +1,11 @@
-use rand::{rngs::StdRng, Rng, SeedableRng};
+use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};
 use rug::Integer;
 use sha2::{Digest, Sha256};
 
 use crate::gm::{
     decrypt_bit_and, decrypt_bit_gm, decrypt_gm, dot_mod, embed_and, embed_bit_and,
     encrypt_bit_and, encrypt_bit_gm, encrypt_bit_gm_coin, encrypt_gm, generate_keys,
+    StrainRandomGenerator,
 };
 
 /// Called by supplier 1, who bids number1
@@ -12,14 +13,14 @@ use crate::gm::{
 /// Encrypts the result with pub_key2 for later decryption by supplier 2
 fn gm_eval_honest(
     number1: u32,
-    cipher1: &Vec<Integer>,
-    cipher2: &Vec<Integer>,
-    pub_key2: &Integer,
-    rand1: &[Integer],
-    rand2: &[Integer],
-    rand3: &[Integer],
-    rand4: &[Integer],
-) -> Vec<Integer> {
+    cipher1: &[Integer],
+    cipher2: &[Integer],
+    pub_key2: Integer,
+    rand1: &Vec<Vec<Integer>>,
+    rand2: &Vec<Vec<Integer>>,
+    rand3: &Vec<Vec<Integer>>,
+    rand4: &Vec<Vec<Integer>>,
+) -> Vec<Vec<Integer>> {
     assert_eq!(cipher2.len(), 32);
     let n = pub_key2.clone();
 
@@ -33,9 +34,9 @@ fn gm_eval_honest(
 
     let mut res = Vec::new();
     for l in 0..32 {
-        let mut temp = dot_mod(&cipher2_and[l], &neg_cipher1_and[l], &n);
+        let mut temp = dot_mod(&cipher2_and[l], &neg_cipher1_and[l], n);
         for u in 0..l {
-            temp = dot_mod(&temp, &c_neg_xor_and[u], &n);
+            temp = dot_mod(&temp, &c_neg_xor_and[u], n);
         }
         res.push(temp);
     }
@@ -48,10 +49,10 @@ fn gm_eval_honest(
 /// Called by supplier 2, w.r.t. the document of gm_eval_honest
 /// Returns True if myNumber <= otherNumber
 ///                 (number2 <= number1)
-fn compare_leq_honest(eval_res: &Vec<Integer>, priv_key: &Integer) -> bool {
+fn compare_leq_honest(eval_res: &Vec<Vec<Integer>>, priv_key: (Integer, Integer)) -> bool {
     let mut one_cnt = 0;
     for cipher in eval_res {
-        if decrypt_bit_and(cipher, priv_key) == "1" {
+        if decrypt_bit_and(cipher, priv_key) == 1 {
             one_cnt += 1;
         }
     }
@@ -93,6 +94,9 @@ fn proof_eval(
 
     let bits_v = format!("{:032b}", number1);
 
+    // the following lines differ from the original Python implementation
+    let mut strain_rng = StrainRandomGenerator::new();
+
     // Generate coins_delta, coins_gamma, and coins_gamma2
     let mut coins_delta = vec![vec![Integer::from(0); sound_param]; 32];
     let mut coins_gamma = vec![vec![Integer::from(0); sound_param]; 32];
@@ -102,8 +106,8 @@ fn proof_eval(
     for l in 0..32 {
         for m in 0..sound_param {
             coins_delta[l][m] = Integer::from(rng.gen::<u8>() % 2);
-            coins_gamma[l][m] = Integer::from(getNextRandom(pub_key1 - 1));
-            coins_gamma2[l][m] = Integer::from(getNextRandom(pub_key2 - 1));
+            coins_gamma[l][m] = Integer::from(strain_rng.get_next_random(pub_key1 - 1));
+            coins_gamma2[l][m] = Integer::from(strain_rng.get_next_random(pub_key2 - 1));
         }
     }
 
@@ -234,9 +238,9 @@ mod tests {
 
     #[test]
     fn strain_main() {
-        let keys1 = generate_keys();
+        let keys1 = generate_keys(None);
         let n1 = &keys1.pub_key;
-        let keys2 = generate_keys();
+        let keys2 = generate_keys(None);
         let n2 = &keys2.pub_key;
 
         let mut rng = thread_rng();
@@ -251,9 +255,10 @@ mod tests {
         let r12 = rand32(n2);
         println!("Encryption timings...");
         let mut timings = Vec::new();
+        let mut c12;
         for _ in 0..10 {
             let start_time = Instant::now();
-            let _c12 = encrypt_gm_coin(&v1, n2, &r12);
+            c12 = encrypt_gm_coin(&v1, n2, &r12);
             timings.push(start_time.elapsed().as_secs_f64());
         }
         let avg = timings.iter().sum::<f64>() / timings.len() as f64;
@@ -285,9 +290,10 @@ mod tests {
         let rand3 = generate_rand_matrix(n2, 32, 128);
         let rand4 = generate_rand_matrix(n2, 32, 128);
 
+        let mut eval_res;
         for _ in 0..10 {
             let start_time = Instant::now();
-            let eval_res = gm_eval_honest(&v1, &c2, n2, &rand1, &rand2, &rand3, &rand4);
+            eval_res = gm_eval_honest(&v1, c12, &c2, n2, &rand1, &rand2, &rand3, &rand4);
             eval_timings.push(start_time.elapsed().as_secs_f64());
         }
         let avg = eval_timings.iter().sum::<f64>() / eval_timings.len() as f64;
@@ -301,7 +307,7 @@ mod tests {
         assert_eq!(
             (v2 <= v1),
             compare_leq_honest(
-                &gm_eval_honest(&v1, &c2, n2, &rand1, &rand2, &rand3, &rand4),
+                eval_res,
                 &keys2.priv_key
             )
         );
