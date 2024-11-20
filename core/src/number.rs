@@ -1,7 +1,7 @@
 use num_bigint::{BigInt, Sign};
 use num_integer::Integer;
 use num_traits::{One, ToPrimitive, Zero};
-use rand::{Rng, RngCore};
+use rand::RngCore;
 
 /// Generates a random integer with at most `n_bits` bits.
 ///
@@ -106,14 +106,19 @@ pub fn get_strong_prime(
 
     let rabin_miller_rounds = ((-false_positive_prob.ln()) / 4f64.ln()).ceil() as u32;
 
+    // calculate range for X
+    //  lower_bound = sqrt(2) * 2^{511 + 128*x}
+    //   upper_bound = 2^{512 + 128*x} - 1
     let x: u64 = (n_bits - 512) >> 7; /* (n_bits - 512) / 128; */
-    // Calculate lower bound
     let multiplier = BigInt::from(14142135623730950489u64);
     let exponent = 511 + 128 * x;
+    // We need to approximate the sqrt(2) in the lower_bound by an integer
+    // expression because floating point math overflows with these numbers
     let lower_bound: BigInt =
         (multiplier * (BigInt::one() << exponent)) / BigInt::from(10u16).pow(19);
     let upper_bound: BigInt = (BigInt::one() << (512 + 128 * x)) - BigInt::one();
 
+    // Randomly choose X in calculated range
     let mut x_val = get_random_range(&lower_bound, &upper_bound);
 
     // generate p1 and p2
@@ -144,6 +149,7 @@ pub fn get_strong_prime(
 
         // look for suitable p[i] starting at y
         for (j, &is_composite) in field.iter().enumerate() {
+            // look for next candidate
             if is_composite {
                 continue;
             }
@@ -160,10 +166,14 @@ pub fn get_strong_prime(
         }
     }
 
+    // Calculate R
+    //     R = (p2^{-1} mod p1) * p2 - (p1^{-1} mod p2) * p1
     let tmp1 = p[1].modinv(&p[0]).expect("No modular inverse for p[1] mod p[0]") * p[1].clone();
     let tmp2 = p[0].modinv(&p[1]).expect("No modular inverse for p[0] mod p[1]") * p[0].clone();
     let r: BigInt = tmp1 - tmp2;
 
+    // search for final prime number starting by Y0
+    //    Y0 = X + (R - X mod p1p2)
     let increment = p[0].clone() * p[1].clone();
     x_val += r - (x_val.clone() % increment.clone());
 
@@ -955,3 +965,90 @@ const SIEVE_BASE: [u32; 10000] = [
     104597, 104623, 104639, 104651, 104659, 104677, 104681, 104683, 104693, 104701, 104707, 104711,
     104717, 104723, 104729,
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use num_bigint::BigInt;
+    use num_traits::{FromPrimitive, One};
+
+    #[test]
+    fn test_rabin_miller_test_with_prime() {
+        let prime = BigInt::from(2147483647u64);
+        let rounds = 10;
+        let result = rabin_miller_test(&prime, rounds);
+        assert!(result > 0, "Expected rabin_miller_test to confirm primality for 101");
+    }
+
+    #[test]
+    fn test_rabin_miller_test_with_non_prime() {
+        let non_prime = BigInt::from(100u32);
+        let rounds = 10;
+        let result = rabin_miller_test(&non_prime, rounds);
+        assert!(result == 0, "Expected rabin_miller_test to reject 100 as non-prime");
+    }
+
+    #[test]
+    fn test_rabin_miller_test_on_two() {
+        let prime = BigInt::from(2u32); // 2 is the smallest prime
+        let rounds = 10;
+        let result = rabin_miller_test(&prime, rounds);
+        assert!(result > 0, "Expected rabin_miller_test to confirm primality for 2");
+    }
+
+    #[test]
+    fn test_rabin_miller_test_large_prime() {
+        let large_prime = BigInt::from(104729u32); // 104729 is a large prime
+        let rounds = 10;
+        let result = rabin_miller_test(&large_prime, rounds);
+        assert!(result > 0, "Expected rabin_miller_test to confirm primality for 104729");
+    }
+
+    #[test]
+    fn test_rabin_miller_test_large_non_prime() {
+        let large_non_prime = BigInt::from(104728u32); // 104728 is not prime
+        let rounds = 10;
+        let result = rabin_miller_test(&large_non_prime, rounds);
+        assert!(result == 0, "Expected rabin_miller_test to reject 104728 as non-prime");
+    }
+
+    #[test]
+    fn test_get_strong_prime_with_valid_n_bits() {
+        let n_bits = 768;
+        let prime = get_strong_prime(n_bits, None, None);
+        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {} bits", n_bits);
+        assert!(
+            rabin_miller_test(&prime, 10) > 0,
+            "The generated prime should pass the Rabin-Miller test"
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "n_bits must be >512 and a multiple of 128")]
+    fn test_get_strong_prime_with_invalid_n_bits() {
+        let n_bits = 512;
+        let _ = get_strong_prime(n_bits, None, None);
+    }
+
+    #[test]
+    fn test_get_strong_prime_with_large_n_bits() {
+        let n_bits = 896;
+        let prime = get_strong_prime(n_bits, None, None);
+        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {} bits", n_bits);
+        assert!(
+            rabin_miller_test(&prime, 10) > 0,
+            "The generated prime should pass the Rabin-Miller test"
+        );
+    }
+
+    #[test]
+    fn test_get_strong_prime_with_large_false_positive_prob() {
+        let n_bits = 768;
+        let prime = get_strong_prime(n_bits, None, Some(0.1));
+        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {} bits", n_bits);
+        assert!(
+            rabin_miller_test(&prime, 10) > 0,
+            "The generated prime should pass the Rabin-Miller test"
+        );
+    }
+}
