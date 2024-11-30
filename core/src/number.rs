@@ -217,6 +217,47 @@ pub fn get_strong_prime(
     x_val
 }
 
+pub trait Jacobi {
+    fn jacobi(&self, n: &BigInt) -> i32;
+}
+
+impl Jacobi for BigInt {
+    fn jacobi(&self, n: &BigInt) -> i32 {
+        if n.is_zero() || n.is_even() {
+            panic!("n must be a positive odd number.");
+        }
+        let mut a = self.mod_floor(n);
+        let mut n = n.clone();
+        let mut result = 1;
+
+        while a != BigInt::zero() {
+            while a.is_even() {
+                a /= 2;
+                let n_mod_8 = n.mod_floor(&BigInt::from(8));
+                if n_mod_8 == BigInt::from(3) || n_mod_8 == BigInt::from(5) {
+                    result = -result;
+                }
+            }
+
+            // variable reassignment
+            std::mem::swap(&mut a, &mut n);
+
+            if a.mod_floor(&BigInt::from(4)) == BigInt::from(3)
+                && n.mod_floor(&BigInt::from(4)) == BigInt::from(3)
+            {
+                result = -result;
+            }
+            a = a.mod_floor(&n);
+        }
+
+        if n == BigInt::one() {
+            result
+        } else {
+            0
+        }
+    }
+}
+
 const SIEVE_BASE: [u32; 10000] = [
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
     101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193,
@@ -977,7 +1018,7 @@ const SIEVE_BASE: [u32; 10000] = [
 mod tests {
     use super::*;
     use num_bigint::BigInt;
-    use num_traits::{FromPrimitive, One};
+    use num_traits::One;
 
     #[test]
     fn test_rabin_miller_test_with_prime() {
@@ -1057,5 +1098,69 @@ mod tests {
             rabin_miller_test(&prime, 10) > 0,
             "The generated prime should pass the Rabin-Miller test"
         );
+    }
+
+    #[test]
+    fn test_jacobi_basic_cases() {
+        // Test cases from standard Jacobi symbol definitions
+        let mut a = BigInt::one();
+        let mut b = BigInt::from(3);
+        assert_eq!(a.jacobi(&b), 1);
+        a = BigInt::from(2);
+        b = BigInt::from(3);
+        assert_eq!(a.jacobi(&b), -1);
+        a = BigInt::from(3);
+        b = BigInt::from(3);
+        assert_eq!(a.jacobi(&b), 0);
+        a = BigInt::from(4);
+        b = BigInt::from(5);
+        assert_eq!(a.jacobi(&b), 1);
+    }
+
+    #[test]
+    fn test_jacobi_large_values() {
+        let mut a = BigInt::from(100);
+        let mut b = BigInt::from(23);
+        assert_eq!(a.jacobi(&b), 1);
+        a = BigInt::from(45);
+        b = BigInt::from(13);
+        assert_eq!(a.jacobi(&b), -1);
+    }
+
+    #[test]
+    fn test_jacobi_negative_a() {
+        let mut a = BigInt::from(-1);
+        let mut b = BigInt::from(5);
+        assert_eq!(a.jacobi(&b), 1);
+        a = BigInt::from(-2);
+        b = BigInt::from(7);
+        assert_eq!(a.jacobi(&b), -1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_jacobi_invalid_n_even() {
+        // Test invalid n (even number)
+        let a = BigInt::from(3);
+        let b = BigInt::from(4);
+        a.jacobi(&b);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_jacobi_invalid_n_zero() {
+        let a = BigInt::from(3);
+        let b = BigInt::from(0);
+        a.jacobi(&b);
+    }
+
+    #[test]
+    fn test_jacobi_corner_cases() {
+        let mut a = BigInt::zero();
+        let mut b = BigInt::from(3);
+        assert_eq!(a.jacobi(&b), 0);
+        a = BigInt::from(2);
+        b = BigInt::from(1);
+        assert_eq!(a.jacobi(&b), 1);
     }
 }
