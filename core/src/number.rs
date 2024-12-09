@@ -48,16 +48,19 @@ fn get_random_n_bit_integer(n_bits: usize) -> BigInt {
 }
 
 fn rabin_miller_test(n: &BigInt, rounds: u32) -> u8 {
+    // check particular cases.
     if *n < BigInt::from(3u16) || n & BigInt::from(1u16) == BigInt::from(0u16) {
-        return if *n == BigInt::from(2u16) { 2 } else { 0 };
+        return if *n == BigInt::from(2u16) { 1 } else { 0 };
     }
 
     let n_1: BigInt = n - 1u16;
     let mut m = n_1.clone();
     let mut b = 0;
 
+    // searching for odd $m$
     while m.clone() & BigInt::from(1u16) == BigInt::from(0u16) {
         m >>= 1;
+        // will be the number of iterations later on.
         b += 1;
     }
 
@@ -72,16 +75,20 @@ fn rabin_miller_test(n: &BigInt, rounds: u32) -> u8 {
         tested.push(a.clone());
 
         let mut z = a.modpow(&m, &n);
+        // Instead of failing the test, we just give it another round until max_rounds.
         if z == BigInt::from(1u16) || z == n_1 {
             continue;
         }
 
         let mut composite = true;
         for _ in 0..b {
-            z = (z.clone() * z.clone()) % n;
+            z = z.modpow(&z, n);
             if z == BigInt::from(1u16) {
+                // at this point, previous value of z, i.e., before `modpow` is
+                // a Miller-Rabin witness for (the compositeness of) n
                 return 0;
             } else if z == n_1 {
+                /* if z \equiv -1 \pmod n, it is less likely to be a composite */
                 composite = false;
                 break;
             }
