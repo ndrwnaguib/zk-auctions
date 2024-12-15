@@ -1,7 +1,7 @@
 // Goldwasser-Micali Encryption and its AND variance
 // Support 32-bit unsigned integers as plaintext
 
-use crate::number::{get_strong_prime, Jacobi};
+use crate::number::get_strong_prime;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use rand::{rngs::StdRng, Rng, SeedableRng};
@@ -55,30 +55,29 @@ pub fn generate_keys(prime_size: Option<u64>) -> Keys {
 
 static mut MY_COUNTER: u64 = 0;
 
-pub fn get_next_random(n: BigInt) -> BigInt {
+pub fn get_next_random(n: &BigInt) -> BigInt {
     unsafe {
         MY_COUNTER += 1;
         n - BigInt::from(MY_COUNTER)
     }
 }
 
-pub fn encrypt_bit_gm(bit: u8, n: &BigInt) -> BigInt {
-    let r = get_next_random(n - 1);
-
-    let m = if bit == 1 { BigInt::one() } else { BigInt::zero() };
-    (r.clone() * r.clone() * &(n - BigInt::one()).modpow(&m, &n)) % n
+pub fn encrypt_bit_gm(bit: &BigInt, n: &BigInt) -> BigInt {
+    let r = get_next_random(&(n - BigInt::one()));
+    (r.clone() * r.clone() * &(n - BigInt::one()).modpow(&bit, &n)) % n
 }
 
-pub fn encrypt_bit_gm_coin(bit: u8, n: &BigInt, r: BigInt) -> BigInt {
+pub fn encrypt_bit_gm_coin(bit: &BigInt /* only 0 or 1 */, n: &BigInt, r: BigInt) -> BigInt {
     assert!(r >= BigInt::zero() && r <= n - 1);
-
-    let m = if bit == 1 { BigInt::one() } else { BigInt::zero() };
-    (r.clone() * r.clone() * &(n - BigInt::one()).modpow(&m, &n)) % n
+    (r.clone() * r.clone() * &(n - BigInt::one()).modpow(&bit, &n)) % n
 }
 
-pub fn encrypt_gm(number: u32, pub_key: &BigInt) -> Vec<BigInt> {
+pub fn encrypt_gm(number: &BigInt, pub_key: &BigInt) -> Vec<BigInt> {
     let bits_str = format!("{:032b}", number);
-    bits_str.chars().map(|bit| encrypt_bit_gm(bit.to_digit(2).unwrap() as u8, pub_key)).collect()
+    bits_str
+        .chars()
+        .map(|bit| encrypt_bit_gm(&BigInt::from(bit.to_digit(2).unwrap()), pub_key))
+        .collect()
 }
 
 pub fn decrypt_bit_gm(c: &BigInt, sk_gm: &BigInt, n: &BigInt) -> u8 {
@@ -89,7 +88,7 @@ pub fn decrypt_bit_gm(c: &BigInt, sk_gm: &BigInt, n: &BigInt) -> u8 {
     }
 }
 
-pub fn decrypt_gm(cipher_numbers: &[BigInt], priv_key: &(BigInt, BigInt)) -> Option<u32> {
+pub fn decrypt_gm(cipher_numbers: &[BigInt], priv_key: &(BigInt, BigInt)) -> Option<BigInt> {
     let (p, q) = priv_key;
     let n = p * q;
 
@@ -101,21 +100,21 @@ pub fn decrypt_gm(cipher_numbers: &[BigInt], priv_key: &(BigInt, BigInt)) -> Opt
         .map(|bit| if bit == 1 { '1' } else { '0' }) // Convert BigInt to '1' or '0'
         .collect();
 
-    println!("String is {}", bits_str);
-
-    u32::from_str_radix(&bits_str, 2).ok()
+    Some(BigInt::from(u32::from_str_radix(&bits_str, 2).unwrap()))
 }
 
 pub fn encrypt_bit_and(bit: u8, pub_key: &BigInt) -> Vec<BigInt> {
     let mut rng = StdRng::from_entropy();
     if bit == 1 {
-        (0..AND_SIZE_FACTOR).map(|_| encrypt_bit_gm(0, pub_key)).collect()
+        (0..AND_SIZE_FACTOR).map(|_| encrypt_bit_gm(&BigInt::zero(), pub_key)).collect()
     } else {
-        (0..AND_SIZE_FACTOR).map(|_| encrypt_bit_gm(rng.gen_range(0..=1), pub_key)).collect()
+        (0..AND_SIZE_FACTOR)
+            .map(|_| encrypt_bit_gm(&BigInt::from(rng.gen_range(0..=1)), pub_key))
+            .collect()
     }
 }
 
-pub fn decrypt_bit_and(cipher: &Vec<BigInt>, priv_key: (BigInt, BigInt)) -> u8 {
+pub fn decrypt_bit_and(cipher: &Vec<BigInt>, priv_key: &(BigInt, BigInt)) -> u8 {
     let (p, q) = priv_key;
     let sk_gm: BigInt = ((p.clone() - 1) * (q.clone() - 1)) / 4;
     let n = p.clone() * q.clone();
@@ -139,9 +138,9 @@ pub fn embed_bit_and(bit_cipher: &BigInt, pub_key: &BigInt, r: &[BigInt]) -> Vec
     (0..AND_SIZE_FACTOR)
         .map(|i| {
             if rng.gen_range(0..=1) == 1 {
-                encrypt_bit_gm_coin(0, n, r[i].clone())
+                encrypt_bit_gm_coin(&BigInt::zero(), n, r[i].clone())
             } else {
-                encrypt_bit_gm_coin(0, n, r[i].clone()) * bit_cipher * (n - 1) % n
+                encrypt_bit_gm_coin(&BigInt::zero(), n, r[i].clone()) * bit_cipher * (n - 1) % n
             }
         })
         .collect()
@@ -155,13 +154,13 @@ pub fn embed_and(cipher: &[BigInt], pub_key: &BigInt, r: &[Vec<BigInt>]) -> Vec<
         .collect()
 }
 
-pub fn encrypt_gm_coin(mpz_number: u32, pub_key: BigInt, r: &[BigInt]) -> Vec<BigInt> {
+pub fn encrypt_gm_coin(mpz_number: &BigInt, pub_key: &BigInt, r: &[BigInt]) -> Vec<BigInt> {
     let bits_str = format!("{:032b}", mpz_number);
 
     (0..32)
         .map(|i| {
             encrypt_bit_gm_coin(
-                bits_str.chars().nth(i).unwrap().to_digit(2).unwrap() as u8,
+                &BigInt::from(bits_str.chars().nth(i).unwrap().to_digit(2).unwrap()),
                 &pub_key,
                 r[i].clone(),
             )
@@ -172,6 +171,7 @@ pub fn encrypt_gm_coin(mpz_number: u32, pub_key: BigInt, r: &[BigInt]) -> Vec<Bi
 #[cfg(test)] // This module is included only during testing
 mod tests {
     use super::*;
+    use crate::number::Jacobi;
     use std::time::Instant;
 
     #[test]
@@ -199,13 +199,15 @@ mod tests {
         let mut rng = StdRng::from_entropy();
 
         for _ in 0..iters {
-            let num: u32 = rng.gen::<u32>();
-            let mut cipher = encrypt_gm(num, &n);
+            let num: BigInt = BigInt::from(rng.gen::<u32>());
+            let mut cipher = encrypt_gm(&num, &n);
 
             // Re-encryption
             for _ in 0..3 {
-                cipher =
-                    cipher.iter().map(|c| (c * encrypt_gm(0u32, &n)[0].clone()) % &n).collect();
+                cipher = cipher
+                    .iter()
+                    .map(|c| (c * encrypt_gm(&BigInt::zero(), &n)[0].clone()) % &n)
+                    .collect();
             }
 
             let decrypted = decrypt_gm(&cipher, &keys.priv_key);
@@ -227,22 +229,31 @@ mod tests {
             let n = keys.pub_key;
             let priv_key = keys.priv_key;
 
-            let c0 = encrypt_bit_gm(0, &n);
-            let c1 = encrypt_bit_gm(1, &n);
+            let c0 = encrypt_bit_gm(&BigInt::zero(), &n);
+            let c1 = encrypt_bit_gm(&BigInt::one(), &n);
 
             // XOR tests
-            assert_eq!(decrypt_gm(&[c0.clone() * c1.clone() % n.clone()], &priv_key), Some(1u32));
-            assert_eq!(decrypt_gm(&[c0.clone() * c0.clone() % n.clone()], &priv_key), Some(0u32));
-            assert_eq!(decrypt_gm(&[c1.clone() * c1.clone() % n.clone()], &priv_key), Some(0u32));
+            assert_eq!(
+                decrypt_gm(&[c0.clone() * c1.clone() % n.clone()], &priv_key),
+                Some(BigInt::one())
+            );
+            assert_eq!(
+                decrypt_gm(&[c0.clone() * c0.clone() % n.clone()], &priv_key),
+                Some(BigInt::zero())
+            );
+            assert_eq!(
+                decrypt_gm(&[c1.clone() * c1.clone() % n.clone()], &priv_key),
+                Some(BigInt::zero())
+            );
 
             // Flip tests
             assert_eq!(
                 decrypt_gm(&[c0.clone() * (n.clone() - 1) % n.clone()], &priv_key),
-                Some(1u32)
+                Some(BigInt::one())
             );
             assert_eq!(
                 decrypt_gm(&[c1.clone() * (n.clone() - 1) % n.clone()], &priv_key),
-                Some(0u32)
+                Some(BigInt::zero())
             );
         }
 
@@ -270,35 +281,26 @@ mod tests {
             enc_times.push(start.elapsed().as_secs_f64());
 
             let start = Instant::now();
-            let bit0 = decrypt_bit_and(&cipher0, priv_key.clone());
+            let bit0 = decrypt_bit_and(&cipher0, &priv_key);
             dec_times.push(start.elapsed().as_secs_f64());
 
             let start = Instant::now();
-            let bit1 = decrypt_bit_and(&cipher1, priv_key.clone());
+            let bit1 = decrypt_bit_and(&cipher1, &priv_key);
             dec_times.push(start.elapsed().as_secs_f64());
 
             assert_eq!(bit0, 0u8);
             assert_eq!(bit1, 1u8);
 
             assert_eq!(
-                decrypt_bit_and(
-                    &dot_mod(&cipher0, &encrypt_bit_and(1u8, &n), &n),
-                    priv_key.clone()
-                ),
+                decrypt_bit_and(&dot_mod(&cipher0, &encrypt_bit_and(1u8, &n), &n), &priv_key),
                 0u8
             );
             assert_eq!(
-                decrypt_bit_and(
-                    &dot_mod(&cipher0, &encrypt_bit_and(0u8, &n), &n),
-                    priv_key.clone()
-                ),
+                decrypt_bit_and(&dot_mod(&cipher0, &encrypt_bit_and(0u8, &n), &n), &priv_key),
                 0u8
             );
             assert_eq!(
-                decrypt_bit_and(
-                    &dot_mod(&cipher1, &encrypt_bit_and(1u8, &n), &n),
-                    priv_key.clone()
-                ),
+                decrypt_bit_and(&dot_mod(&cipher1, &encrypt_bit_and(1u8, &n), &n), &priv_key),
                 1u8
             );
         }
