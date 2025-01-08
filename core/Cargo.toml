@@ -6,13 +6,9 @@ edition = "2021"
 [dependencies]
 serde = { version = "1.0", default-features = false }
 rand = "0.8.5"
-rug = "1.26.1"
 sha2 = "0.10.8"
 num-bigint = { version = "0.4.6", features = ["rand"]}
 num-iter = "0.1.45"
 num-traits = "0.2.19"
 num-integer = "0.1.46"
 rand_chacha = "0.3.1"
-hex = "0.4.3"
-serde_json = "1.0.133"
-zerocopy = "0.8.13"
