@@ -6,9 +6,9 @@ use rand_chacha::ChaCha20Rng;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
-use zk_auctions_core::number::Jacobi;
+use crate::number::Jacobi;
 
-use zk_auctions_core::gm::get_next_random;
+use crate::gm::get_next_random;
 
 #[derive(Debug, Serialize)]
 pub enum StrainProof {
@@ -159,4 +159,12 @@ pub fn permute(length: usize, seed_bigint: &BigInt) -> HashMap<usize, usize> {
     }
 
     permutation
+}
+
+pub fn rand32(n: &BigInt) -> Vec<BigInt> {
+    let mut result = Vec::new();
+    for _ in 0..32 {
+        result.push(get_next_random(n));
+    }
+    result
 }
