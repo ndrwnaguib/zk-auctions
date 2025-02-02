@@ -9,7 +9,7 @@ members = ["methods"]
 [dependencies]
 zk-auctions-core = { path = "core" }
 zk-auctions-methods = { path = "methods" }
-risc0-zkvm = "1.2.2"
+risc0-zkvm = { version = "1.2.2", default-features = false, features = ['std', 'getrandom', 'client'] }
 risc0-build = "1.2.2"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 serde = { version = "1.0", features = ["derive"] }
