@@ -1,16 +1,72 @@
 use num_bigint::{BigInt, RandBigInt};
 use num_traits::{One, Zero};
 use rand::{rngs::StdRng, Rng, SeedableRng};
+use rand::seq::SliceRandom;
 use rand_chacha::ChaCha20Rng;
 use risc0_zkvm::guest::env;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
-use zk_auctions_core::gm::{encrypt_bit_gm_coin, get_next_random, StrainRandomGenerator};
+use zk_auctions_core::gm::{encrypt_bit_gm_coin, get_next_random, StrainRandomGenerator, generate_keys, embed_and, dot_mod, encrypt_gm};
 
-use guest::utils::{
+use zk_auctions_core::utils::{
     bigint_to_seed, compute_permutation, divm, get_rand_jn1, hash_flat, permute, set_rand_seed,
-    StrainProof,
+    StrainProof, rand32
 };
+
+
+fn main() {
+    let mut rng = rand::thread_rng();
+
+    let keys_j = generate_keys(None);
+    let pub_key_j = &keys_j.pub_key;
+    let (p_j, q_j) = keys_j.priv_key;
+
+    let r = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
+    let y_j = rng.gen_bigint_range(&BigInt::zero(), &pub_key_j);
+
+    // Generate a second random value for v2.
+    let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+    let c_j = encrypt_gm(&v_j, pub_key_j);
+
+    // Encrypt v1 under n2.
+    let r_ij = rand32(pub_key_j);
+
+
+    let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
+    let (cipher_i, pub_key_i, sound_param): (
+        Vec<BigInt>,
+        BigInt,
+        usize,
+    ) = env::read();
+    let sigma: BigInt = env::read();
+    let (rand1, rand2, rand3, rand4): (Vec<Vec<BigInt>>, Vec<Vec<BigInt>>, Vec<Vec<BigInt>>, Vec<Vec<BigInt>>) = env::read();
+
+    let proof_enc = compute_proof_enc(c_i.clone(), &n_i, &r_i);
+    env::commit(&proof_enc);
+
+    let c_ij = encrypt_gm(&v_j.clone(), &n_i);
+    let (proof_eval, plaintext_and_coins) = proof_eval(
+        &c_i.clone(),
+        &c_j,
+        &c_ij,
+        v_j.clone(),
+        &pub_key_i,
+        &pub_key_j,
+        &r_i,
+        &r_ij,
+        sound_param,
+    );
+
+    env::commit(&(proof_eval, plaintext_and_coins));
+
+    let proof_dlog = proof_dlog_eq(&sigma, &y_j, &pub_key_j, Some(sound_param));
+    env::commit(&proof_dlog);
+
+    let res = gm_eval_honest(&v_j.clone(), &c_ij, &c_j, &n_i, &rand1, &rand2, &rand3, &rand4);
+    let proof_shuffle = compute_proof_shuffle(&res, &pub_key_j);
+    env::commit(&proof_shuffle);
+}
+
 
 fn compute_proof_enc(c1: Vec<BigInt>, n1: &BigInt, r1: &[BigInt]) -> Vec<Vec<Vec<BigInt>>> {
     let mut rng = rand::thread_rng();
@@ -64,7 +120,7 @@ fn proof_eval(
     cipher_i: &Vec<BigInt>,
     cipher_j: &Vec<BigInt>,
     cipher_ij: &Vec<BigInt>,
-    number1: u32,
+    number1: BigInt,
     pub_key_i: &BigInt,
     pub_key_j: &BigInt,
     r1: &Vec<BigInt>,
@@ -272,40 +328,37 @@ fn compute_proof_shuffle(res: &[Vec<BigInt>], n2: &BigInt) -> HashMap<usize, Str
     proof
 }
 
-fn main() {
-    let (c1, n1, r1): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
-    let (cipher_i, cipher_j, cipher_ij, number1, pub_key_i, pub_key_j, r12, sound_param): (
-        Vec<BigInt>,
-        Vec<BigInt>,
-        Vec<BigInt>,
-        u32,
-        BigInt,
-        BigInt,
-        Vec<BigInt>,
-        usize,
-    ) = env::read();
-    let (sigma, y, n_dlog): (BigInt, BigInt, BigInt) = env::read();
-    let (res, n_shuffle): (Vec<Vec<BigInt>>, BigInt) = env::read();
+fn gm_eval_honest(
+    number1: &BigInt,
+    cipher_i: &Vec<BigInt>,
+    cipher_j: &Vec<BigInt>,
+    pub_key_j: &BigInt,
+    rand1: &Vec<Vec<BigInt>>,
+    rand2: &Vec<Vec<BigInt>>,
+    rand3: &Vec<Vec<BigInt>>,
+    rand4: &Vec<Vec<BigInt>>,
+) -> Vec<Vec<BigInt>> {
+    assert_eq!(cipher_j.len(), 32);
 
-    let proof_enc = compute_proof_enc(c1, &n1, &r1);
-    env::commit(&proof_enc);
+    let neg_cipher_i: Vec<BigInt> =
+        cipher_i.iter().map(|x| x * (pub_key_j - BigInt::one()) % pub_key_j).collect();
+    let c_neg_xor = dot_mod(&neg_cipher_i, &cipher_j, pub_key_j);
 
-    let (proof_eval, plaintext_and_coins) = proof_eval(
-        &cipher_i,
-        &cipher_j,
-        &cipher_ij,
-        number1,
-        &pub_key_i,
-        &pub_key_j,
-        &r1,
-        &r12,
-        sound_param,
-    );
-    env::commit(&(proof_eval, plaintext_and_coins));
+    let cipher_i_and = embed_and(&cipher_i, pub_key_j, rand1);
+    let cipher_j_and = embed_and(&cipher_j, pub_key_j, rand2);
+    let neg_cipher_i_and = embed_and(&neg_cipher_i, pub_key_j, rand3);
+    let c_neg_xor_and = embed_and(&c_neg_xor, pub_key_j, rand4);
 
-    let proof_dlog = proof_dlog_eq(&sigma, &y, &n_dlog, Some(40 as usize));
-    env::commit(&proof_dlog);
+    let mut res = Vec::new();
+    for l in 0..32 {
+        let mut temp = dot_mod(&cipher_j_and[l], &neg_cipher_i_and[l], pub_key_j);
+        for u in 0..l {
+            temp = dot_mod(&temp, &c_neg_xor_and[u], pub_key_j);
+        }
+        res.push(temp);
+    }
 
-    let proof_shuffle = compute_proof_shuffle(&res, &n_shuffle);
-    env::commit(&proof_shuffle);
+    let mut rng = rand::thread_rng();
+    res.shuffle(&mut rng);
+    res
 }
