@@ -3,11 +3,13 @@
 extern crate num_bigint;
 extern crate risc0_zkvm;
 extern crate zk_auctions_core;
+extern crate zk_auctions_methods;
 
 use num_bigint::{BigInt, RandBigInt};
 use risc0_zkvm::{default_prover, ExecutorEnv};
 use zk_auctions_core::gm::{encrypt_gm, generate_keys, get_next_random};
 use zk_auctions_core::utils::rand32;
+use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -57,7 +59,7 @@ fn main() {
         .expect("Failed to build execution environment");
 
     let prover = default_prover();
-    let receipt = prover.prove(env, ZK_AUCTION_GUEST_ELF).expect("Proof generation failed").receipt;
+    let receipt = prover.prove(env, GUEST_ELF).expect("Proof generation failed").receipt;
 
-    receipt.verify(ZK_AUCTION_GUEST_ID).expect("Proof verification failed");
+    receipt.verify(GUEST_ID).expect("Proof verification failed");
 }
