@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [build-dependencies]
-risc0-zkvm = "1.2.2"
+risc0-zkvm = { version = "1.2.2", default-features = false, features = ['std', 'getrandom'] }
 risc0-build = "1.2.2"
 
 [package.metadata.risc0]
