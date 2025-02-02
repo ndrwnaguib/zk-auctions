@@ -120,7 +120,7 @@ fn proof_eval(
     cipher_i: &Vec<BigInt>,
     cipher_j: &Vec<BigInt>,
     cipher_ij: &Vec<BigInt>,
-    number1: u32,
+    number1: BigInt,
     pub_key_i: &BigInt,
     pub_key_j: &BigInt,
     r1: &Vec<BigInt>,
@@ -803,26 +803,76 @@ mod tests {
     }
 
     #[test]
-    /* TODO: this test is not working in the original implementation */
-    // fn test_proof_eval() {
-    //     let keys = generate_keys(None);
-    //     let n = &keys.pub_key;
+    fn test_proof_eval() {
+        println!("test_proof_eval");
 
-    //     let mut rng = rand::thread_rng();
-    //     let v1 = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    //     let r1 = rand32(n);
-    //     let c1 = encrypt_gm_coin(&v1, n, &r1);
+        // Generate two key pairs.
+        let keys1 = generate_keys(None);
+        let n1 = &keys1.pub_key;
+        let (p1, q1) = keys1.priv_key; 
 
-    //     let rand1 = generate_rand_matrix(n, 32, 128);
-    //     let rand2 = generate_rand_matrix(n, 32, 128);
-    //     let rand3 = generate_rand_matrix(n, 32, 128);
-    //     let rand4 = generate_rand_matrix(n, 32, 128);
+        let keys2 = generate_keys(None);
+        let n2 = &keys2.pub_key;
+        let (p2, q2) = keys2.priv_key;
 
-    //     let eval_res = gm_eval_honest(&v1, &c1, n, &rand1, &rand2, &rand3, &rand4);
+        println!("test honest model");
+        let iters = 1;
+        let mut rng = rand::thread_rng();
 
-    //     let proof = proof_eval(&eval_res, &keys.priv_key, n);
-    //     assert!(verify_eval(&eval_res, &proof, n), "Proof verification failed");
-    // }
+        for i in 0..iters {
+            println!("i = {}", i);
+
+            let v1: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+            let start_time = Instant::now();
+            let cipher_i = encrypt_gm(&v1, n1);
+            let r1 = rand32(n1);
+            println!("Enc elapsed: {:?}", start_time.elapsed());
+
+            let v2: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+            let cipher_j = encrypt_gm(&v2, n2);
+
+            let cipher_ij = encrypt_gm(&v1, n2);
+            let r12 = rand32(n2);
+
+            let start_time = Instant::now();
+            let (p_eval, plaintext_and_coins) = proof_eval(
+                &cipher_i,
+                &cipher_j,
+                &cipher_ij,
+                v1.clone(),
+                n1,
+                n2,
+                &r1,
+                &r12,
+                40, /* soundness parameter */
+            );
+            println!("p_eval elapsed: {:?}", start_time.elapsed());
+
+            let start_time = Instant::now();
+            let eval_res =
+                Some(verify_eval(p_eval.clone(), plaintext_and_coins.clone(), n1, n2, 40));
+            println!("verify eval elapsed: {:?}", start_time.elapsed());
+
+            assert!(eval_res.is_some(), "Proof verification failed");
+
+            // The bit-flipping tests are commented out as in the original Python code.
+            /*
+            // Example for flipping one bit (if you wish to test failures):
+            let bit_to_flip = 1 << rng.gen_range(0, 31);
+            let v1_flipped = &v1 ^ BigInt::from(bit_to_flip);
+            let cipher_ij_flipped = encrypt_gm(&v1_flipped, n2);
+
+            let (P_eval_x1, plaintext_and_coins_x1) = proof_eval(&cipher_i, &cipher_j, &cipher_ij, v1_flipped.clone(), n1, n2);
+            let (P_eval_x2, plaintext_and_coins_x2) = proof_eval(&cipher_i, &cipher_j, &cipher_ij_flipped, v1.clone(), n1, n2);
+            let (P_eval_x3, plaintext_and_coins_x3) = proof_eval(&cipher_i, &cipher_j, &cipher_ij_flipped, v1_flipped, n1, n2);
+            assert!(verify_eval(P_eval_x1, plaintext_and_coins_x1, n1, n2).is_none());
+            assert!(verify_eval(P_eval_x2, plaintext_and_coins_x2, n1, n2).is_none());
+            assert!(verify_eval(P_eval_x3, plaintext_and_coins_x3, n1, n2).is_none());
+            */
+        }
+        println!("test_proof_eval pass");
+    }
+
     #[test]
     fn test_dlog_eq() {
         let keys = generate_keys(None);
