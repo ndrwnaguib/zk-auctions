@@ -1,16 +1,15 @@
 use crate::number::Jacobi;
 use num_bigint::{BigInt, RandBigInt};
-use num_traits::{One, Zero};
-use rand::seq::SliceRandom;
-use rand::{rngs::StdRng, Rng, SeedableRng};
+use num_traits::Zero;
+use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 
 use crate::gm::get_next_random;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum StrainProof {
     MEPermutations((HashMap<usize, usize>, HashMap<usize, HashMap<usize, BigInt>>)),
     AMPermutations((HashMap<usize, usize>, Vec<Vec<BigInt>>)),
