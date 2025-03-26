@@ -809,7 +809,7 @@ mod tests {
         // Generate two key pairs.
         let keys1 = generate_keys(None);
         let n1 = &keys1.pub_key;
-        let (p1, q1) = keys1.priv_key; 
+        let (p1, q1) = keys1.priv_key;
 
         let keys2 = generate_keys(None);
         let n2 = &keys2.pub_key;

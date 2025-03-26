@@ -1,3 +1,4 @@
+use crate::number::Jacobi;
 use num_bigint::{BigInt, RandBigInt};
 use num_traits::{One, Zero};
 use rand::seq::SliceRandom;
@@ -6,7 +7,6 @@ use rand_chacha::ChaCha20Rng;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
-use crate::number::Jacobi;
 
 use crate::gm::get_next_random;
 

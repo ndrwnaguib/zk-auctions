@@ -1,18 +1,20 @@
 use num_bigint::{BigInt, RandBigInt};
 use num_traits::{One, Zero};
-use rand::{rngs::StdRng, Rng, SeedableRng};
 use rand::seq::SliceRandom;
+use rand::{rngs::StdRng, Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use risc0_zkvm::guest::env;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
-use zk_auctions_core::gm::{encrypt_bit_gm_coin, get_next_random, StrainRandomGenerator, generate_keys, embed_and, dot_mod, encrypt_gm};
-
-use zk_auctions_core::utils::{
-    bigint_to_seed, compute_permutation, divm, get_rand_jn1, hash_flat, permute, set_rand_seed,
-    StrainProof, rand32
+use zk_auctions_core::gm::{
+    dot_mod, embed_and, encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random,
+    StrainRandomGenerator,
 };
 
+use zk_auctions_core::utils::{
+    bigint_to_seed, compute_permutation, divm, get_rand_jn1, hash_flat, permute, rand32,
+    set_rand_seed, StrainProof,
+};
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -31,17 +33,18 @@ fn main() {
     // Encrypt v1 under n2.
     let r_ij = rand32(pub_key_j);
 
-
     let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
-    let (cipher_i, pub_key_i, sound_param): (
-        Vec<BigInt>,
-        BigInt,
-        usize,
-    ) = env::read();
+    let (cipher_i, pub_key_i, sound_param): (Vec<BigInt>, BigInt, usize) = env::read();
     let sigma: BigInt = env::read();
-    let (rand1, rand2, rand3, rand4): (Vec<Vec<BigInt>>, Vec<Vec<BigInt>>, Vec<Vec<BigInt>>, Vec<Vec<BigInt>>) = env::read();
+    let (rand1, rand2, rand3, rand4): (
+        Vec<Vec<BigInt>>,
+        Vec<Vec<BigInt>>,
+        Vec<Vec<BigInt>>,
+        Vec<Vec<BigInt>>,
+    ) = env::read();
 
     let proof_enc = compute_proof_enc(c_i.clone(), &n_i, &r_i);
+    println!("About to commit ...");
     env::commit(&proof_enc);
 
     let c_ij = encrypt_gm(&v_j.clone(), &n_i);
@@ -66,7 +69,6 @@ fn main() {
     let proof_shuffle = compute_proof_shuffle(&res, &pub_key_j);
     env::commit(&proof_shuffle);
 }
-
 
 fn compute_proof_enc(c1: Vec<BigInt>, n1: &BigInt, r1: &[BigInt]) -> Vec<Vec<Vec<BigInt>>> {
     let mut rng = rand::thread_rng();
