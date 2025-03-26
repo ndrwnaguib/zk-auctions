@@ -43,6 +43,8 @@ fn main() {
         Vec<Vec<BigInt>>,
     ) = env::read();
 
+    println!("Received `sound_param` = {} and `sigma` = {}", sound_param, sigma);
+
     let proof_enc = compute_proof_enc(c_i.clone(), &n_i, &r_i);
     println!("About to commit ...");
     env::commit(&proof_enc);
@@ -61,13 +63,18 @@ fn main() {
     );
 
     env::commit(&(proof_eval, plaintext_and_coins));
+    println!("Finished committing the `proof_eval`.");
 
     let proof_dlog = proof_dlog_eq(&sigma, &y_j, &pub_key_j, Some(sound_param));
+    println!("About to commit `proof_dlog`");
     env::commit(&proof_dlog);
+    println!("Finished committing `proof_dlog`");
 
     let res = gm_eval_honest(&v_j.clone(), &c_ij, &c_j, &n_i, &rand1, &rand2, &rand3, &rand4);
     let proof_shuffle = compute_proof_shuffle(&res, &pub_key_j);
+    println!("About to commit `proof_shuffle`");
     env::commit(&proof_shuffle);
+    println!("Finished committing `proof_shuffle`");
 }
 
 fn compute_proof_enc(c1: Vec<BigInt>, n1: &BigInt, r1: &[BigInt]) -> Vec<Vec<Vec<BigInt>>> {

@@ -7,8 +7,9 @@ extern crate zk_auctions_methods;
 
 use num_bigint::{BigInt, RandBigInt};
 use risc0_zkvm::{default_prover, ExecutorEnv};
+use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_gm, generate_keys, get_next_random};
-use zk_auctions_core::utils::rand32;
+use zk_auctions_core::utils::{rand32, StrainProof};
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
@@ -22,7 +23,7 @@ fn main() {
     let c_i = encrypt_gm(&v_i, n_i);
 
     let sound_param: usize = 40;
-    let sigma: usize = 40;
+    let sigma: BigInt = BigInt::from(40);
 
     let mut rand1: Vec<Vec<BigInt>> = Vec::with_capacity(32);
     let mut rand2: Vec<Vec<BigInt>> = Vec::with_capacity(32);
@@ -59,7 +60,31 @@ fn main() {
         .expect("Failed to build execution environment");
 
     let prover = default_prover();
-    let receipt = prover.prove(env, GUEST_ELF).expect("Proof generation failed").receipt;
+    println!("Attempting at unwraping receipt");
+    let receipt = prover.prove(env, GUEST_ELF).unwrap().receipt;
 
-    receipt.verify(GUEST_ID).expect("Proof verification failed");
+    println!("Attempting at unwraping receipt, after verifying");
+    receipt.verify(GUEST_ID).unwrap();
+
+    println!("Attempting at decoding `proof_enc`");
+    let proof_enc: Vec<Vec<Vec<BigInt>>> =
+        receipt.journal.decode().expect("Failed to decode `proof_enc`");
+    println!("Successfully decoded `proof_enc`");
+
+    println!("Attempting at decoding `proof_eval, plaintext_and_coins`");
+    let (proof_eval, plaintext_and_coins): (
+        Vec<Vec<Vec<BigInt>>>,
+        Vec<Vec<(BigInt, BigInt, BigInt)>>,
+    ) = receipt.journal.decode().expect("Failed to decode proof_eval and plaintext_and_coins");
+    println!("Successfully decoded `proof_eval, plaintext_and_coins`");
+
+    println!("Attempting at decoding `proof_dlog_eq`");
+    let proof_dlog_eq: Vec<(BigInt, BigInt, BigInt)> =
+        receipt.journal.decode().expect("Failed to decode proof_dlog_eq");
+    println!("Successfully decoded `proof_dlog_eq`");
+
+    println!("Attempting at decoding `proof_shuffle`");
+    let proof_shuffle: HashMap<usize, StrainProof> =
+        receipt.journal.decode().expect("Failed to decode `proof_shuffle`");
+    println!("Successfully decoded `proof_shuffle`");
 }
