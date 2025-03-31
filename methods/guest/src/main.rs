@@ -34,7 +34,7 @@ fn main() {
     let r_ij = rand32(pub_key_j);
 
     let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
-    let (cipher_i, pub_key_i, sound_param): (Vec<BigInt>, BigInt, usize) = env::read();
+    let (cipher_i, pub_key_i, sound_param): (Vec<BigInt>, BigInt, u32) = env::read();
     let sigma: BigInt = env::read();
     let (rand1, rand2, rand3, rand4): (
         Vec<Vec<BigInt>>,
@@ -44,37 +44,38 @@ fn main() {
     ) = env::read();
 
     println!("Received `sound_param` = {} and `sigma` = {}", sound_param, sigma);
-
+    println!("Computing `proof_enc`");
     let proof_enc = compute_proof_enc(c_i.clone(), &n_i, &r_i);
-    println!("About to commit ...");
     env::commit(&proof_enc);
+    println!("Successfully committed `proof_enc`");
 
-    let c_ij = encrypt_gm(&v_j.clone(), &n_i);
-    let (proof_eval, plaintext_and_coins) = proof_eval(
-        &c_i.clone(),
-        &c_j,
-        &c_ij,
-        v_j.clone(),
-        &pub_key_i,
-        &pub_key_j,
-        &r_i,
-        &r_ij,
-        sound_param,
-    );
+    // let c_ij = encrypt_gm(&v_j.clone(), &n_i);
+    // let (proof_eval, plaintext_and_coins) = proof_eval(
+    //     &c_i.clone(),
+    //     &c_j,
+    //     &c_ij,
+    //     v_j.clone(),
+    //     &pub_key_i,
+    //     &pub_key_j,
+    //     &r_i,
+    //     &r_ij,
+    //     sound_param,
+    // );
 
-    env::commit(&(proof_eval, plaintext_and_coins));
-    println!("Finished committing the `proof_eval`.");
+    // env::commit(&(proof_eval, plaintext_and_coins));
+    // println!("Finished committing the `proof_eval`.");
 
-    let proof_dlog = proof_dlog_eq(&sigma, &y_j, &pub_key_j, Some(sound_param));
-    println!("About to commit `proof_dlog`");
-    env::commit(&proof_dlog);
-    println!("Finished committing `proof_dlog`");
+    // let proof_dlog = proof_dlog_eq(&sigma, &y_j, &pub_key_j, Some(sound_param));
+    // println!("About to commit `proof_dlog`");
+    // env::commit(&proof_dlog);
+    // println!("Finished committing `proof_dlog`");
 
-    let res = gm_eval_honest(&v_j.clone(), &c_ij, &c_j, &n_i, &rand1, &rand2, &rand3, &rand4);
-    let proof_shuffle = compute_proof_shuffle(&res, &pub_key_j);
-    println!("About to commit `proof_shuffle`");
-    env::commit(&proof_shuffle);
-    println!("Finished committing `proof_shuffle`");
+    // println!("Computing `gm_eval_honest`");
+    // let res = gm_eval_honest(&v_j.clone(), &c_ij, &c_j, &n_i, &rand1, &rand2, &rand3, &rand4);
+    // let proof_shuffle = compute_proof_shuffle(&res, &pub_key_j);
+    // println!("About to commit `proof_shuffle`");
+    // env::commit(&proof_shuffle);
+    // println!("Finished committing `proof_shuffle`");
 }
 
 fn compute_proof_enc(c1: Vec<BigInt>, n1: &BigInt, r1: &[BigInt]) -> Vec<Vec<Vec<BigInt>>> {
@@ -134,7 +135,7 @@ fn proof_eval(
     pub_key_j: &BigInt,
     r1: &Vec<BigInt>,
     r12: &Vec<BigInt>,
-    sound_param: usize,
+    sound_param: u32,
 ) -> (Vec<Vec<Vec<BigInt>>>, Vec<Vec<(BigInt, BigInt, BigInt)>>) {
     assert_eq!(cipher_i.len(), 32);
     assert_eq!(cipher_j.len(), 32);
@@ -145,13 +146,13 @@ fn proof_eval(
     let mut strain_rng = StrainRandomGenerator::new();
 
     // Generate coins_delta, coins_gamma, and coins_gamma2
-    let mut coins_delta = vec![vec![BigInt::zero(); sound_param]; 32];
-    let mut coins_gamma = vec![vec![BigInt::zero(); sound_param]; 32];
-    let mut coins_gamma2 = vec![vec![BigInt::zero(); sound_param]; 32];
+    let mut coins_delta: Vec<Vec<BigInt>> = vec![vec![BigInt::zero(); sound_param as usize]; 32];
+    let mut coins_gamma = vec![vec![BigInt::zero(); sound_param as usize]; 32];
+    let mut coins_gamma2 = vec![vec![BigInt::zero(); sound_param as usize]; 32];
 
     let mut rng = StdRng::from_entropy();
     for l in 0..32 {
-        for m in 0..sound_param {
+        for m in 0..(sound_param as usize) {
             coins_delta[l][m] = BigInt::from(rng.gen_range(0..2));
             coins_gamma[l][m] = strain_rng.get_next_random(&(pub_key_i - BigInt::one()));
             coins_gamma2[l][m] = strain_rng.get_next_random(&(pub_key_j - BigInt::one()));
@@ -199,7 +200,7 @@ fn proof_eval(
 
     let plaintext_and_coins: Vec<Vec<(BigInt, BigInt, BigInt)>> = (0..32)
         .map(|l| {
-            (0..sound_param)
+            (0..(sound_param as usize))
                 .map(|m| {
                     if rng_seed.gen::<u8>() % 2 == 0 {
                         (
@@ -229,7 +230,7 @@ fn proof_dlog_eq(
     sigma: &BigInt,
     y: &BigInt,
     n: &BigInt,
-    iters: Option<usize>,
+    iters: Option<u32>,
 ) -> Vec<(BigInt, BigInt, BigInt)> {
     let iters = iters.unwrap_or(/* default value */ 10);
 
@@ -264,7 +265,7 @@ fn proof_dlog_eq(
     p_dlog
 }
 
-fn compute_proof_shuffle(res: &[Vec<BigInt>], n2: &BigInt) -> HashMap<usize, StrainProof> {
+fn compute_proof_shuffle(res: &[Vec<BigInt>], n2: &BigInt) -> HashMap<u32, StrainProof> {
     let (ae_permutation_desc, ae_permutation, ae_reencrypt_factors) = compute_permutation(res, n2);
 
     let challenges_length = 40;
@@ -273,62 +274,61 @@ fn compute_proof_shuffle(res: &[Vec<BigInt>], n2: &BigInt) -> HashMap<usize, Str
 
     for i in 0..challenges_length {
         let am = compute_permutation(res, n2);
-        am_permutations.insert(i as usize, am.clone());
+        am_permutations.insert(i as u32, am.clone());
         let (am_permutation_desc, am_permutation, am_reencrypt_factors) = am;
 
         let mut me_permutation_desc = HashMap::new();
         let mut me_permutation = HashMap::new();
         let mut me_reencrypt_factors = HashMap::new();
         for j in 0..res.len() {
-            me_permutation_desc.insert(am_permutation_desc[&j], ae_permutation_desc[&j]);
+            me_permutation_desc
+                .insert(am_permutation_desc[&(j as u32)], ae_permutation_desc[&(j as u32)]);
         }
 
         for j in 0..res.len() {
             let mut rs = HashMap::new();
             let mut and_encryptions = HashMap::new();
             for k in 0..challenges_length {
-                let r1: &BigInt = &ae_reencrypt_factors[j][k];
-                let r2: &BigInt = &am_reencrypt_factors[j][k];
+                let r1: &BigInt = &ae_reencrypt_factors[j as usize][k as usize];
+                let r2: &BigInt = &am_reencrypt_factors[j as usize][k as usize];
                 let r: BigInt = divm(r1, r2, n2);
-                rs.insert(k as usize, r.clone());
+                rs.insert(k as u32, r.clone());
                 let rsquare = r.modpow(&BigInt::from(2), n2);
-                let reencryption = (rsquare * &am_permutation[&j][&k]) % n2;
-                and_encryptions.insert(k as usize, reencryption);
+                let reencryption = (rsquare * &am_permutation[&(j as u32)][&(k as u32)]) % n2;
+                and_encryptions.insert(k as u32, reencryption);
             }
-            me_permutation.insert(me_permutation_desc[&j].clone(), and_encryptions);
-            me_reencrypt_factors.insert(j as usize, rs);
+            me_permutation.insert(me_permutation_desc[&(j as u32)].clone(), and_encryptions);
+            me_reencrypt_factors.insert(j as u32, rs);
         }
         me_permutations
-            .insert(i as usize, (me_permutation_desc, me_permutation, me_reencrypt_factors));
+            .insert(i as u32, (me_permutation_desc, me_permutation, me_reencrypt_factors));
     }
 
-    let mut proof: HashMap<usize, StrainProof> = HashMap::new();
+    let mut proof: HashMap<u32, StrainProof> = HashMap::new();
     let mut hash_input = HashMap::new();
-    hash_input.insert(0 as usize, (ae_permutation.clone(), HashMap::new()));
+    hash_input.insert(0 as u32, (ae_permutation.clone(), HashMap::new()));
     for i in 0..challenges_length {
-        hash_input.insert(
-            (i + 1) as usize,
-            (am_permutations[&i].1.clone(), me_permutations[&i].1.clone()),
-        );
+        hash_input
+            .insert((i + 1) as u32, (am_permutations[&i].1.clone(), me_permutations[&i].1.clone()));
     }
     let h = hash_flat(&hash_input);
     let bitstring =
         format!("{:0256b}", BigInt::from_bytes_be(num_bigint::Sign::Plus, &h.to_be_bytes()));
 
-    proof.insert(0 as usize, StrainProof::HashInput(hash_input));
+    proof.insert(0 as u32, StrainProof::HashInput(hash_input));
     for i in 0..challenges_length {
-        if bitstring.chars().nth(i).unwrap() == '0' {
+        if bitstring.chars().nth(i.try_into().unwrap()).unwrap() == '0' {
             let (am_perm_desc, am_reencrypt_factors) =
                 (&am_permutations[&i].0, &am_permutations[&i].2); /* plucking the first and third elements of the returned tuple */
             proof.insert(
-                i + 1 as usize,
+                i + 1 as u32,
                 StrainProof::AMPermutations((am_perm_desc.clone(), am_reencrypt_factors.clone())),
             );
         } else {
             let (me_perm_desc, me_reencrypt_factors) =
                 (&me_permutations[&i].0, &me_permutations[&i].2);
             proof.insert(
-                i + 1 as usize,
+                i + 1 as u32,
                 StrainProof::MEPermutations((me_perm_desc.clone(), me_reencrypt_factors.clone())),
             );
         }

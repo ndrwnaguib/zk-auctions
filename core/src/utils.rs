@@ -9,16 +9,19 @@ use std::collections::HashMap;
 
 use crate::gm::get_next_random;
 
-#[derive(Debug, Serialize, Deserialize)]
+type InnerMap = HashMap<u32, BigInt>;
+type NestedMap = HashMap<u32, InnerMap>;
+type StrainProofComplexType = HashMap<u32, (NestedMap, NestedMap)>;
+
+type SimpleMap = HashMap<u32, u32>;
+type BigIntMatrix = Vec<Vec<BigInt>>;
+type PermutationComplexType = (SimpleMap, NestedMap, BigIntMatrix);
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum StrainProof {
-    MEPermutations((HashMap<usize, usize>, HashMap<usize, HashMap<usize, BigInt>>)),
-    AMPermutations((HashMap<usize, usize>, Vec<Vec<BigInt>>)),
-    HashInput(
-        HashMap<
-            usize,
-            (HashMap<usize, HashMap<usize, BigInt>>, HashMap<usize, HashMap<usize, BigInt>>),
-        >,
-    ),
+    MEPermutations((HashMap<u32, u32>, HashMap<u32, HashMap<u32, BigInt>>)),
+    AMPermutations((HashMap<u32, u32>, Vec<Vec<BigInt>>)),
+    HashInput(StrainProofComplexType),
 }
 
 pub fn divm(a: &BigInt, b: &BigInt, n: &BigInt) -> BigInt {
@@ -29,9 +32,9 @@ pub fn divm(a: &BigInt, b: &BigInt, n: &BigInt) -> BigInt {
 pub fn get_rand_jn1(n: &BigInt, rng: Option<ChaCha20Rng>) -> BigInt {
     let mut rng = rng.unwrap_or(/* default value */ ChaCha20Rng::from_entropy());
     loop {
-        let r = rng.gen_bigint_range(&BigInt::zero(), &n);
+        let r = rng.gen_bigint_range(&BigInt::zero(), n);
 
-        if r.jacobi(&n) == 1 {
+        if r.jacobi(n) == 1 {
             return r;
         }
     }
@@ -65,7 +68,7 @@ impl Hashable for BigInt {
     }
 }
 
-impl Hashable for usize {
+impl Hashable for u32 {
     fn hash_flat(&self, hasher: &mut Sha256) {
         hasher.update(self.to_string().as_bytes());
     }
@@ -114,12 +117,9 @@ pub fn bigint_to_seed(bigint: &BigInt) -> [u8; 32] {
     seed
 }
 
-pub fn compute_permutation(
-    res: &[Vec<BigInt>],
-    n: &BigInt,
-) -> (HashMap<usize, usize>, HashMap<usize, HashMap<usize, BigInt>>, Vec<Vec<BigInt>>) {
+pub fn compute_permutation(res: &[Vec<BigInt>], n: &BigInt) -> PermutationComplexType {
     let seed = get_next_random(n);
-    let permutation_desc = permute(res.len(), &seed);
+    let permutation_desc = permute(res.len() as u32, &seed);
 
     let mut output_permutation = HashMap::new();
     let mut reencrypt_factors = Vec::new();
@@ -133,20 +133,20 @@ pub fn compute_permutation(
             rs.push(r.clone());
             let rsquare = r.modpow(&BigInt::from(2), n);
             let reencryption = (rsquare * res_ij) % n;
-            and_encryptions.insert(j, reencryption);
+            and_encryptions.insert(j as u32, reencryption);
         }
 
-        output_permutation.insert(permutation_desc[&i], and_encryptions);
+        output_permutation.insert(permutation_desc[&(i as u32)], and_encryptions);
         reencrypt_factors.push(rs);
     }
 
     (permutation_desc, output_permutation, reencrypt_factors)
 }
 
-pub fn permute(length: usize, seed_bigint: &BigInt) -> HashMap<usize, usize> {
-    let seed = bigint_to_seed(&seed_bigint);
+pub fn permute(length: u32, seed_bigint: &BigInt) -> HashMap<u32, u32> {
+    let seed = bigint_to_seed(seed_bigint);
     let mut rng = ChaCha20Rng::from_seed(seed);
-    let mut permutation: HashMap<usize, usize> = (0..length).map(|i| (i, i)).collect();
+    let mut permutation: HashMap<u32, u32> = (0..length).map(|i| (i, i)).collect();
 
     for i in 0..(length - 1) {
         let index = rng.gen_range(i..length);
