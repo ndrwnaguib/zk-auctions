@@ -372,7 +372,6 @@ mod tests {
     use num_traits::ToPrimitive;
     use std::collections::HashMap;
     use std::time::Instant;
-    use zerocopy::IntoBytes;
 
     enum StrainProof {
         MEPermutations((HashMap<usize, usize>, HashMap<usize, HashMap<usize, BigInt>>)),
