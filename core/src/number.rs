@@ -13,7 +13,7 @@ use rand::RngCore;
 /// * An Integer with at most `n_bits` bits.
 fn get_random_integer(n_bits: usize) -> BigInt {
     let byte_len = n_bits >> 3;
-    let mut random_bytes: Vec<u8> = vec![0u8; byte_len as usize];
+    let mut random_bytes: Vec<u8> = vec![0u8; byte_len];
     rand::thread_rng().fill_bytes(&mut random_bytes);
 
     // Mask the most significant byte if n_bits isn't a multiple of 8
@@ -68,13 +68,13 @@ fn rabin_miller_test(n: &BigInt, rounds: u32) -> u8 {
     let max_rounds: BigInt = (n - BigInt::from(2u16)).min(BigInt::from(rounds));
 
     for _ in num_iter::range_inclusive(BigInt::from(0u16), max_rounds) {
-        let mut a = get_random_range(&BigInt::from(2u16), &n);
+        let mut a = get_random_range(&BigInt::from(2u16), n);
         while tested.contains(&a) {
-            a = get_random_range(&BigInt::from(2u16), &n);
+            a = get_random_range(&BigInt::from(2u16), n);
         }
         tested.push(a.clone());
 
-        let mut z = a.modpow(&m, &n);
+        let mut z = a.modpow(&m, n);
         // Instead of failing the test, we just give it another round until max_rounds.
         if z == BigInt::from(1u16) || z == n_1 {
             continue;
@@ -132,7 +132,7 @@ pub fn get_strong_prime(
     // TODO: I do not think I need the following line.
     let mut p = [BigInt::zero(), BigInt::zero()];
 
-    for i in 0..2 {
+    for p_candidate in &mut p {
         // randomly choose 101-bit y
         let y = get_random_n_bit_integer(101);
         let sieve_size = 5 * SIEVE_BASE.len();
@@ -163,12 +163,12 @@ pub fn get_strong_prime(
 
             let candidate = y.clone() + j;
             if rabin_miller_test(&candidate, rabin_miller_rounds) > 0 {
-                p[i] = candidate;
+                *p_candidate = candidate;
                 break;
             }
         }
 
-        if p[i] == BigInt::zero() {
+        if *p_candidate == BigInt::zero() {
             panic!("Failed to find a prime in the sieve field");
         }
     }
@@ -258,7 +258,7 @@ impl Jacobi for BigInt {
     }
 }
 
-const SIEVE_BASE: [u32; 10000] = [
+static SIEVE_BASE: [u32; 10000] = [
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
     101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193,
     197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307,

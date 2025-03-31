@@ -15,15 +15,19 @@ pub struct StrainRandomGenerator {
 }
 
 impl StrainRandomGenerator {
-    // Create a new RandomGenerator with an initial counter value
     pub fn new() -> Self {
         Self { counter: 0 }
     }
 
-    // Get the next random number based on `n`
     pub fn get_next_random(&mut self, n: &BigInt) -> BigInt {
         self.counter += 1;
         n - BigInt::from(self.counter)
+    }
+}
+
+impl Default for StrainRandomGenerator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -40,12 +44,12 @@ pub fn generate_keys(prime_size: Option<u64>) -> Keys {
     // TODO: add a rand seed
 
     let mut p = get_strong_prime(prime_size, None, None);
-    while (p.clone() % BigInt::from(4u16) != BigInt::from(3u16)).into() {
+    while p.clone() % BigInt::from(4u16) != BigInt::from(3u16) {
         p = get_strong_prime(prime_size, None, None);
     }
 
     let mut q = get_strong_prime(prime_size, None, None);
-    while (q.clone() % BigInt::from(4u16) != BigInt::from(3u16)).into() {
+    while q.clone() % BigInt::from(4u16) != BigInt::from(3u16) {
         q = get_strong_prime(prime_size, None, None);
     }
 
@@ -64,12 +68,12 @@ pub fn get_next_random(n: &BigInt) -> BigInt {
 
 pub fn encrypt_bit_gm(bit: &BigInt, n: &BigInt) -> BigInt {
     let r = get_next_random(&(n - BigInt::one()));
-    (r.clone() * r.clone() * &(n - BigInt::one()).modpow(&bit, &n)) % n
+    (r.clone() * r.clone() * &(n - BigInt::one()).modpow(bit, n)) % n
 }
 
 pub fn encrypt_bit_gm_coin(bit: &BigInt /* only 0 or 1 */, n: &BigInt, r: BigInt) -> BigInt {
-    assert!(r >= BigInt::zero() && r <= n - 1);
-    (r.clone() * r.clone() * &(n - BigInt::one()).modpow(&bit, &n)) % n
+    assert!(r >= BigInt::zero() && r < *n);
+    (r.clone() * r.clone() * &(n - BigInt::one()).modpow(bit, n)) % n
 }
 
 pub fn encrypt_gm(number: &BigInt, pub_key: &BigInt) -> Vec<BigInt> {
@@ -96,7 +100,7 @@ pub fn decrypt_gm(cipher_numbers: &[BigInt], priv_key: &(BigInt, BigInt)) -> Opt
 
     let bits_str: String = cipher_numbers
         .iter()
-        .map(|c| decrypt_bit_gm(&c, &sk_gm, &n)) // Decrypt each number to a bit
+        .map(|c| decrypt_bit_gm(c, &sk_gm, &n)) // Decrypt each number to a bit
         .map(|bit| if bit == 1 { '1' } else { '0' }) // Convert BigInt to '1' or '0'
         .collect();
 
@@ -120,7 +124,7 @@ pub fn decrypt_bit_and(cipher: &Vec<BigInt>, priv_key: &(BigInt, BigInt)) -> u8 
     let n = p.clone() * q.clone();
 
     for c in cipher {
-        if decrypt_bit_gm(&c, &sk_gm, &n) == 1u8 {
+        if decrypt_bit_gm(c, &sk_gm, &n) == 1u8 {
             return 0;
         }
     }
@@ -150,7 +154,7 @@ pub fn embed_and(cipher: &[BigInt], pub_key: &BigInt, r: &[Vec<BigInt>]) -> Vec<
     cipher
         .iter()
         .enumerate()
-        .map(|(i, bit_cipher)| embed_bit_and(bit_cipher, &pub_key, &r[i]))
+        .map(|(i, bit_cipher)| embed_bit_and(bit_cipher, pub_key, &r[i]))
         .collect()
 }
 
@@ -161,7 +165,7 @@ pub fn encrypt_gm_coin(mpz_number: &BigInt, pub_key: &BigInt, r: &[BigInt]) -> V
         .map(|i| {
             encrypt_bit_gm_coin(
                 &BigInt::from(bits_str.chars().nth(i).unwrap().to_digit(2).unwrap()),
-                &pub_key,
+                pub_key,
                 r[i].clone(),
             )
         })
