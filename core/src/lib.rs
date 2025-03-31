@@ -1,5 +1,5 @@
 pub mod number;
 
-pub mod gm;
+pub mod utils;
 
-pub mod proofs;
+pub mod gm;
