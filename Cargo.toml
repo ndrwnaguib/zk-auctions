@@ -15,6 +15,10 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 serde = { version = "1.0", features = ["derive"] }
 num-bigint = { version = "0.4.6", features = ["rand", "serde"]}
 rand = "0.8.5"
+rand_chacha = "0.3.1"
+num-traits = "0.2.19"
+sha2 = { git = "https://github.com/risc0/RustCrypto-hashes", tag = "sha2-v0.10.6-risczero.0" }
+
 
 [features]
 cuda = ["risc0-zkvm/cuda"]
