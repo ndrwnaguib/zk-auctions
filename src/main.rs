@@ -58,9 +58,9 @@ fn main() {
     }
 
     let env = ExecutorEnv::builder()
-        .write(&(c_i.clone(), n_i.clone(), r_i.clone()))
-        .expect("Failed to add encryption proof input")
-        .write(&(c_i.clone(), n_i.clone(), sound_param))
+        // .write(&(c_i.clone(), n_i.clone(), r_i.clone()))
+        // .expect("Failed to add encryption proof input")
+        .write(&(c_i.clone(), n_i.clone(), sound_param)) /* typically, this should be a different bidder */
         .expect("Failed to add evaluation proof input")
         .write(&sigma)
         .expect("Failed to add discrete-log input")
@@ -99,8 +99,12 @@ fn main() {
     println!("`proof_eval` verification succeeded");
 
     println!("Attempting at decoding `proof_dlog_eq`");
-    let (proof_dlog_eq, y_j, y_pow_r, z_pow_r): (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt) =
-        receipt.journal.decode().expect("Failed to decode proof_dlog_eq");
+    let (proof_dlog_eq, y_j, y_pow_r, z_pow_r): (
+        Vec<(BigInt, BigInt, BigInt)>,
+        BigInt,
+        BigInt,
+        BigInt,
+    ) = receipt.journal.decode().expect("Failed to decode proof_dlog_eq");
     println!("Successfully decoded `proof_dlog_eq`");
     assert!(verify_dlog_eq(&n_j, &y_j, &y_pow_r, &z_pow_r, &proof_dlog_eq, Some(sound_param)));
 

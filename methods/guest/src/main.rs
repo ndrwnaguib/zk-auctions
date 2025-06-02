@@ -7,8 +7,8 @@ use risc0_zkvm::guest::env;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{
-    dot_mod, embed_and, encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random,
-    StrainRandomGenerator,
+    dot_mod, embed_and, encrypt_bit_gm_coin, encrypt_gm, encrypt_gm_coin, generate_keys,
+    get_next_random, StrainRandomGenerator,
 };
 
 use zk_auctions_core::utils::{
@@ -26,19 +26,14 @@ fn main() {
     let q_j = BigInt::from(307);
     let n_j = &(p_j.clone() * q_j.clone());
 
-    let r_j = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
     let y_j = rng.gen_bigint_range(&BigInt::zero(), &n_j);
     let z_j = n_j.clone() - BigInt::one();
 
     // Generate a second random value for v2.
     let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let c_j = encrypt_gm(&v_j, n_j);
 
-    // Encrypt v1 under n2.
-    let r_ij = rand32(n_j);
-
-    let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
-    let (cipher_i, n_i, sound_param): (Vec<BigInt>, BigInt, u32) = env::read();
+    // let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
+    let (c_i, n_i, sound_param): (Vec<BigInt>, BigInt, u32) = env::read();
     let sigma: BigInt = env::read();
     let (rand1, rand2, rand3, rand4): (
         Vec<Vec<BigInt>>,
@@ -47,26 +42,32 @@ fn main() {
         Vec<Vec<BigInt>>,
     ) = env::read();
 
+    // Encrypt v1 under n2.
+    let r_ij = rand32(&n_i);
+
     println!("Sharing public key");
     env::commit(&n_j);
     println!("Successfully shared the public key");
 
+    let r_j = rand32(n_j);
     println!("Received `sound_param` = {} and `sigma` = {}", sound_param, sigma);
     println!("Computing `proof_enc`");
-    let proof_enc = compute_proof_enc(c_i.clone(), &n_i, &r_i);
+    let c_j = encrypt_gm_coin(&v_j, n_j, &r_j);
+    let proof_enc = compute_proof_enc(c_j.clone(), n_j, &r_j);
     env::commit(&proof_enc);
     println!("Successfully committed `proof_enc`");
 
-    let c_ij = encrypt_gm(&v_j.clone(), &n_i);
+    let c_j = encrypt_gm(&v_j, n_j);
+    let c_ji = encrypt_gm(&v_j.clone(), &n_i);
     let (proof_eval, plaintext_and_coins) = proof_eval(
-        &c_i.clone(),
         &c_j,
-        &c_ij,
+        &c_i,
+        &c_ji,
         /* this should be v_i */
         v_j.clone(),
-        &n_i,
         &n_j,
-        &r_i,
+        &n_i,
+        &r_j,
         &r_ij,
         sound_param,
     );
@@ -74,6 +75,7 @@ fn main() {
     env::commit(&(proof_eval, plaintext_and_coins));
     println!("Finished committing the `proof_eval`.");
 
+    let r_j = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
     let y_pow_r = y_j.modpow(&r_j, &n_j);
     let z_pow_r = z_j.modpow(&r_j, &n_j);
 
