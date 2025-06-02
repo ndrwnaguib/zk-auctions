@@ -19,22 +19,26 @@ use zk_auctions_core::utils::{
 fn main() {
     let mut rng = rand::thread_rng();
 
-    let keys_j = generate_keys(None);
-    let pub_key_j = &keys_j.pub_key;
-    let (p_j, q_j) = keys_j.priv_key;
+    // let keys_j = generate_keys(None);
+    // let pub_key_j = &keys_j.pub_key;
+    // let (p_j, q_j) = keys_j.priv_key;
+    let p_j = BigInt::from(251);
+    let q_j = BigInt::from(307);
+    let n_j = &(p_j.clone() * q_j.clone());
 
-    let r = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
-    let y_j = rng.gen_bigint_range(&BigInt::zero(), &pub_key_j);
+    let r_j = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
+    let y_j = rng.gen_bigint_range(&BigInt::zero(), &n_j);
+    let z_j = n_j.clone() - BigInt::one();
 
     // Generate a second random value for v2.
     let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let c_j = encrypt_gm(&v_j, pub_key_j);
+    let c_j = encrypt_gm(&v_j, n_j);
 
     // Encrypt v1 under n2.
-    let r_ij = rand32(pub_key_j);
+    let r_ij = rand32(n_j);
 
     let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
-    let (cipher_i, pub_key_i, sound_param): (Vec<BigInt>, BigInt, u32) = env::read();
+    let (cipher_i, n_i, sound_param): (Vec<BigInt>, BigInt, u32) = env::read();
     let sigma: BigInt = env::read();
     let (rand1, rand2, rand3, rand4): (
         Vec<Vec<BigInt>>,
@@ -43,38 +47,47 @@ fn main() {
         Vec<Vec<BigInt>>,
     ) = env::read();
 
+    println!("Sharing public key");
+    env::commit(&n_j);
+    println!("Successfully shared the public key");
+
     println!("Received `sound_param` = {} and `sigma` = {}", sound_param, sigma);
     println!("Computing `proof_enc`");
     let proof_enc = compute_proof_enc(c_i.clone(), &n_i, &r_i);
     env::commit(&proof_enc);
     println!("Successfully committed `proof_enc`");
 
-    // let c_ij = encrypt_gm(&v_j.clone(), &n_i);
-    // let (proof_eval, plaintext_and_coins) = proof_eval(
-    //     &c_i.clone(),
-    //     &c_j,
-    //     &c_ij,
-    //     v_j.clone(),
-    //     &pub_key_i,
-    //     &pub_key_j,
-    //     &r_i,
-    //     &r_ij,
-    //     sound_param,
-    // );
+    let c_ij = encrypt_gm(&v_j.clone(), &n_i);
+    let (proof_eval, plaintext_and_coins) = proof_eval(
+        &c_i.clone(),
+        &c_j,
+        &c_ij,
+        /* this should be v_i */
+        v_j.clone(),
+        &n_i,
+        &n_j,
+        &r_i,
+        &r_ij,
+        sound_param,
+    );
 
-    // env::commit(&(proof_eval, plaintext_and_coins));
-    // println!("Finished committing the `proof_eval`.");
+    env::commit(&(proof_eval, plaintext_and_coins));
+    println!("Finished committing the `proof_eval`.");
 
-    // let proof_dlog = proof_dlog_eq(&sigma, &y_j, &pub_key_j, Some(sound_param));
-    // println!("About to commit `proof_dlog`");
-    // env::commit(&proof_dlog);
-    // println!("Finished committing `proof_dlog`");
+    let y_pow_r = y_j.modpow(&r_j, &n_j);
+    let z_pow_r = z_j.modpow(&r_j, &n_j);
+
+    println!("Computing `proof_dlog`");
+    let proof_dlog = proof_dlog_eq(&sigma, &y_j, &n_j, Some(sound_param));
+    println!("About to commit `proof_dlog`");
+    env::commit(&(proof_dlog, y_j, y_pow_r, z_pow_r));
+    println!("Finished committing `proof_dlog`");
 
     // println!("Computing `gm_eval_honest`");
     // let res = gm_eval_honest(&v_j.clone(), &c_ij, &c_j, &n_i, &rand1, &rand2, &rand3, &rand4);
-    // let proof_shuffle = compute_proof_shuffle(&res, &pub_key_j);
+    // let proof_shuffle = compute_proof_shuffle(&res, &n_j);
     // println!("About to commit `proof_shuffle`");
-    // env::commit(&proof_shuffle);
+    // env::commit(&(proof_shuffle, res));
     // println!("Finished committing `proof_shuffle`");
 }
 
