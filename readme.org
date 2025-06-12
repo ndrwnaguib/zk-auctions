@@ -10,11 +10,9 @@
 #+LATEX_HEADER: \usepackage{algorithm}
 #+LATEX_HEADER: \usepackage{algpseudocode}
 
-* Table of Contents
-:PROPERTIES:
-:TOC:      :include all :ignore this
-:END:
-:CONTENTS:
+#+begin_center
+| [[./media/pse.png]] | [[./media/ethereum.png]] |
+#+end_center
 
 *Status*
 
@@ -62,6 +60,8 @@ let it be deployed on a blockchain, message-queue, REST APIs, etc.
 Generally speaking, auctions are a very interesting social interaction (and a
 game), one that inevitably reveals several traits of the participants (and
 consequently, allows for exploitation).
+
+This project is sponsored by Ethereum's Privacy, Scaling, and Explorations team.
 
 ** Short Rationale
 
