@@ -1,0 +1,230 @@
+#+TITLE: [[color:navy][_Auction Specification Model v0.1-draft_]]
+#+BIBLIOGRAPHY: bibliography.bib
+#+SUBTITLE: 2024-05-01
+
+#+begin_details More details about this document
+History:
+
+TODO: Link commit history on the file after initial commit
+
+Editors:
+ * Andrew Naguib
+Authors:
+ * Andrew Naguib
+#+end_details
+
+#+EXPORT_FILE_NAME: /home/drew/projects/zk-auctions/docs/auction_specification_model.html
+#+startup: num
+
+* Introduction
+
+/This section is non-normative./[fn:1]
+
+The Auction Specification Model (ASM) =v0.1-draft= defines a standardized
+framework for conducting auctions on blockchain platforms, with a particular
+focus on zero-knowledge auctions. Inspired by the principles of transparency,
+security, and privacy, ASM provides a comprehensive blueprint for developers,
+auctioneers, and participants alike to engage in fair and efficient auction
+processes.
+
+ASM facilitates the creation, exchange, and verification of auction-related data
+in a manner that ensures trust, integrity, and confidentiality. By leveraging
+blockchain technology and cryptographic techniques, ASM enables bidders to
+participate in auctions while preserving their privacy and anonymity
+
+* What is a zero-knowledge auction?
+
+/This section is non-normative./
+
+
+We begin by defining an /auction/ as an interactive setting involving a group of
+participants, known as bidders, who all have a mutual interest in a particular
+item, referred to as the asset. This item is being offered for sale by its
+owner, or a representative acting on their behalf, who is typically referred to
+as the auctioneer.
+
+Building upon the previous definition, a /zero-knowledge auction/ is an auction
+where the bids and bidding process are conducted in such a way that the bidders
+can prove the validity of their bids without revealing any sensitive information
+about the bid itself or their identity. In other words, participants can
+demonstrate that they have made a valid bid without disclosing the actual
+content of the bid or any identifying information, ensuring bidder privacy while
+maintaining the integrity of the auction process.
+
+* Ecosystem Overview
+
+/This section is non-normative./
+
+** Bidder
+** Auctioneer (verifier)
+** Bid
+** Auction type
+*** English Auctions
+
+/Draft: Each bidder broadcasts a commitment (the encrypted bid) to all
+participants including the auctioneer, and using ZK proofs, each bidder verifies
+whether the bid is higher or lower than theirs. If higher, then a bidder who is
+interested in the asset could place a higher one by following the same process./
+
+*** Dutch Auctions
+
+/Draft: The auctioneer (or the verifier) repeatedly broadcasts the lowered price
+to the participating bidders until bids are placed./
+
+*** Sealed-Bid Auctions
+**** First-Price Sealed-Bid Auction
+**** Second-Price Sealed-Bid Auction
+** Assets
+
+
+
+
+* Terminology
+
+/This section is non-normative./
+
+** Bidder
+
+A participant in an auction who submits bids for items or assets being
+auctioned. Bidders compete with each other by placing bids with the intention of
+acquiring the auctioned item at the best possible price.
+
+The bidders may engage in the process of deciding the winner by providing ZK
+proofs that said winner's bid in indeed larger or smaller (in case of a
+procurement auction)
+
+** Auctioneer (verifier)
+
+The entity responsible for overseeing and managing the auction process. The
+auctioneer verifies the validity of bids, ensures compliance with auction rules,
+and ultimately determines the winning bid. In the context of zero-knowledge
+auctions, the auctioneer may also act as a verifier, validating bids without
+gaining knowledge of their content or the identity of the bidders. Moreover, the
+verifier declares the winner of the auction.
+
+** Bid
+
+An offer made by a bidder to purchase an item or asset being auctioned. Bids
+typically include the bid amount and any relevant terms or conditions specified
+by the bidder. Bids can be submitted openly in English or Dutch auctions, or in
+sealed envelopes in sealed-bid auctions.
+
+** Sealed-bid Auction
+
+An auction format where bidders submit their bids privately without knowledge of
+other bidders' bids. Bids are typically sealed in envelopes or submitted
+electronically in a confidential manner. The bids are then opened simultaneously
+at the end of the auction, and the highest bid, in the case of First-price
+Sealed-Bid auction, wins.
+
+** Gas Cost
+
+Quoting from [cite:@blass2018strain],
+
+#+begin_quote
+One run of $\Pi_{\text{strain}}$ requires a total of 4 blocks latency: 1 block
+for suppliers to commit, and then 3 blocks for core comparisons and computation
+of the winning bid.
+#+end_quote
+
+* Verification and Validation
+
+/This section is non-normative./
+
+** Identity Validation
+
+To be discussed in [[file:Proposal.org::*<2024-07-01 Mon>][<2024-07-01 Mon>]] meeting--it seems to be relevant to some
+work that was recently completed by @0xisk.
+
+** Bid Validation
+
+
+* Auction Lifecycle
+
+/This section is non-normative./
+
+** Commitment of bids.
+** Opening the commitments.
+** Verification of the winner.
+** Finalizing the auction.
+
+Quoting from [cite:@blass2018strain],
+
+#+begin_quote
+*Ideal Functionality*. Our protocol [Strain] emulates a trusted third party TTP that,
+ first, receives all bids from all suppliers. If supplier pseudonymity is
+ required, all participating suppliers $S_i$ send their bids $v_i$ via a
+ pseudonymous channel, or else they send it via an authenticated channel. The
+ trusted third party then computes result $cmp_{i,j}$ of the comparison between
+ each bid. Finally, the trusted third party announces (broadcasts) the results
+ of all comparisons to auctioneer A, each Supplier $S_i$, and all other
+ participants of the blockchain. Similar to order preserving encryption, this
+ reveals the total order of bids and hence the winner of the auction, but does
+ not reveal the bids themselves.
+
+ \begin{align*}
+&\text{for all } S_i \text{ do} \\
+&\quad \text{if Pseudonymity then } S_i \rightarrow \text{TTP}: \mathcal{F}_{\text{Pseu}}(v_i); \text{ else } S_i \rightarrow \text{TTP}: \mathcal{F}_{\text{Auth}}(v_i); \\
+&\text{for } i = 1 \text{ to } s \text{ do} \\
+&\quad \text{for all } j \neq i \text{ do} \\
+&\quad \quad \text{TTP}: \text{Let } \text{cmp}_{i,j} = 1, \text{ if } v_i > v_j \text{ and } \text{cmp}_{i,j} = 0 \text{ otherwise;} \\
+&\quad \text{end for} \\
+&\text{end for} \\
+&\text{TTP} \rightarrow \{A, S_1, \ldots, S_s\}: \mathcal{F}_{\text{BC}}(\{\text{cmp}_{i,j} \mid \forall i, j \in \{1, \ldots, s\}\}); \\
+&\text{TTP} \rightarrow A: \{v_w \mid v_w = \min(v_1, \ldots, v_s)\};
+\end{align*}
+
+#+end_quote
+
+The only difference to our settings is that we would use the $\max$ function
+instead in the last step.
+
+#+begin_quote
+Imagine that, at some point, $A$ announces a new auction and uploads a smart
+contract to the blockchain. The smart contract is very simple and allows parties
+to comfortably exchange messages as mentioned before. The contract is signed by
+$sk_A$, so everybody understands that this is a valid procurement auction
+#+end_quote
+
+* Security and Privacy
+. /This section is non-normative./
+
+** Bidder anonymity
+
+The identity of bidders must remain unknown and the specifics of their bids are
+kept private (this is important when revealing the bidder’s identity could
+influence the auction’s outcome or lead to privacy breaches, e.g., real estate,
+art/collectibles, etc.).
+
+** Secure transactions
+
+Ensuring the integrity of the auction process as well as protecting against
+fraud. Questions to be answered:
+
+     * How to prove the actual worth of the bidder claiming that she has? If
+       that's not in the scope of the project, it has to be explicitly stated
+       that such a responsibility is delegated to third-party tools.
+     * Should there be an escrow to guarantee that the bid is held securely?
+
+** Integrity
+
+The system must provide a proof that the some bid has won without revealing its value.
+
+     * Revealing the winning bid is an sensitive information. It shows the
+       valuation of item $i$ by the bidder $j$. While it may not impact the
+       auction at time $t$, it could still be abused in an auction at time $t +
+       1$
+
+* Scalability and Efficiency
+
+/This section is non-normative./
+
+1. How to compute the winner correctly over ciphertexts while not exposing the
+   bids during the auction?
+2. How to /efficiently/ execute the auction protocol with multiple participants
+   while the underlying secure circuits mechanically compare bids?
+
+* Footnotes
+
+[fn:1] The “Auction Specification Model” is not normative and is still in a
+heavy editing process.
