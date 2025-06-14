@@ -10,6 +10,12 @@
 #+LATEX_HEADER: \usepackage{algorithm}
 #+LATEX_HEADER: \usepackage{algpseudocode}
 
+We are grateful to the Privacy + Scaling Explorations team at Ethereum
+Foundation for sponsoring this project and bringing it into light. Additionally,
+we are also thankful to Florian Kerschbaum and Erik-Oliver Blass for providing a
+Python 2.7-implementation of the Strain protocol which served as a reference for
+the Rust implementation.
+
 #+begin_center
 | [[./media/pse.png]] | [[./media/ethereum.png]] |
 #+end_center
@@ -421,7 +427,7 @@ CLOSED: [2024-06-30 Sun 20:01] SCHEDULED: <2024-05-15 Wed>
 
                 auction.exclude_bidder(malicious_bidder);
                 assert!(!auction.is_bidder_active(malicious_bidder));
-            } 
+            }
          #+end_src
 
  * The mocking of the identities in testing should handle mainly Ethereum's
@@ -749,7 +755,7 @@ self-contained documentation of the workflow since day one.
 
 * Footnotes
 
-[fn:1] https://ads.google.com/intl/en_ca/home/measurement/bidding/ 
+[fn:1] https://ads.google.com/intl/en_ca/home/measurement/bidding/
 [fn:2] https://support.google.com/authorizedbuyers/answer/6136272
 
 # Local Variables:
