@@ -1,4 +1,4 @@
-#+TITLE: ZK-Auctions Toolkit Grant Proposal and Progress Tracking
+#+TITLE: ZK-Auctions
 #+AUTHOR: ndrwnaguib and 0xisk
 #+BIBLIOGRAPHY: bibliography.bib
 #+HTML_HEAD: <style> blockquote { background-color: #f1f1e9; border: 2px solid #454545; border-radius: 5px;} .timestamp { color: #000080; }</style>
@@ -9,6 +9,12 @@
 #+INFOJS_OPT: view:info
 #+LATEX_HEADER: \usepackage{algorithm}
 #+LATEX_HEADER: \usepackage{algpseudocode}
+
+#+begin_html
+<p align="center">
+  <img src="./media/auction.png" width="30%">
+</p>
+#+end_html
 
 We are grateful to the Privacy + Scaling Explorations team at Ethereum
 Foundation for sponsoring this project and bringing it into light. Additionally,
