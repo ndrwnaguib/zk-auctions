@@ -17,10 +17,10 @@
 #+end_html
 
 We are grateful to the Privacy + Scaling Explorations team at Ethereum
-Foundation for sponsoring this project and bringing it into light. Additionally,
-we are also thankful to Florian Kerschbaum and Erik-Oliver Blass for providing a
-Python 2.7-implementation of the Strain protocol which served as a reference for
-the Rust implementation.
+Foundation for sponsoring this project and bringing it into light. We are also
+thankful to Professor Florian Kerschbaum and Dr. Erik-Oliver Blass for providing
+a Python 2.7-implementation of the Strain protocol which served as a reference
+for its Rust implementation.
 
 #+begin_center
 | [[./media/pse.png]] | [[./media/ethereum.png]] |
@@ -81,7 +81,7 @@ A zero-knowledge-proof-based contract library for First-Bid, Second-Bid,
 English, Dutch,and SEAL auctions to govern bidder anonymity, decentralization,
 and integrity while particularly avoiding neopotism.
 
-** Project Details and Motivation <<project_details_and_motivation>>
+** Project Details and Motivation
 
 The output of the project will be a Rust-based toolkit that simulates a
 decentralized auction and governs the following properties:
@@ -143,7 +143,7 @@ https://github.com/ndrwnaguib/zk-auctions
 
 * Development Roadmap
 
-** Milestone 1: Research, Proof-sketching, and Algorithm Design <<milestone-1>>
+** Milestone 1: Research, Proof-sketching, and Algorithm Design
 
 *** Objectives
 
@@ -251,7 +251,7 @@ competitiveness will not have an impact on subsequent comparisons.
               deciding the protocol that will be followed, and the punishment
               mechanism, should it be needed, will be designed accordingly.
          -----
-***** $\star$ In [cite:@blass2018strain] <<strain>>,
+***** $\star$ In [cite:@blass2018strain],
 
          The authors propose a maliciously-secure blockchain-based auction where
          all encrypted bids are compared pair-by-pair via homomorphic circuit
@@ -354,7 +354,7 @@ CLOSED: [2024-06-30 Sun 20:01] SCHEDULED: <2024-05-06 Mon>
     * check other open-source projects that could be relevant.
 *** DONE Milestone 1: (Sprint 3) [2/2]
 CLOSED: [2024-06-30 Sun 21:08] SCHEDULED: <2024-05-25 Sat>
-**** DONE Milestone 1: (Sprint 3): Test suite development (cont'd) <<milestone-1-sprint-3>>
+**** DONE Milestone 1: (Sprint 3): Test suite development (cont'd)
 CLOSED: [2024-06-30 Sun 20:01] SCHEDULED: <2024-05-15 Wed>
  * writing the tests of the circuits which are to be
     developed in [[milestone-2][Milestone 2]].
@@ -511,7 +511,7 @@ CLOSED: [2024-07-16 Tue 10:33] SCHEDULED: <2024-05-28 Tue>
      * Literature Review
    * Lay the schedule and plan for Milestone 2.
 
-** Milestone 2: Development <<milestone-2>>
+** Milestone 2: Development
 
 *** Objectives
 
@@ -669,9 +669,9 @@ Notes:
 - @0xisk recommended that we update the current skeleton to use =halo2-browser=.
 - @0xisk and @ndrwnaguib will both review the Strain paper again to decide if
   custom software engineering is expected to implement the Strain protocol.
-- @ndrwnaguib will implement the primitives contained in the
-  <<auction-specification-model>> as structs and traits. Initially, they are not expected to be
-  located anywhere only until the main skeleton is decided
+- @ndrwnaguib will implement the primitives contained in the Auction
+  Specification Model as structs and traits. Initially, they are not expected to
+  be located anywhere only until the main skeleton is decided
 - @ndrwnaguib will try to implement the Goldwasser-Micali encryption algorithm
   if the current implementations (e.g., https://github.com/crodriguezvega/probabilisticpubkey) are not mature enough.
 
