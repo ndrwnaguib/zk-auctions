@@ -63,7 +63,6 @@ fn main() {
 
     let proof_dlog = proof_dlog_eq(&r_j_dlog, &y_j, &n_j, Some(sound_param));
 
-    // // Encrypt v1 under n2.
     let r_ji = rand32(&n_i);
     let c_ji = encrypt_gm_coin(&v_j, &n_i, &r_ji);
     let res = gm_eval_honest(&v_j, &c_ji, &c_i, &n_i, &rand1, &rand2, &rand3, &rand4);
