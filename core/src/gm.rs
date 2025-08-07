@@ -77,7 +77,7 @@ pub fn encrypt_bit_gm_coin(bit: &BigInt /* only 0 or 1 */, n: &BigInt, r: BigInt
 }
 
 pub fn encrypt_gm(number: &BigInt, pub_key: &BigInt) -> Vec<BigInt> {
-    let bits_str = format!("{:032b}", number);
+    let bits_str = format!("{number:032b}");
     bits_str
         .chars()
         .map(|bit| encrypt_bit_gm(&BigInt::from(bit.to_digit(2).unwrap()), pub_key))
@@ -159,7 +159,7 @@ pub fn embed_and(cipher: &[BigInt], pub_key: &BigInt, r: &[Vec<BigInt>]) -> Vec<
 }
 
 pub fn encrypt_gm_coin(mpz_number: &BigInt, pub_key: &BigInt, r: &[BigInt]) -> Vec<BigInt> {
-    let bits_str = format!("{:032b}", mpz_number);
+    let bits_str = format!("{mpz_number:032b}");
 
     (0..32)
         .map(|i| {

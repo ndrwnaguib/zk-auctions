@@ -149,7 +149,7 @@ pub fn get_strong_prime(
                     /* semantically speaking, this case should not be reached at
                      * all, given that the length of the sieve is fairly
                      * small */
-                    eprintln!("Skipping a value because it exceeds usize limits: {}", j);
+                    eprintln!("Skipping a value because it exceeds usize limits: {j}");
                 }
             }
         }
@@ -1064,7 +1064,7 @@ mod tests {
     fn test_get_strong_prime_with_valid_n_bits() {
         let n_bits = 768;
         let prime = get_strong_prime(n_bits, None, None);
-        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {} bits", n_bits);
+        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {n_bits} bits");
         assert!(
             rabin_miller_test(&prime, 10) > 0,
             "The generated prime should pass the Rabin-Miller test"
@@ -1082,7 +1082,7 @@ mod tests {
     fn test_get_strong_prime_with_large_n_bits() {
         let n_bits = 896;
         let prime = get_strong_prime(n_bits, None, None);
-        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {} bits", n_bits);
+        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {n_bits} bits");
         assert!(
             rabin_miller_test(&prime, 10) > 0,
             "The generated prime should pass the Rabin-Miller test"
@@ -1093,7 +1093,7 @@ mod tests {
     fn test_get_strong_prime_with_large_false_positive_prob() {
         let n_bits = 768;
         let prime = get_strong_prime(n_bits, None, Some(0.1));
-        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {} bits", n_bits);
+        assert_eq!(prime.bits(), n_bits, "The prime should have exactly {n_bits} bits");
         assert!(
             rabin_miller_test(&prime, 10) > 0,
             "The generated prime should pass the Rabin-Miller test"
