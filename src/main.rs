@@ -16,7 +16,7 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
 use zk_auctions_core::number::Jacobi;
-use zk_auctions_core::utils::{rand32, StrainProof, compare_leq_honest};
+use zk_auctions_core::utils::{compare_leq_honest, rand32, StrainProof};
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
@@ -78,16 +78,11 @@ fn main() {
         Vec<Vec<(BigInt, BigInt, BigInt)>>,
     ) = from_slice(&private_output).expect("Failed to deserialize private data");
 
-    let (
-        n_j,
-        proof_enc,
-        (proof_dlog, y_j, y_pow_r, z_pow_r),
-        (proof_shuffle, res)
-    ): (
+    let (n_j, proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res)): (
         BigInt,
         Vec<Vec<Vec<BigInt>>>,
         (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
-        (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>)
+        (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
     ) = receipt.journal.decode().expect("Failed to decode all results");
 
     let eval_res =

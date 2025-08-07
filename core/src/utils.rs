@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 
-use crate::gm::{get_next_random, decrypt_bit_and};
+use crate::gm::{decrypt_bit_and, get_next_random};
 
 type InnerMap = HashMap<u32, BigInt>;
 type NestedMap = HashMap<u32, InnerMap>;
@@ -186,8 +186,8 @@ pub fn rand32(n: &BigInt) -> Vec<BigInt> {
 pub fn compare_leq_honest(eval_res: &Vec<Vec<BigInt>>, priv_key: &(BigInt, BigInt)) -> bool {
     let mut one_cnt = 0;
     for cipher in eval_res {
-    if decrypt_bit_and(cipher, priv_key) == 1 {
-    one_cnt += 1;
+        if decrypt_bit_and(cipher, priv_key) == 1 {
+            one_cnt += 1;
         }
     }
 
