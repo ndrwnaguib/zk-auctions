@@ -2,39 +2,32 @@ use num_bigint::{BigInt, RandBigInt};
 use num_traits::{One, Zero};
 use rand::seq::SliceRandom;
 use rand::{rngs::StdRng, Rng, SeedableRng};
-use rand_chacha::ChaCha20Rng;
 use risc0_zkvm::guest::env;
-use sha2::{Digest, Sha256};
+use sha2::Digest;
 use std::collections::HashMap;
 use zk_auctions_core::gm::{
-    dot_mod, embed_and, encrypt_bit_gm_coin, encrypt_gm, encrypt_gm_coin, generate_keys,
-    get_next_random, StrainRandomGenerator,
+    dot_mod, embed_and, encrypt_bit_gm_coin, encrypt_gm, encrypt_gm_coin, generate_keys, Keys,
+    StrainRandomGenerator,
 };
 
 use zk_auctions_core::utils::{
-    bigint_to_seed, compute_permutation, divm, get_rand_jn1, hash_flat, permute, rand32,
-    set_rand_seed, StrainProof,
+    compute_permutation, divm, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
 };
 
 fn main() {
     let mut rng = rand::thread_rng();
 
-    // let keys_j = generate_keys(None);
-    // let pub_key_j = &keys_j.pub_key;
-    // let (p_j, q_j) = keys_j.priv_key;
-    let p_j = BigInt::from(251);
-    let q_j = BigInt::from(307);
-    let n_j = &(p_j.clone() * q_j.clone());
-
-    let y_j = rng.gen_bigint_range(&BigInt::zero(), &n_j);
-    let z_j = n_j.clone() - BigInt::one();
+    let keys_j: Keys = generate_keys(None);
+    let (p_j, q_j): &(BigInt, BigInt) = &keys_j.priv_key;
+    let n_j: BigInt = keys_j.pub_key;
+    println!("Generated keys for bidder 1: p_j = {p_j}, q_j = {q_j}, n_j = {n_j}");
 
     // Generate a second random value for v2.
     let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
 
-    // let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
-    let (c_i, n_i, sound_param): (Vec<BigInt>, BigInt, u32) = env::read();
-    let sigma: BigInt = env::read();
+    let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
+    let (sigma, sound_param): (BigInt, u32) = env::read();
+    println!("Received `sound_param` = {sound_param} and `sigma` = {sigma}");
     let (rand1, rand2, rand3, rand4): (
         Vec<Vec<BigInt>>,
         Vec<Vec<BigInt>>,
@@ -42,25 +35,17 @@ fn main() {
         Vec<Vec<BigInt>>,
     ) = env::read();
 
-    // Encrypt v1 under n2.
-    let r_ij = rand32(&n_i);
-
     println!("Sharing public key");
-    env::commit(&n_j);
-    println!("Successfully shared the public key");
+    // 1. Commit bidder's public key (auctioneer needs this for verification)
+    // env::commit(&n_j);
 
-    let r_j = rand32(n_j);
-    println!("Received `sound_param` = {} and `sigma` = {}", sound_param, sigma);
-    println!("Computing `proof_enc`");
-    let c_j = encrypt_gm_coin(&v_j, n_j, &r_j);
-    let proof_enc = compute_proof_enc(c_j.clone(), n_j, &r_j);
-    env::commit(&proof_enc);
-    println!("Successfully committed `proof_enc`");
-
-    let c_j = encrypt_gm(&v_j, n_j);
-    let c_ji = encrypt_gm(&v_j.clone(), &n_i);
+    println!("Computing `proof_eval` and `plaintext_and_coins`");
+    let r_j: Vec<BigInt> = rand32(&n_j);
+    let c_j_proofeval = encrypt_gm(&v_j, &n_j);
+    let c_ji = encrypt_gm(&v_j, &n_i);
+    let r_ji = rand32(&n_i);
     let (proof_eval, plaintext_and_coins) = proof_eval(
-        &c_j,
+        &c_j_proofeval,
         &c_i,
         &c_ji,
         /* this should be v_i */
@@ -68,29 +53,57 @@ fn main() {
         &n_j,
         &n_i,
         &r_j,
-        &r_ij,
-        sound_param,
+        &r_ji,
+        sound_param as usize,
     );
 
-    env::commit(&(proof_eval, plaintext_and_coins));
-    println!("Finished committing the `proof_eval`.");
+    /* only seen by auctioneer */
+    // env::commit(&(&proof_eval, &plaintext_and_coins));
+    // println!("Finished committing the `proof_eval` and `plaintext_and_coins`.");
 
-    let r_j = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
-    let y_pow_r = y_j.modpow(&r_j, &n_j);
-    let z_pow_r = z_j.modpow(&r_j, &n_j);
+    println!("Computing `proof_enc`");
+    let c_j_proofenc = encrypt_gm_coin(&v_j.clone(), &n_j, &r_j);
+    let proof_enc: Vec<Vec<Vec<BigInt>>> = compute_proof_enc(c_j_proofenc, &n_j, &r_j);
+
+    let z_j = n_j.clone() - BigInt::one();
+    let r_j_dlog = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
+    let y_j = rng.gen_bigint_range(&BigInt::zero(), &n_j);
+
+    let y_pow_r = y_j.modpow(&r_j_dlog, &n_j);
+    let z_pow_r = z_j.modpow(&r_j_dlog, &n_j);
 
     println!("Computing `proof_dlog`");
-    let proof_dlog = proof_dlog_eq(&sigma, &y_j, &n_j, Some(sound_param));
+    let proof_dlog = proof_dlog_eq(&r_j_dlog, &y_j, &n_j, Some(sound_param));
     println!("About to commit `proof_dlog`");
-    env::commit(&(proof_dlog, y_j, y_pow_r, z_pow_r));
     println!("Finished committing `proof_dlog`");
 
+    // // // Encrypt v1 under n2.
+    // let r_ji = rand32(&n_i);
+    // println!("Computing `encrypt_gm_coin`");
+    // let c_ji = encrypt_gm_coin(&v_j, &n_i, &r_ji);
+    // println!("Computed `encrypt_gm_coin`");
     // println!("Computing `gm_eval_honest`");
-    // let res = gm_eval_honest(&v_j.clone(), &c_ij, &c_j, &n_i, &rand1, &rand2, &rand3, &rand4);
-    // let proof_shuffle = compute_proof_shuffle(&res, &n_j);
+    // let res = gm_eval_honest(&v_j, &c_ji, &c_i, &n_i, &rand1, &rand2, &rand3, &rand4);
+    // println!("Computed `gm_eval_honest`");
+    // println!("Computing `proof_shuffle`");
+    // let proof_shuffle = compute_proof_shuffle(&res, &n_i);
+    // println!("Computed `proof_shuffle`");
     // println!("About to commit `proof_shuffle`");
-    // env::commit(&(proof_shuffle, res));
-    // println!("Finished committing `proof_shuffle`");
+
+    println!("Sending private proof_eval and plaintext_and_coins to host");
+    let private_data = (&proof_eval, &plaintext_and_coins);
+    env::write(&private_data);
+
+    let public_results = (
+        n_j.clone(),
+        // (proof_eval, plaintext_and_coins),
+        proof_enc,
+        (proof_dlog, y_j, y_pow_r, z_pow_r),
+        // (proof_shuffle, res)
+    );
+
+    // Single commit
+    env::commit(&public_results); // println!("Finished committing `proof_shuffle`");
 }
 
 fn compute_proof_enc(c1: Vec<BigInt>, n1: &BigInt, r1: &[BigInt]) -> Vec<Vec<Vec<BigInt>>> {
@@ -150,24 +163,24 @@ fn proof_eval(
     pub_key_j: &BigInt,
     r1: &Vec<BigInt>,
     r12: &Vec<BigInt>,
-    sound_param: u32,
+    sound_param: usize,
 ) -> (Vec<Vec<Vec<BigInt>>>, Vec<Vec<(BigInt, BigInt, BigInt)>>) {
     assert_eq!(cipher_i.len(), 32);
     assert_eq!(cipher_j.len(), 32);
 
-    let bits_v = format!("{:032b}", number1);
+    let bits_v = format!("{number1:032b}");
 
     // the following lines differ from the original Python implementation
     let mut strain_rng = StrainRandomGenerator::new();
 
     // Generate coins_delta, coins_gamma, and coins_gamma2
-    let mut coins_delta: Vec<Vec<BigInt>> = vec![vec![BigInt::zero(); sound_param as usize]; 32];
-    let mut coins_gamma = vec![vec![BigInt::zero(); sound_param as usize]; 32];
-    let mut coins_gamma2 = vec![vec![BigInt::zero(); sound_param as usize]; 32];
+    let mut coins_delta = vec![vec![BigInt::zero(); sound_param]; 32];
+    let mut coins_gamma = vec![vec![BigInt::zero(); sound_param]; 32];
+    let mut coins_gamma2 = vec![vec![BigInt::zero(); sound_param]; 32];
 
     let mut rng = StdRng::from_entropy();
     for l in 0..32 {
-        for m in 0..(sound_param as usize) {
+        for m in 0..sound_param {
             coins_delta[l][m] = BigInt::from(rng.gen_range(0..2));
             coins_gamma[l][m] = strain_rng.get_next_random(&(pub_key_i - BigInt::one()));
             coins_gamma2[l][m] = strain_rng.get_next_random(&(pub_key_j - BigInt::one()));
@@ -215,7 +228,7 @@ fn proof_eval(
 
     let plaintext_and_coins: Vec<Vec<(BigInt, BigInt, BigInt)>> = (0..32)
         .map(|l| {
-            (0..(sound_param as usize))
+            (0..sound_param)
                 .map(|m| {
                     if rng_seed.gen::<u8>() % 2 == 0 {
                         (
@@ -289,7 +302,7 @@ fn compute_proof_shuffle(res: &[Vec<BigInt>], n2: &BigInt) -> HashMap<u32, Strai
 
     for i in 0..challenges_length {
         let am = compute_permutation(res, n2);
-        am_permutations.insert(i as u32, am.clone());
+        am_permutations.insert(i, am.clone());
         let (am_permutation_desc, am_permutation, am_reencrypt_factors) = am;
 
         let mut me_permutation_desc = HashMap::new();
@@ -304,46 +317,44 @@ fn compute_proof_shuffle(res: &[Vec<BigInt>], n2: &BigInt) -> HashMap<u32, Strai
             let mut rs = HashMap::new();
             let mut and_encryptions = HashMap::new();
             for k in 0..challenges_length {
-                let r1: &BigInt = &ae_reencrypt_factors[j as usize][k as usize];
-                let r2: &BigInt = &am_reencrypt_factors[j as usize][k as usize];
+                let r1: &BigInt = &ae_reencrypt_factors[j][k as usize];
+                let r2: &BigInt = &am_reencrypt_factors[j][k as usize];
                 let r: BigInt = divm(r1, r2, n2);
-                rs.insert(k as u32, r.clone());
+                rs.insert(k, r.clone());
                 let rsquare = r.modpow(&BigInt::from(2), n2);
-                let reencryption = (rsquare * &am_permutation[&(j as u32)][&(k as u32)]) % n2;
-                and_encryptions.insert(k as u32, reencryption);
+                let reencryption = (rsquare * &am_permutation[&(j as u32)][&{ k }]) % n2;
+                and_encryptions.insert(k, reencryption);
             }
-            me_permutation.insert(me_permutation_desc[&(j as u32)].clone(), and_encryptions);
+            me_permutation.insert(me_permutation_desc[&(j as u32)], and_encryptions);
             me_reencrypt_factors.insert(j as u32, rs);
         }
-        me_permutations
-            .insert(i as u32, (me_permutation_desc, me_permutation, me_reencrypt_factors));
+        me_permutations.insert(i, (me_permutation_desc, me_permutation, me_reencrypt_factors));
     }
 
     let mut proof: HashMap<u32, StrainProof> = HashMap::new();
     let mut hash_input = HashMap::new();
-    hash_input.insert(0 as u32, (ae_permutation.clone(), HashMap::new()));
+    hash_input.insert(0_u32, (ae_permutation.clone(), HashMap::new()));
     for i in 0..challenges_length {
-        hash_input
-            .insert((i + 1) as u32, (am_permutations[&i].1.clone(), me_permutations[&i].1.clone()));
+        hash_input.insert(i + 1, (am_permutations[&i].1.clone(), me_permutations[&i].1.clone()));
     }
     let h = hash_flat(&hash_input);
     let bitstring =
         format!("{:0256b}", BigInt::from_bytes_be(num_bigint::Sign::Plus, &h.to_be_bytes()));
 
-    proof.insert(0 as u32, StrainProof::HashInput(hash_input));
+    proof.insert(0_u32, StrainProof::HashInput(hash_input));
     for i in 0..challenges_length {
         if bitstring.chars().nth(i.try_into().unwrap()).unwrap() == '0' {
             let (am_perm_desc, am_reencrypt_factors) =
                 (&am_permutations[&i].0, &am_permutations[&i].2); /* plucking the first and third elements of the returned tuple */
             proof.insert(
-                i + 1 as u32,
+                i + 1_u32,
                 StrainProof::AMPermutations((am_perm_desc.clone(), am_reencrypt_factors.clone())),
             );
         } else {
             let (me_perm_desc, me_reencrypt_factors) =
                 (&me_permutations[&i].0, &me_permutations[&i].2);
             proof.insert(
-                i + 1 as u32,
+                i + 1_u32,
                 StrainProof::MEPermutations((me_perm_desc.clone(), me_reencrypt_factors.clone())),
             );
         }
@@ -366,10 +377,10 @@ fn gm_eval_honest(
 
     let neg_cipher_i: Vec<BigInt> =
         cipher_i.iter().map(|x| x * (pub_key_j - BigInt::one()) % pub_key_j).collect();
-    let c_neg_xor = dot_mod(&neg_cipher_i, &cipher_j, pub_key_j);
+    let c_neg_xor = dot_mod(&neg_cipher_i, cipher_j, pub_key_j);
 
-    let cipher_i_and = embed_and(&cipher_i, pub_key_j, rand1);
-    let cipher_j_and = embed_and(&cipher_j, pub_key_j, rand2);
+    let cipher_i_and = embed_and(cipher_i, pub_key_j, rand1);
+    let cipher_j_and = embed_and(cipher_j, pub_key_j, rand2);
     let neg_cipher_i_and = embed_and(&neg_cipher_i, pub_key_j, rand3);
     let c_neg_xor_and = embed_and(&c_neg_xor, pub_key_j, rand4);
 

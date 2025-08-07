@@ -5,12 +5,12 @@ extern crate risc0_zkvm;
 extern crate zk_auctions_core;
 extern crate zk_auctions_methods;
 
-use num_bigint::{BigInt, RandBigInt};
+use num_bigint::{BigInt, RandBigInt, Sign};
 use num_traits::{One, Zero};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use risc0_zkvm::{default_prover, ExecutorEnv};
+use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
@@ -22,18 +22,16 @@ use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 fn main() {
     let mut rng = rand::thread_rng();
 
-    // let keys1 = generate_keys(None);
-    // let n_i = &keys1.pub_key;
-    let p_j = BigInt::from(227);
-    let q_j = BigInt::from(191);
-    let n_i = &(p_j.clone() * q_j.clone());
+    let keys_i = generate_keys(None);
+    let n_i = &keys_i.pub_key;
 
     let v_i: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let r_i = rand32(n_i);
-    let c_i = encrypt_gm(&v_i, n_i);
 
-    let sound_param: u32 = 20;
-    let sigma: BigInt = BigInt::from(20);
+    let r_i: Vec<BigInt> = rand32(n_i);
+    let c_i: Vec<BigInt> = encrypt_gm(&v_i, n_i);
+
+    let sound_param: usize = 40;
+    let sigma: BigInt = BigInt::from(40);
 
     let mut rand1: Vec<Vec<BigInt>> = Vec::with_capacity(32);
     let mut rand2: Vec<Vec<BigInt>> = Vec::with_capacity(32);
@@ -57,63 +55,54 @@ fn main() {
         rand4.push(y2);
     }
 
+    let mut private_output = Vec::new();
     let env = ExecutorEnv::builder()
-        // .write(&(c_i.clone(), n_i.clone(), r_i.clone()))
-        // .expect("Failed to add encryption proof input")
-        .write(&(c_i.clone(), n_i.clone(), sound_param)) /* typically, this should be a different bidder */
-        .expect("Failed to add evaluation proof input")
-        .write(&sigma)
+        .write(&(&c_i, &n_i, &r_i))
+        .expect("Failed to add encryption proof input")
+        .write(&(&sigma, &(sound_param as u32)))
         .expect("Failed to add discrete-log input")
-        .write(&(rand1, rand2, rand3, rand4))
+        .write(&(&rand1, &rand2, &rand3, &rand4))
         .expect("Failed to add shuffle proof input")
+        .stdout(&mut private_output)
         .build()
-        .expect("Failed to build execution environment");
+        .unwrap();
 
-    let prover = default_prover();
-    println!("Attempting at unwraping receipt");
-    let receipt = prover.prove(env, GUEST_ELF).unwrap().receipt;
-
-    println!("Attempting at unwraping receipt, after verifying");
+    let session = default_prover();
+    println!("Unwrapping and verifying receipt ...");
+    let receipt = session.prove(env, GUEST_ELF).unwrap().receipt;
     receipt.verify(GUEST_ID).unwrap();
 
-    let n_j: BigInt = receipt.journal.decode().expect("Failed to decode `n_j`");
-    println!("Received the prover's public key: {}", n_j);
-
-    println!("Attempting at decoding `proof_enc`");
-    let proof_enc: Vec<Vec<Vec<BigInt>>> =
-        receipt.journal.decode().expect("Failed to decode `proof_enc`");
-    println!("Successfully decoded `proof_enc`");
-    assert!(verify_proof_enc(proof_enc));
-    println!("Successfully verified `proof_enc`");
-
-    println!("Attempting at decoding `proof_eval, plaintext_and_coins`");
+    println!("Decoding private proof_eval and plaintext_and_coins");
     let (proof_eval, plaintext_and_coins): (
         Vec<Vec<Vec<BigInt>>>,
         Vec<Vec<(BigInt, BigInt, BigInt)>>,
-    ) = receipt.journal.decode().expect("Failed to decode proof_eval and plaintext_and_coins");
-    println!("Successfully decoded `proof_eval, plaintext_and_coins`");
+    ) = from_slice(&private_output).expect("Failed to deserialize private data");
+    println!("Successfully decoded private data");
+
+    let (
+        n_j,
+        // (proof_eval, plaintext_and_coins),
+        proof_enc,
+        (proof_dlog, y_j, y_pow_r, z_pow_r), /*, (proof_shuffle, res)*/
+    ): (
+        BigInt,
+        // (Vec<Vec<Vec<BigInt>>>, Vec<Vec<(BigInt, BigInt, BigInt)>>),
+        Vec<Vec<Vec<BigInt>>>,
+        (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
+        // (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>)
+    ) = receipt.journal.decode().expect("Failed to decode all results");
 
     let eval_res =
         Some(verify_eval(proof_eval.clone(), plaintext_and_coins.clone(), n_i, &n_j, sound_param));
     assert!(eval_res.is_some(), "`proof_eval` verification failed.");
     println!("`proof_eval` verification succeeded");
 
-    println!("Attempting at decoding `proof_dlog_eq`");
-    let (proof_dlog_eq, y_j, y_pow_r, z_pow_r): (
-        Vec<(BigInt, BigInt, BigInt)>,
-        BigInt,
-        BigInt,
-        BigInt,
-    ) = receipt.journal.decode().expect("Failed to decode proof_dlog_eq");
-    println!("Successfully decoded `proof_dlog_eq`");
-    assert!(verify_dlog_eq(&n_j, &y_j, &y_pow_r, &z_pow_r, &proof_dlog_eq, Some(sound_param)));
+    assert!(verify_proof_enc(proof_enc));
+    println!("Successfully verified `proof_enc`");
 
-    // let res: Vec<Vec<BigInt>> = receipt.journal.decode().expect("Failed to decode `proof_shuffle`");
+    assert!(verify_dlog_eq(&n_j, &y_j, &y_pow_r, &z_pow_r, &proof_dlog, Some(sound_param)));
+    println!("Successfully verified `proof_dlog_eq`");
 
-    // println!("Attempting at decoding `proof_shuffle`");
-    // let (proof_shuffle, res): (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>) =
-    //     receipt.journal.decode().expect("Failed to decode `proof_shuffle`");
-    // println!("Successfully decoded `proof_shuffle`");
     // let success = verify_shuffle(&proof_shuffle, &n_j, &res);
     // assert!(success, "verify_shuffle failed");
 }
@@ -232,7 +221,7 @@ fn verify_eval(
     plaintext_and_coins: Vec<Vec<(BigInt, BigInt, BigInt)>>,
     n1: &BigInt,
     n2: &BigInt,
-    sound_param: u32,
+    sound_param: usize,
 ) -> Option<()> {
     let (gamma, gamma2, cipher_i, cipher_j, cipher_ij) =
         (&p_eval[0], &p_eval[1], &p_eval[2], &p_eval[3], &p_eval[4]);
@@ -271,7 +260,7 @@ fn verify_dlog_eq(
     y_pow_r: &BigInt,
     z_pow_r: &BigInt,
     p_dlog: &[(BigInt, BigInt, BigInt)],
-    k: Option<u32>,
+    k: Option<usize>,
 ) -> bool {
     let k = k.unwrap_or(/* default value */ 10) as usize;
     if p_dlog.len() < k {
