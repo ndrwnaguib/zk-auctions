@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 
-use crate::gm::get_next_random;
+use crate::gm::{get_next_random, decrypt_bit_and};
 
 type InnerMap = HashMap<u32, BigInt>;
 type NestedMap = HashMap<u32, InnerMap>;
@@ -166,4 +166,31 @@ pub fn rand32(n: &BigInt) -> Vec<BigInt> {
         result.push(get_next_random(n));
     }
     result
+}
+
+/// Decrypts a single bit from a ciphertext using the private key.
+/// # Arguments
+/// * `cipher` - A vector of BigInts representing the ciphertext.
+/// * `priv_key` - A tuple containing the private key (BigInt, BigInt
+/// # Returns
+/// The decrypted bit as a u8 (0 or 1).
+/// # Examples
+/// ```
+/// let cipher = vec![BigInt::from(12345), BigInt::from(
+/// 67890)];
+/// let priv_key = (BigInt::from(11111), BigInt::from(
+/// 22222));
+/// let decrypted_bit = decrypt_bit_and(&cipher, &priv_key);
+/// assert!(decrypted_bit == 0 || decrypted_bit == 1);
+/// ```
+pub fn compare_leq_honest(eval_res: &Vec<Vec<BigInt>>, priv_key: &(BigInt, BigInt)) -> bool {
+    let mut one_cnt = 0;
+    for cipher in eval_res {
+    if decrypt_bit_and(cipher, priv_key) == 1 {
+    one_cnt += 1;
+        }
+    }
+
+    assert!(one_cnt <= 1);
+    one_cnt == 0
 }

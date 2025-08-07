@@ -16,10 +16,12 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
 use zk_auctions_core::number::Jacobi;
-use zk_auctions_core::utils::{rand32, StrainProof};
+use zk_auctions_core::utils::{rand32, StrainProof, compare_leq_honest};
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
+    // The host code here plays the role of the auctioneer and a second bidder
+    // Ideally, the second bidder would be a separate entity, but for simplicity, we run it in the same process.
     let mut rng = rand::thread_rng();
 
     let keys_i = generate_keys(None);
@@ -68,43 +70,41 @@ fn main() {
         .unwrap();
 
     let session = default_prover();
-    println!("Unwrapping and verifying receipt ...");
     let receipt = session.prove(env, GUEST_ELF).unwrap().receipt;
     receipt.verify(GUEST_ID).unwrap();
 
-    println!("Decoding private proof_eval and plaintext_and_coins");
     let (proof_eval, plaintext_and_coins): (
         Vec<Vec<Vec<BigInt>>>,
         Vec<Vec<(BigInt, BigInt, BigInt)>>,
     ) = from_slice(&private_output).expect("Failed to deserialize private data");
-    println!("Successfully decoded private data");
 
     let (
         n_j,
-        // (proof_eval, plaintext_and_coins),
         proof_enc,
-        (proof_dlog, y_j, y_pow_r, z_pow_r), /*, (proof_shuffle, res)*/
+        (proof_dlog, y_j, y_pow_r, z_pow_r),
+        (proof_shuffle, res)
     ): (
         BigInt,
-        // (Vec<Vec<Vec<BigInt>>>, Vec<Vec<(BigInt, BigInt, BigInt)>>),
         Vec<Vec<Vec<BigInt>>>,
         (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
-        // (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>)
+        (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>)
     ) = receipt.journal.decode().expect("Failed to decode all results");
 
     let eval_res =
         Some(verify_eval(proof_eval.clone(), plaintext_and_coins.clone(), n_i, &n_j, sound_param));
     assert!(eval_res.is_some(), "`proof_eval` verification failed.");
-    println!("`proof_eval` verification succeeded");
 
     assert!(verify_proof_enc(proof_enc));
-    println!("Successfully verified `proof_enc`");
 
     assert!(verify_dlog_eq(&n_j, &y_j, &y_pow_r, &z_pow_r, &proof_dlog, Some(sound_param)));
-    println!("Successfully verified `proof_dlog_eq`");
 
-    // let success = verify_shuffle(&proof_shuffle, &n_j, &res);
-    // assert!(success, "verify_shuffle failed");
+    let success = verify_shuffle(&proof_shuffle, &n_j, &res);
+    assert!(success, "verify_shuffle failed");
+    if compare_leq_honest(&res, &keys_i.priv_key) {
+        println!("The second bidder's bid is less than or equal to the first bidder's bid.");
+    } else {
+        println!("The second bidder's bid is greater than the first bidder's bid.");
+    }
 }
 
 fn hash_flat_recursive(hasher: &mut Sha256, obj: &dyn Hashable) {
@@ -264,11 +264,11 @@ fn verify_dlog_eq(
 ) -> bool {
     let k = k.unwrap_or(/* default value */ 10) as usize;
     if p_dlog.len() < k {
-        println!("Insufficient number of rounds");
+        // println!("Insufficient number of rounds");
         return false;
     }
 
-    println!("Sufficient number of rounds test: Passed");
+    // println!("Sufficient number of rounds test: Passed");
 
     let z = n - BigInt::one();
 
