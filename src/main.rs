@@ -153,20 +153,7 @@ fn hash_flat<T: Hashable>(input: &T) -> u64 {
 }
 
 // get_rand_jn1 is now imported from core::utils
-fn set_rand_seed(num_list: &[BigInt]) -> ChaCha20Rng {
-    let mut hasher = Sha256::new();
-
-    for x in num_list {
-        hasher.update(x.to_bytes_be().1);
-    }
-
-    let hash_result = hasher.finalize();
-    let mut seed = [0u8; 32];
-    seed.copy_from_slice(&hash_result[..32]); // SHA256 output is 32 bytes
-    ChaCha20Rng::from_seed(seed)
-    // Non-thread-safe seeding
-}
-
+// set_rand_seed is now imported from zk_auctions_core::utils
 fn verify_proof_enc(proof: Vec<Vec<Vec<BigInt>>>) -> bool {
     let n1 = &proof[0][0][0];
 
