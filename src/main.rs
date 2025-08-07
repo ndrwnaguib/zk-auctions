@@ -16,7 +16,9 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
 use zk_auctions_core::number::Jacobi;
-use zk_auctions_core::utils::{compare_leq_honest, rand32, StrainProof};
+use zk_auctions_core::utils::{
+    compare_leq_honest, get_rand_jn1, rand32, set_rand_seed, StrainProof,
+};
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
@@ -152,8 +154,6 @@ fn hash_flat<T: Hashable>(input: &T) -> u64 {
     u64::from_le_bytes(hasher.finalize().to_vec()[..8].try_into().unwrap())
 }
 
-// get_rand_jn1 is now imported from core::utils
-// set_rand_seed is now imported from zk_auctions_core::utils
 fn verify_proof_enc(proof: Vec<Vec<Vec<BigInt>>>) -> bool {
     let n1 = &proof[0][0][0];
 
