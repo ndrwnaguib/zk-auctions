@@ -152,17 +152,7 @@ fn hash_flat<T: Hashable>(input: &T) -> u64 {
     u64::from_le_bytes(hasher.finalize().to_vec()[..8].try_into().unwrap())
 }
 
-fn get_rand_jn1(n: &BigInt, rng: Option<ChaCha20Rng>) -> BigInt {
-    let mut rng = rng.unwrap_or(/* default value */ ChaCha20Rng::from_entropy());
-    loop {
-        let r = rng.gen_bigint_range(&BigInt::zero(), &n);
-
-        if r.jacobi(&n) == 1 {
-            return r;
-        }
-    }
-}
-
+// get_rand_jn1 is now imported from core::utils
 fn set_rand_seed(num_list: &[BigInt]) -> ChaCha20Rng {
     let mut hasher = Sha256::new();
 
