@@ -3,7 +3,7 @@
 #+BIBLIOGRAPHY: bibliography.bib
 #+HTML_HEAD: <style> blockquote { background-color: #f1f1e9; border: 2px solid #454545; border-radius: 5px;} .timestamp { color: #000080; }</style>
 #+OPTIONS: p:t
-#+EXPORT_FILE_NAME: /home/drew/projects/zk-auctions/docs/index.html
+#+EXPORT_FILE_NAME: docs/index.html
 #+OPTIONS: H:5 TeX:t
 #+HTML_MATHJAX: align: left indent: 5em tagside: left
 #+INFOJS_OPT: view:info
