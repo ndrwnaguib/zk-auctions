@@ -130,7 +130,7 @@ reasons:
 
 ** Team members
 
-- Andrew Naguib (ndrwnaguib, src_sh[:exports code]{base64 --decode <<< "bmRyd25hZ3VpYkBnbWFpbC5jb20="})
+- Andrew Naguib (ndrwnaguib, GitHub: [ndrwnaguib](https://github.com/ndrwnaguib))
 
 Currently, ndrwnaguib is a graduate student at the Combinatorics and
 Optimization department, Faculty of Mathematics, University of Waterloo. His
