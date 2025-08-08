@@ -42,7 +42,7 @@ for its Rust implementation.
 |------------------------------------------------------------------+--------+------------------+------------------------|
 | \_    Milestone 1: (Sprint 3)                                    | DONE   | [2024-05-25 Sat] | [2024-06-30 Sun 21:08] |
 | \_      Milestone 1: (Sprint 3): Test suite development (cont'd) | DONE   | [2024-05-15 Wed] | [2024-06-30 Sun 20:01] |
-| \_      Milestone1 1: (Sprint 3): Sketching the Pseudo-code      | DONE   | [2024-05-25 Sat] | [2024-06-30 Sun 20:01] |
+| \_      Milestone 1: (Sprint 3): Sketching the Pseudo-code      | DONE   | [2024-05-25 Sat] | [2024-06-30 Sun 20:01] |
 |------------------------------------------------------------------+--------+------------------+------------------------|
 | \_    Milestone 1: (Sprint 4)                                    | DONE   | [2024-05-28 Tue] | [2024-07-16 Tue 10:33] |
 
