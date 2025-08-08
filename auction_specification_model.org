@@ -13,7 +13,7 @@ Authors:
  * Andrew Naguib
 #+end_details
 
-#+EXPORT_FILE_NAME: /home/drew/projects/zk-auctions/docs/auction_specification_model.html
+#+EXPORT_FILE_NAME: docs/auction_specification_model.html
 #+startup: num
 
 * Introduction
