@@ -1,0 +1,769 @@
+#+TITLE: ZK-Auctions
+#+AUTHOR: ndrwnaguib and 0xisk
+#+BIBLIOGRAPHY: bibliography.bib
+#+HTML_HEAD: <style> blockquote { background-color: #f1f1e9; border: 2px solid #454545; border-radius: 5px;} .timestamp { color: #000080; }</style>
+#+OPTIONS: p:t
+#+EXPORT_FILE_NAME: docs/index.html
+#+OPTIONS: H:5 TeX:t
+#+HTML_MATHJAX: align: left indent: 5em tagside: left
+#+INFOJS_OPT: view:info
+#+LATEX_HEADER: \usepackage{algorithm}
+#+LATEX_HEADER: \usepackage{algpseudocode}
+
+#+begin_html
+<p align="center">
+  <img src="./media/auction.png" width="30%">
+</p>
+#+end_html
+
+We are grateful to the Privacy + Scaling Explorations team at Ethereum
+Foundation for sponsoring this project and bringing it into light. We are also
+thankful to Professor Florian Kerschbaum and Dr. Erik-Oliver Blass for providing
+a Python 2.7-implementation of the Strain protocol which served as a reference
+for its Rust implementation.
+
+#+begin_center
+| [[./media/pse.png]] | [[./media/ethereum.png]] |
+#+end_center
+
+*Status*
+
+| ITEM                                                             | STATUS | SCHEDULED        | CLOSED                 |
+|------------------------------------------------------------------+--------+------------------+------------------------|
+| \_  Milestone 1 Tasks (2-month period)                           | DONE   | [2024-04-14 Sun] | [2024-07-16 Tue 10:33] |
+|------------------------------------------------------------------+--------+------------------+------------------------|
+| \_    Milestone 1: (Sprint 1)                                    | DONE   | [2024-02-28 Wed] | [2024-03-24 Sun 00:46] |
+| \_      Milestone 1: Research                                    | DONE   | [2024-02-27 Tue] | [2024-02-28 Wed 15:43] |
+| \_      Milestone 1: Development environment setup               | DONE   | [2024-02-27 Tue] | [2024-03-24 Sun 00:46] |
+|------------------------------------------------------------------+--------+------------------+------------------------|
+| \_    Milestone 1: (Sprint 2)                                    | DONE   | [2024-05-06 Mon] | [2024-06-30 Sun 20:02] |
+| \_      Milestone 1: (Sprint 2): Technical specification         | DONE   | [2024-05-01 Wed] | [2024-05-03 Sat 23:16] |
+| \_      Milestone 1: (Sprint 2): Test suite development          | DONE   | [2024-05-06 Mon] | [2024-06-30 Sun 20:01] |
+|------------------------------------------------------------------+--------+------------------+------------------------|
+| \_    Milestone 1: (Sprint 3)                                    | DONE   | [2024-05-25 Sat] | [2024-06-30 Sun 21:08] |
+| \_      Milestone 1: (Sprint 3): Test suite development (cont'd) | DONE   | [2024-05-15 Wed] | [2024-06-30 Sun 20:01] |
+| \_      Milestone 1: (Sprint 3): Sketching the Pseudo-code      | DONE   | [2024-05-25 Sat] | [2024-06-30 Sun 20:01] |
+|------------------------------------------------------------------+--------+------------------+------------------------|
+| \_    Milestone 1: (Sprint 4)                                    | DONE   | [2024-05-28 Tue] | [2024-07-16 Tue 10:33] |
+
+* Project Overview
+
+** Overview
+
+The proposed idea is to develop a toolkit called =zk-auctions= (which stands for
+Zero-Knowledge Auctions), aiming to found a practical and versatile
+primitives for conducting secure and private auctions using zero-knowledge
+proofs. Although there are distorted efforts to implement similar toolkits, at
+the time of writing this document, there does not seem to be any widely adopted
+framework, at least not on the idea perception as later described.
+
+The toolkit will prioritize +SPARTAN+ PLONK as the underlying proof system. That being
+said, we will ensure that a modular implementation is in place to enable the
+flexibility to integrate alternative proof constructions methods (e.g., STARKs)
+should the need arise.
+
+The toolkit seeks to address the need for bidder anonymity, transaction
+security, and decentralized auction processes while ensuring modularity and
+efficient integration with blockchain platforms. However, the final product is
+not at all only targeted at the so-called HTTP/3 world. But, the properties
+described in [[project_details_and_motivation][Project Motivation]] are the imperative contribution of this toolkit,
+let it be deployed on a blockchain, message-queue, REST APIs, etc.
+
+Generally speaking, auctions are a very interesting social interaction (and a
+game), one that inevitably reveals several traits of the participants (and
+consequently, allows for exploitation).
+
+This project is sponsored by Ethereum's Privacy, Scaling, and Explorations team.
+
+** Short Rationale
+
+A zero-knowledge-proof-based contract library for First-Bid, Second-Bid,
+English, Dutch,and SEAL auctions to govern bidder anonymity, decentralization,
+and integrity while particularly avoiding neopotism.
+
+** Project Details and Motivation
+
+The output of the project will be a Rust-based toolkit that simulates a
+decentralized auction and governs the following properties:
+
+ * Bidder anonymity: the identity of bidders must remain unknown and the
+   specifics of their bids are kept private.
+     * This is important when revealing the bidder’s identity could influence
+       the auction’s outcome or lead to privacy breaches (e.g., real estate,
+       art/collectibles, etc.).
+
+        For example, whether one is the auctioneer or a bidder, a piece of
+       information claiming that, say, Apple is joining a tender may impact
+       one’s strategy to bid.
+
+ * Secure transactions: ensuring the integrity of the auction process as well as
+   protecting against fraud. Questions to be answered:
+     * How to prove the actual worth of the bidder claiming that she has? If
+       that's not in the scope of the project, it has to be explicitly stated
+       that such a responsibility is delegated to third-party tools.
+     * Will there be an escrow to guarantee that the bid is held securely?
+
+
+ * Decentralized auctions: facilitate transparent and decentralized auctions
+   (without even an auctioneer in case of SEAL).
+     * Decentralized auctions take place on a daily basis[fn:1][fn:2].
+     * In the case of SEAL, the system must provide a proof that is computable
+       by each party and asserts the winning result.
+
+ * Integrity: the system must provide a proof that the some bid has won without
+   revealing its value.
+     * Why? Revealing the winning bid is an sensitive information. It shows the
+       valuation of item $i$ by the bidder $j$. While it may not impact the
+       auction at time $t$, it could still be abused in an auction at time $t +
+       1$–e.g., as explained in [cite:@varian1995economic].
+
+*** Backend
+
+The backend will be developed using Rust programming language for the following
+reasons:
+
+ * Wider interoperability to other core systems (especially in cryptography).
+ * Rapid performance.
+ * Seamless porting to web browsers with `wasm-pack`.
+
+* Team
+
+** Team members
+
+- Andrew Naguib (ndrwnaguib, GitHub: [ndrwnaguib](https://github.com/ndrwnaguib))
+
+Currently, ndrwnaguib is a graduate student at the Combinatorics and
+Optimization department, Faculty of Mathematics, University of Waterloo. His
+interests spans Game Theory, Distributed Optimization, Interactive proofs,
+Formal verification--among others.
+
+** Team Code Repos
+
+https://github.com/ndrwnaguib/zk-auctions
+
+* Development Roadmap
+
+** Milestone 1: Research, Proof-sketching, and Algorithm Design
+
+*** Objectives
+
+- Establish the core technical framework.
+- Develop the foundational circuits leveraging +SPARTAN+ PLONK as the underlying zero-knowledge proof system.
+
+** DONE Milestone 1 Tasks (2-month period) [4/4]
+CLOSED: [2024-07-16 Tue 10:33] SCHEDULED: <2024-04-14 Sun>
+
+*** DONE Milestone 1: (Sprint 1) [2/2]
+CLOSED: [2024-03-24 Sun 00:46] SCHEDULED: <2024-02-28 Wed>
+
+**** DONE Milestone 1: Research
+    CLOSED: [2024-02-28 Wed 15:43] SCHEDULED: <2024-02-27 Tue>
+
+    completing a comprehensive literature review of +SPARTAN+ PLONK and
+    zero-knowledge proofs and their intersection with auction theory. What is
+    the current progress on zero-knowledge auctions?
+*****  In [cite:@galal2019verifiable],
+          * the bidders submit their sealed-bid as homomorphic commitments on the contract.
+          * zero knowledge proof protocols are used to verify the correctness of
+            the claim made by the aucitoneer of some winner.
+          * To be precise, no information about the losing bids is leaked
+          * The authors also emphasize on how sealed-bid auctions encourage the
+            bidders to bid according to their *monetary valuation* of the asset.
+            But, at the same time, highlight the conflicting goals of preserving
+            the privacy of the bids and trusting the auctioneer to determine the
+            winner.
+          * The authors utilize Pedersen commitment scheme with zero-knowledge
+            proof of interval membership to create the underlying protocol.
+****** Phases of Deployment
+******* Contract Deployment and Parameters Setup
+        * Decide $T_1, T_2, T_3, T_4$, which are the time intervals for four phases:
+          * Commitment of bids.
+          * Opening the commitments.
+          * Verification of the winner.
+          * Finalizing the auction.
+        * $F$ defines the amount of initial deposit of ethers received from
+          the bidders and the auctioneer to achieve financial fairness
+          against malicious parties.
+        * $N$ is the maximum number of bidders (they tested their protocol on $N = 10$)--/how does this impact the protocol?/
+        * $A_{pk}$ is the auctioneer's public key of an asymmetric encryption scheme.
+******* Commitment of Bids
+        * “Each bidder submits a bid commitment using Pedersen commitment scheme along with the initial deposit $F$ in ethers”
+          * A malicious bidder Alice and the auctioneer can eliminate Bob's
+            winning chance by abusing the homomorphic property of the Pedersen
+            commitment--/the authors instead use Chaum-Pedersen non-interactive ZKP, details in Section 4.2./
+******* Opening the commitments
+        #+begin_quote
+        Each bidder $B_i$ sends the outcome of ciphertext of encrypting $(x_i, r_i)$ by the public key of the auctioneer $A_{pk}$.
+        #+end_quote
+******* Verification of Comparison Proofs
+         #+begin_quote
+         The auctioneer orders the bids to determine the wining bid $x_w$ , the
+         associated account address $B_w$ and commitment $C_w$"
+         #+end_quote
+******* Finalizing the auction
+         #+begin_quote
+         After the successful veriﬁcation of correctness, the auctioneer
+         invokes the function =VerifyAll= [...] to change the state of the
+         auction contract so that the winner can pay the winning bid.
+         #+end_quote
+****** Gas Cost
+       #+begin_quote
+         The upper bound on bid values is up to 250-bit length which is very
+         adequate for ﬁnancial values. The Pedersen commitment size is 512-bits
+         that represent two points on the elliptic curve.
+       #+end_quote
+         -----
+***** $\star$ In [cite:@zhang2015blockchain],
+          * The authors emphasize that even though sealed-bid auctions are
+            generally preferred since they do not impact the revenue while
+            maintaining some sort of privacy, the auctioneer can at any time
+            leak the bids or manipulate the results of said auction.
+            #+begin_quote
+            In a word, the behaviours of the auctioneer can be malicious, once
+bids are obtained before the bid-opening day.
+            #+end_quote
+          * The authors highlight challenges in sealed-bid auctions due to the need to maintain the following four properties at the same time:
+            1. All bids cannot be shared to the auctioneer before the bid-opening day.
+            2. All bids cannot be exposed to any bidders during the auction.
+            3. All the bidders can publicly verify the bid comparison result
+               that is published by the auctioneer.
+            4. The whole sealed-bid scheme must be efficient in practice.
+          * Particularly highlighted challenges are:
+            1. How to compute the winner correctly over ciphertexts while not exposing the bids during the auction?
+               #+begin_quote
+               How to accurately find the highest bidder among multiple bidders
+               without revealing privacy is the challenge we want to solve.
+               #+end_quote
+            2. How to /efficiently/ execute the auction protocol with multiple
+               participants while the underlying secure circuits mechanically
+               compare bids?
+            3. How to construct a secure auction protocol while allowing
+               participants to quit during auction?
+               #+begin_quote
+               Since some users leave halfway may cause the protocol to fail, it
+is necessary to consider an additional punishment mechanism to restrain their
+behavior when designing such a system...Therefore, our protocol needs to support
+the fact that a bidder’s choice to leave the auction even after losing
+competitiveness will not have an impact on subsequent comparisons.
+              #+end_quote
+              *Note:* The severity (in terms of the computational integrity) of
+              such issue for the =zk-auctions= toolkit will be determined upon
+              deciding the protocol that will be followed, and the punishment
+              mechanism, should it be needed, will be designed accordingly.
+         -----
+***** $\star$ In [cite:@blass2018strain],
+
+         The authors propose a maliciously-secure blockchain-based auction where
+         all encrypted bids are compared pair-by-pair via homomorphic circuit
+         and the winner is declared by using ZK proofs.
+         #+begin_quote
+         At the heart, we improve Fischlin’s comparison protocol in several key
+         aspects tailored for adoption in blockchains.
+         #+end_quote
+         * Very nice work. Section "Dedicated Auction Protocols" could inspire our work.
+         -----
+      * $\star$ In [cite:@bag2020seal],
+
+        The authors propose an auctioneer-free sealed-bid auction protocol where
+        each bidder has to publish a zero-knowledge eproof about the
+        relationship between com
+       -----
+      * What are the existing gaps?
+        * The work of [cite:@galal2019verifiable] does not protect the privacy
+          of bids from all parties including the auctioneer.
+      * The output of this task should influence the implementation of the
+        pseudocode in “Algorithm Design”.
+        * The following listicle was suggested in [cite:@galal2019verifiable]:
+          1. "*Bid privacy.* All bidders cannot know the bids submitted by the
+            others before committing to their own. This property is also
+            guaranteed even in a collusion with a malicious auctioneer."
+          2. "*Posterior privacy.* Given a semi-honest auctioneer, all committed
+            bids are maintained private from the bidders and public users."
+          3. "*Bid Binding.* Once the bid interval is closed, bidders cannot change
+            their commitments."
+          4. "*Public veriﬁable correctness.* The auction contract veriﬁes the
+            correctness of the auctioneer’s work to determine the auctioneer
+            winner."
+          5. "*Financial fairness.* Bidders or auctioneer may attempt to deviate
+             from the protocol and prematurely abort to aﬀect the behavior of
+             the auction protocol. The aborting parties are ﬁnancially
+             penalized while honest parties are refunded after a speciﬁc
+             timeout."
+          6. "*Non-Interactivity.* Bidders do not participate in complex
+             interactions with the underlying protocol of the auction contract.
+             In fact, no extra communications between the bidders and the
+             auction contract are required aside from the submission of the bid
+             commitments and the associated opening values."
+
+      * <2024-02-15> =0xisk= advised that we steer away from SPARTAN and
+        instead use PSE's [[https://github.com/privacy-scaling-explorations/halo2-solidity-verifier][Halo2 verifier]], which operates on PLONK (Yet to expound on the rationale behind
+        the decision, however it is relevant to [[https://github.com/personaelabs/spartan-ecdsa/issues/36#issuecomment-1578737744][this issue]]).
+      * Example of the equations are:
+
+        * $max(b_1, b_2, \cdots, b_n)$, where $b_i$ is the bid of participant $i
+          \in P$, and $P$ is the set of participants.
+
+        Moreover, the public inputs could either be the winning bid, or the
+        amount the winner required to pay (but the latter may need a different
+        formulation)
+**** Questions
+/(some of which will possibly be answered in later phases of the project)/
+        * How does the revenue equivalence theorem relate to our work?
+        * Will using secure multi-party computation to protect bids from being
+          shared among bidders be efficient?
+          * Considered extremely expensive on a blockchain in terms of latency [cite:@blass2018strain].
+
+        * What are the limitations in terms of the number of participants?
+
+        * Will there be any zero-knowledge proofs needed to be designed for
+          particular attribute that a participant must have? E.g., age.
+        * How will we handle [[https://www.gametheory.net/dictionary/Auctions/ReservePrice.html][reserve prices]]?
+**** DONE Milestone 1: Development environment setup
+    CLOSED: [2024-03-24 Sun 00:46] SCHEDULED: <2024-02-27 Tue>
+:org-gcal:
+    e.g., configure development tools, version
+   control, package management, and testing modules.
+
+   We could use Halo2's [[https://zcash.github.io/halo2/user/simple-example.html][simple example]] as a boilerplate on which we build the
+   other blocks necessary for the toolkit.
+:END:
+
+*** DONE Milestone 1: (Sprint 2) [2/2]
+CLOSED: [2024-06-30 Sun 20:02] SCHEDULED: <2024-05-06 Mon>
+
+
+**** DONE Milestone 1: (Sprint 2): Technical specification
+    CLOSED: [2024-05-03 Sat 23:16] SCHEDULED: <2024-05-01 Wed>
+    develop a comprehensive technical specification
+    document, detailing auction types, circuits logic, prospect for integration
+    to larger systems.
+     * To the best of our knowledge, there isn't at this point any standard
+       specification for an auction implementation (similar to OpenAPI or
+       [[https://www.w3.org/TR/vc-data-model/][VC-Data-Model]] specifications).
+    :END:
+    We use the synopsis of the literature review phase to write the [[file:auction_specification_model.org::*Introduction][Auction Specification Model]] in an iterative fashion.
+**** DONE Milestone 1: (Sprint 2): Test suite development
+CLOSED: [2024-06-30 Sun 20:01] SCHEDULED: <2024-05-06 Mon>
+    * assess the possibility of following TDD for the remaining milestones.
+      * <2024-02-24 Sat>: If we use Halo2's [[https://zcash.github.io/halo2/user/simple-example.html][simple example]], we should be able to
+        follow TDD the moment we complete the [[milestone-1][Milestone 1]], since we will have
+        the equations used in the verifier ready.
+      * <2024-03-08 Fri>: Since we've decided the first protocol prototype to be
+        Strain ([[*<2024-03-08 Fri>][meeting on <2024-03-08 Fri>]]); following TDD is much more doable
+        and is effective for a more accurate progress in Milestone 2.
+    * check other open-source projects that could be relevant.
+*** DONE Milestone 1: (Sprint 3) [2/2]
+CLOSED: [2024-06-30 Sun 21:08] SCHEDULED: <2024-05-25 Sat>
+**** DONE Milestone 1: (Sprint 3): Test suite development (cont'd)
+CLOSED: [2024-06-30 Sun 20:01] SCHEDULED: <2024-05-15 Wed>
+ * writing the tests of the circuits which are to be
+    developed in [[milestone-2][Milestone 2]].
+   * Tests that are expected to work for any auction type.
+     - Auction Initialization
+     #+begin_src rust
+       #[test]
+       fn test_auction_initialization() {
+           let auction = Auction::new("Artwork", /* starting bid */ 100, /* duration */ 7);
+           assert_eq!(auction.item, "Artwork");
+           assert_eq!(auction.starting_bid, 100);
+           assert_eq!(auction.duration, 7);
+       }
+     #+end_src
+     Note that a blockchain automatically allows for deadlines, an auction smart
+     contract can specify a deadline as a function of the number of future
+     blocks.
+     - Commitment of bids
+     #+begin_src rust
+        #[test]
+       fn test_bid_submission_with_commitment() {
+           let mut auction = Auction::new("Artwork", 100, 7);
+           let bidder = Bidder::new("Alice");
+           // fresh key pair to provide anonymity.
+           let fresh_key_pair = generate_fresh_key_pair();
+
+           // "submit_bid" should be a client-side routine.
+           let encrypted_bid = bidder.prepare_bid(150, &fresh_key_pair);
+           let commitment = bidder.create_commitment(&encrypted_bid);
+
+           // @0xkisk: perhaps we should store only the commitment without the
+           // `bidder.id`?
+           auction.store_commitment(bidder.id, commitment);
+
+           let stored_bid = auction.get_bid(bidder.id);
+           assert!(stored_bid.is_encrypted());
+           assert_ne!(bidder.regular_key_pair.public_key, fresh_key_pair.public_key);
+           assert_ne!(bidder.regular_key_pair.private_key, fresh_key_pair.private_key);
+
+           let stored_commitment = auction.get_commitment(bidder.id);
+           assert!(stored_commitment.is_valid());
+       }
+     #+end_src
+   * Comparison of the bids
+   #+begin_src rust
+     #[test]
+       fn test_secure_comparison() {
+           let mut auction = Auction::new("Artwork", 100, 7);
+           let bidder1 = Bidder::new(/* id */ 1);
+           let bidder2 = Bidder::new(/* id */ 2);
+           let encrypted_bid1 = bidder1.submit_bid(&mut auction, 150);
+           let encrypted_bid2 = bidder2.submit_bid(&mut auction, 200);
+
+           // the comparison is performed by each participanting bidder and each
+           // provide a proof showing that one of the values is greater than the
+           // other.
+           let comparison_result = auction.compare_bids(&bidder1, &encrypted_bid1, &encrypted_bid2);
+           assert!(comparison_result.proof.is_valid());
+           assert_eq!(comparison_result.winner, encrypted_bid2);
+       }
+   #+end_src
+   * Protocol-specific tests
+     - Strain
+       - Excluding Malicious Bidders
+         #+begin_src rust
+           #[test]
+            fn test_exclude_malicious_bidders() {
+                let mut auction = Auction::new("Artwork", 100, 7);
+                let malicious_bidder = Bidder::new("Malicious");
+                let honest_bidder = Bidder::new("Honest");
+
+                let bad_proof = generate_bad_proof();
+                malicious_bidder.submit_proof(bad_proof);
+
+                assert!(!honest_bidder.verify_proof(bad_proof));
+
+                auction.exclude_bidder(malicious_bidder);
+                assert!(!auction.is_bidder_active(malicious_bidder));
+            }
+         #+end_src
+
+ * The mocking of the identities in testing should handle mainly Ethereum's
+   wallet addresses (potential support for HTTP/2 IP addresses in Milestone 3).
+**** DONE Milestone1 1: (Sprint 3): Sketching the Pseudo-code
+  CLOSED: [2024-06-30 Sun 20:01] SCHEDULED: <2024-05-25 Sat>
+   * Designing a tentative pseudo-code for the First-Bid and Second-Bid sealed auctions.
+     * <2024-06-29 Sat 19:28> The following pseudo-code is adopted from [cite:@blass2018strain],
+
+      \begin{array}{l}
+      \textbf{for } i = 1 \textbf{ to } s' \textbf{ do} \\
+      \quad S_i : \text{publish } \{C_i \leftarrow \text{Enc}_{PK_i}^{GM}(v_i), P_i^{\text{enc}} \leftarrow \text{ProofEnc}(C_i, v_i)\} \text{ on blockchain}; \\
+      \textbf{end for} \\
+      \textbf{for } i = 1 \textbf{ to } s' \textbf{ do} \\
+      \quad \textbf{for all } j \ne i \textbf{ do} \\
+      \quad \quad S_j : \{C_{i,j}, res_{i,j}\} \leftarrow \text{Eval}(C_i, v_j); \\
+      \quad \quad S_j : P_{i,j}^{\text{eval}} \leftarrow \text{ProofEval}(C_j, C_i, C_{i,j}, res_{i,j}, v_j); \\
+      \quad \quad S_j : \text{publish } \{\text{Enc}_{pk_A}(P_{i,j}^{\text{eval}}), res_{i,j}\} \text{ on blockchain}; \\
+      \quad \quad A : \text{publish } \text{VerifyEval}(P_{i,j}^{\text{eval}}, res_{i,j}, C_i, C_j) \text{ on blockchain}; \\
+      \quad \quad S_i : bitset_{i,j} = \text{Dec}_{pk_j^{GM}}^{AND}(res_{i,j}); \\
+      \quad \quad S_i : shuffle_{i,j} \leftarrow \text{Shuffle}(res_{i,j}); \\
+      \quad \quad S_i : P_{i,j}^{\text{shuffle}} \leftarrow \text{ProofShuffle}(shuffle_{i,j}, res_{i,j}); \\
+      \quad \quad S_i : \text{let } \gamma_{\ell, m} \leftarrow \text{Enc}_{PK_i}^{GM}(\beta_{\ell, m}) \in shuffle_{i,j} \text{ be the shuffled ciphertexts} \\
+      \quad \quad \quad \text{with their random coins } r_{\ell, m}. \text{ Publish } \{P_{i,j}^{\text{shuffle}}, shuffle_{i,j}, \beta_{\ell, m}, r_{\ell, m}\}; \\
+      \quad \textbf{end for} \\
+      \textbf{end for}
+      \end{array}
+
+Note that the above proof can be used without any modification to execute
+First-Bid sealed auctions (Strain protocol guarantees that the bids themselves
+are never leaked; however, their order could be). However, for the above
+pseudo-code to support Second-Bid sealed auctions as well. There has to be a ZK
+proof verifying the second highest bid (one could possibly rerun the protocol
+after excluding the winner; however, I believe there is a more efficient way to
+verify such knowledge)
+
+   * Explicitly demonstrating how the above-mentioned properties are governed
+     by the circuits in each algorithm.
+
+     - The above pseudo-code uses three ZK proofs as sub-protocols to determine
+       the winning bid ($\text{ProofEnc}$, $\text{ProofEval}$,
+       $\text{ProofShuffle}$)
+     - Anonymity (quoting from [cite:@blass2018strain])
+       #+begin_quote
+       =Strain= optionally supports anonymous auctions by using a combination of
+       Dining Cryptographer networks and blind signatures
+       #+end_quote
+       #+begin_quote
+       Note that we specifically avoid payment channels, and all communication
+       will run through the blockchain.
+       #+end_quote
+       #+begin_quote
+       The first ingredient to our main contribution of secure auctions is a
+       generic comparison construction. It allows two parties $S_i$ and $S_j$
+       (the suppliers in our application) with inputs $v_i$ and $v_j$ to
+       obliviously evaluate whether or not $v_i > v_j$ without disclosing
+       anything else to the other party.
+       #+end_quote
+   * The private and public inputs must be identified.
+     Quoting from [cite:@blass2018strain]
+     #+begin_quote
+     Let $S = \{S_1, \cdots, S_s\}$ be the set of $s$ suppliers in the system
+     with public-private key pairs $(pk_i, sk_i)$. The procurement auction is
+     run by auctioneer $A$ having public-private key pair $(pk_A, sk_A)$. Assume
+     that all suppliers and $A$ know each other's public keys, so $A$ can run an
+     auction accepting bids from valid suppliers only.
+     #+end_quote
+
+:END:
+*** DONE Milestone 1: (Sprint 4) [0/0]
+CLOSED: [2024-07-16 Tue 10:33] SCHEDULED: <2024-05-28 Tue>
+   * Assess the deliverables of Milestone 1.
+   * Reiterate on
+     * Algorithm Design
+     * Literature Review
+   * Lay the schedule and plan for Milestone 2.
+
+** Milestone 2: Development
+
+*** Objectives
+
+ * Develop the core functionality of zk-auctions (e.g., circuits, the various
+   auctions algorithms, etc.).
+ * Modular implementation for potential contributions of other auctions types or
+   proof systems.
+   - E.g., =(circuts/auction_type/protocol/circuit.rs)=.
+
+*** Tasks
+
+1. Core module development: build the main auction system modules, focusing on
+   modular design.
+    * At the beginning, we will implement only First-Bid and Second-Bid sealed
+      auction /types/.
+    * Would it be feasible to handle multiple auction /protocols/? For example:
+      #+begin_src rust
+        zk_auction["type"] = "FPSBA" // First-price sealed-bid acution
+        zk_auction["protocol"] = "strain"
+      #+end_src
+      or
+      #+begin_src rust
+        zk_auction["type"] = "FPSBA" // First-price sealed-bid acution
+        zk_auction["protocol"] = "brandt"
+      #+end_src
+2. Implementation of the auction circuits as specified by the pseudo-code
+   written in [[milestone-1][Milestone 1]].
+3. Modular architecture enhancement: refine the system architecture to easily
+   integrate alternative proof systems.
+    * How flexible is it to replace the underlying proof-system?
+    * How flexible is it to add a new auction type?
+    * How friendly is the codebase for contributors?
+4. Performance Assessment: initial benchmarking for the system performance and
+   privacy. In particular:
+    * How long does it take for the proof to be generated and what is its size?
+    * Identify performance bottlenecks.
+    * How many participants can the system allow before slowing down? What is
+      the potential of the system for being a victim of a DDOS-attack?
+
+
+
+** Milestone 3: Optimization, Testing, and Documentation
+
+*** Objectives
+
+- Revise the codebase for performance and privacy.
+- Conduct comprehensive testing.
+- Develop detailed documentation.
+- Generate web application.
+
+*** Tasks
+
+1. Code optimization: revise code for performance, focusing on the auction logic
+   circuits.
+    * Optimize the implementation of the poor-performing components identified
+      in [[https://hackmd.io/DxPT98fzRYeyRtR6NPSISw*Tasks1][Milestone 2*Performance and Assessment]].
+    * Compare the number of MAC/TFLOPS operations before and after optimizing a
+      certain piece of code.
+
+2. Security and functionality testing: perform rigorous security audits and
+   functional testing of all auction types.
+     * It will be useful to identify what information has been revealed across
+       the complete auction experience (from participating and bidding to the
+       decision).
+3. Documentation: write technical documentation covering setup, configuration,
+   usage, architecture details, and contributing guide.
+    * Using `rustdoc`, write and generate a comprehensive documentation of the
+      implemented toolkit.
+4. Web application:
+    * NPM TypeScript library: a Web Worker to port the auction circuits
+      developed in [[https://hackmd.io/DxPT98fzRYeyRtR6NPSISw*Milestone-2-Core-Development-and-Modular-Implementation][Milestone 2]]
+        * Use [[https://github.com/rustwasm/wasm-pack][`wasm-pack`]] to generate
+          the corresponding `wasm` code for the auction circuits.
+    * Showcase Front-end: create a sample `Next.js` application to the NPM
+      library generated by `wasm-pack`.
+6. Final integration and bug fixes: integrate all components, and address any
+   issues found during testing.
+7. Preparation for release: final preparations for the toolkit's release,
+   including a review of all documentation and code.
+
+
+* Additional Information
+
+** Meetings
+
+*** <2024-02-24 Sat>
+*** <2024-02-28 Wed>
+
+ - We went over the progress of the literature review phase (particularly
+   discussed Strain), raised some questions about the scope of the protocols
+   supported and the engineering design of the toolkit.
+
+*** <2024-03-08 Fri>
+*** <2024-03-31 Sun>
+
+- Revised and merged the pull requests regarding the engineering aspect of the repository.
+- Discussed that we might need to use a proving server, however, it is a
+  decision that should be made after benchmarking the runtime of the circuits.
+- The tests should be adapted from the Strain paper and completed by Tuesday.
+- The next step should be outlining the private and public inputs, the equations
+  to be verified by the circuit as a warm up for Milestone 2.
+
+*** <2024-04-28 Sun>
+
+- Rescheduled the timeline of the milestones.
+
+Agenda:
+
+- Andrew would like to discuss the phases of the a with @0xisk as defined in
+  [cite:@galal2019verifiable].
+- Rebase the git-hooks branch against =main=.
+- Deciding whether we should start with =Strain= as the first protocol.
+- Outlining the [[file:auction_specification_model.org::*Introduction][Auction Specification Model]]
+
+Notes:
+
+- Andrew to move the index page inside docs.
+- The need for a modular design is put aside for now until we have a mature
+  implementation of at least one protocol.
+- =@0xisk=: it'd be very nice if we could leverage mobile devices in our
+  framework.
+- We will start by implementing [[strain][=Strain=]].
+
+*** <2024-07-01 Mon>
+
+- Agenda [0/0]
+  - Is there a Goldwasser-Micali (GM) implementation for Rust?
+    - [ ] Perhaps we should implement it if not?
+      - <2024-07-01 Mon 10:16> @0xisk: We will try to find an efficient
+        implementation of GM to avoid potential mistakes in implementations from scratch.
+
+  - Reviewing the [[milestone-1-sprint-3][tests]].
+  - Reviewing the specification model.
+  - =Strain= assumes that the judge $A$ (or the auctioneer) must be semi-honest,
+    and does not collude with any malicious supplier. Engineering-wise, how the
+    assumptions should be specified?
+    - <2024-07-01 Mon 11:05> @ndrw: the engineering-wise implementation of the
+      assumptions does not seem immediately clear and may be challenging to do.
+  - How strong is the assumption of assuming the blockchain consensus to be fork-free?
+  - =Strain= is not post-quantum resistant, and equivalence with DLOG is shown
+    in [cite:@blass2018strain]. Also, assumes the Decisional Diffie-Hellman
+    (DDH) assumption.
+  - To mitigate DoS attacks in Ethereum, transactions cost money of the
+    blockchain's virtual currency. In [cite:@blass2018strain], it is suggested
+    that the judge $A$ sends funds to keys that have previously been registered.
+    To do so, $S_i$ will register their fresh key pair using a blind RSA
+    signature.
+  - [[file:auction_specification_model.org::*Identity Validation][Identity Validation]]
+    - <2024-07-01 Mon 10:41> @0xisk: it depends on how the keys will be managed.
+
+*** <2024-07-16 Tue>
+
+Notes:
+
+- @0xisk recommended that we update the current skeleton to use =halo2-browser=.
+- @0xisk and @ndrwnaguib will both review the Strain paper again to decide if
+  custom software engineering is expected to implement the Strain protocol.
+- @ndrwnaguib will implement the primitives contained in the Auction
+  Specification Model as structs and traits. Initially, they are not expected to
+  be located anywhere only until the main skeleton is decided
+- @ndrwnaguib will try to implement the Goldwasser-Micali encryption algorithm
+  if the current implementations (e.g., https://github.com/crodriguezvega/probabilisticpubkey) are not mature enough.
+
+*** <2024-07-30 Tue>
+
+Notes:
+
+- We will proceed with =halo2= skeleton.
+- Have the Goldwasser-Micali implemented independently (as gadgets) and use it
+  inside zk-auctions.
+  - Review the implemented version by Carlos Rodriguez at:
+    https://github.com/crodriguezvega/probabilisticpubkey/blob/master/src/goldwasser_micali.rs
+  - Implement it
+- Have the Fischlin protocol implemented independently (as gadgets) and use it
+  inside zk-auctions.
+- Mock GM and Fischlin until they are implemented to implement the Strain protocol.
+
+*** <2024-08-06 Tue>
+
+Notes:
+
+- As per the last meeting notes, we will proceed with Carlos Rodriguez's
+  implementation of the Goldwasser-Micali, with no need for modifications to
+  adapt it in Halo2.
+- Prepare a real-world use-case of how the comparisons will occur, in
+  particular, with respect to Section 4.2 of [cite:@blass2018strain], it would
+  be better if the use-case covers a complete sequence of how the auction takes
+  place.
+
+*** <2024-08-22 Thu>
+
+Questions for Prof. Florian Kerschbaum regarding Strain:
+
+- How does the communication between the suppliers $S_i$ and $S_j$ take place?
+  - Are there $n^2$ comparisons and eventually a single supplier provide a proof
+    that their bid is higher/lower than all the other?
+- “In reality, one could use the blockchain's broadcast feature to efficiently
+  and reliably publish data to all parties or to just send a private
+  (automatically signed) message”--How much expensive is this?
+- In step 2 and 3 of the "Details" paragraph of Section 4.2, should it be $m$ instead of
+  $\lambda^{\prime\prime}$?
+- Check Katz's “Efficient and non-malleable proofs of plaintext knowledge and
+  applications.”
+- Check Ogata's “Fault tolerant anonymous channel.”
+- In Section 5.2 of [cite:@blass2018strain], it seems that there is a typo in
+  the paragraph preceding the last regarding all the terms being 0 and still
+  $v_i > v_j$ still.
+- What proving system was used? E.g., SNARK, STARK, etc.
+- Is it possible to get a copy of the source code?
+
+*** <2024-08-27 Tue>
+
+* Future Work
+
+** Strain
+
+*** Preparation of Pseudonyms
+
+“To pseudonymously place a bid in Strain, suppliers must decouple their
+blockchain transactions from their regular key pair $(pk_i, sk_i)$. Ideally for
+each auction, supplier $S_i$ generates a fresh random key pair $(rpk_i, rsk_i)$
+for bidding. In practice, e.g., with Ethereum, this turns out to be a challenge.
+To interact with smart contract, $S_i$ must send a transaction. Yet, to mitigate
+DoS attacks in Ethereum, transactions cost money of the blockchain's virtual
+currency. If a fresh key pair wants to send a transaction, someone must send
+funds to it. $S_i$ cannt send funds to their fresh key, as this would create a
+visible link between $S_i$ and $(rpk_i, rsk_i)$...”
+
+* Technical Notes
+
+During the development of this project, technical notes were developed in a
+separate [[file:Notes.org::*Introduction][document]] as to supplement the current one and in order to have a
+self-contained documentation of the workflow since day one.
+
+
+** Resources
+
+ - https://zcash.github.io/halo2/
+ - https://github.com/privacy-scaling-explorations/halo2-solidity-verifier
+ - https://blog.computationalcomplexity.org/2024/02/sumchecks-and-snarks.html
+
+
+
+* Bibliography
+
+#+print_bibliography:
+
+* Footnotes
+
+[fn:1] https://ads.google.com/intl/en_ca/home/measurement/bidding/
+[fn:2] https://support.google.com/authorizedbuyers/answer/6136272
+
+# Local Variables:
+# org-log-note-headings: ((done . "CLOSED by %t by %u"))
+# End:
