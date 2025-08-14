@@ -1,4 +1,4 @@
-name: Static Analysis
+name: Test
 
 on:
   pull_request:
@@ -16,26 +16,21 @@ jobs:
       contents: write
 
     steps:
-      # Checkout the repository code
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      # Set up Python environment
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
 
       # Install Rust toolchain and components
-      - name: Install Rust toolchain (nightly-2023-12-21) with Clippy and Rustfmt
+      - name: Install Rust with Clippy and Rustfmt
         run: |
-          rustup toolchain install nightly-2023-12-21
-          rustup component add clippy --toolchain nightly-2023-12-21
-          rustup component add rustfmt --toolchain nightly-2023-12-21
+          rustup install nightly
+          rustup default nightly
+          rustup override set nightly
+          rustup component add clippy
+          rustup component add rustfmt
           curl -L https://risczero.com/install | bash
           ~/.risc0/bin/rzup install
           cargo risczero --version
 
-      # Run pre-commit hooks
-      - name: Run pre-commit hooks
-        uses: pre-commit/action@v3.0.0
-        with:
-          extra_args: --all-files
+      - name: Run tests
+        run: cargo test
