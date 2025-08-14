@@ -54,7 +54,7 @@ pub fn set_rand_seed(num_list: &[BigInt]) -> ChaCha20Rng {
     // Non-thread-safe seeding
 }
 
-fn hash_flat_recursive(hasher: &mut Sha256, obj: &dyn Hashable) {
+pub fn hash_flat_recursive(hasher: &mut Sha256, obj: &dyn Hashable) {
     obj.hash_flat(hasher);
 }
 

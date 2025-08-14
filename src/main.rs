@@ -5,19 +5,15 @@ extern crate risc0_zkvm;
 extern crate zk_auctions_core;
 extern crate zk_auctions_methods;
 
-use num_bigint::{BigInt, RandBigInt, Sign};
-use num_traits::{One, Zero};
+use num_bigint::{BigInt, RandBigInt};
+use num_traits::One;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
-use rand_chacha::ChaCha20Rng;
 use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
-use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
-use zk_auctions_core::number::Jacobi;
 use zk_auctions_core::utils::{
-    compare_leq_honest, get_rand_jn1, rand32, set_rand_seed, StrainProof,
+    compare_leq_honest, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
 };
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
@@ -104,56 +100,6 @@ fn main() {
     }
 }
 
-fn hash_flat_recursive(hasher: &mut Sha256, obj: &dyn Hashable) {
-    obj.hash_flat(hasher);
-}
-
-pub trait Hashable {
-    fn hash_flat(&self, hasher: &mut Sha256);
-}
-
-impl Hashable for BigInt {
-    fn hash_flat(&self, hasher: &mut Sha256) {
-        hasher.update(self.to_string().as_bytes());
-    }
-}
-
-impl Hashable for u32 {
-    fn hash_flat(&self, hasher: &mut Sha256) {
-        hasher.update(self.to_string().as_bytes());
-    }
-}
-
-impl<T: Hashable> Hashable for Vec<T> {
-    fn hash_flat(&self, hasher: &mut Sha256) {
-        for item in self {
-            hash_flat_recursive(hasher, item);
-        }
-    }
-}
-
-impl<K: Hashable, V: Hashable> Hashable for HashMap<K, V> {
-    fn hash_flat(&self, hasher: &mut Sha256) {
-        for (key, value) in self {
-            hash_flat_recursive(hasher, key);
-            hash_flat_recursive(hasher, value);
-        }
-    }
-}
-
-impl<T1: Hashable, T2: Hashable> Hashable for (T1, T2) {
-    fn hash_flat(&self, hasher: &mut Sha256) {
-        hash_flat_recursive(hasher, &self.0);
-        hash_flat_recursive(hasher, &self.1);
-    }
-}
-
-fn hash_flat<T: Hashable>(input: &T) -> u64 {
-    let mut hasher = Sha256::new();
-    input.hash_flat(&mut hasher);
-    u64::from_le_bytes(hasher.finalize().to_vec()[..8].try_into().unwrap())
-}
-
 fn verify_proof_enc(proof: Vec<Vec<Vec<BigInt>>>) -> bool {
     let n1 = &proof[0][0][0];
 
@@ -195,7 +141,7 @@ fn verify_eval(
     n2: &BigInt,
     sound_param: usize,
 ) -> Option<()> {
-    let (gamma, gamma2, cipher_i, cipher_j, cipher_ij) =
+    let (gamma, gamma2, cipher_i, _cipher_j, cipher_ij) =
         (&p_eval[0], &p_eval[1], &p_eval[2], &p_eval[3], &p_eval[4]);
 
     let h = hash_flat(&p_eval);
