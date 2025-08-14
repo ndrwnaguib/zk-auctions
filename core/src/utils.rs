@@ -183,7 +183,7 @@ pub fn rand32(n: &BigInt) -> Vec<BigInt> {
 /// let decrypted_bit = decrypt_bit_and(&cipher, &priv_key);
 /// assert!(decrypted_bit == 0 || decrypted_bit == 1);
 /// ```
-pub fn compare_leq_honest(eval_res: &Vec<Vec<BigInt>>, priv_key: &(BigInt, BigInt)) -> bool {
+pub fn compare_leq_honest(eval_res: &[Vec<BigInt>], priv_key: &(BigInt, BigInt)) -> bool {
     let mut one_cnt = 0;
     for cipher in eval_res {
         if decrypt_bit_and(cipher, priv_key) == 1 {
