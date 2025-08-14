@@ -265,10 +265,7 @@ fn proof_dlog_eq(
     p_dlog
 }
 
-fn compute_proof_shuffle(
-    res: &[Vec<BigInt>],
-    n2: &BigInt,
-) -> Result<HashMap<u32, StrainProof>, &'static str> {
+fn compute_proof_shuffle(res: &[Vec<BigInt>], n2: &BigInt) -> HashMap<u32, StrainProof> {
     let (ae_permutation_desc, ae_permutation, ae_reencrypt_factors) = compute_permutation(res, n2);
 
     let challenges_length = 40;
@@ -318,40 +315,24 @@ fn compute_proof_shuffle(
 
     proof.insert(0_u32, StrainProof::HashInput(hash_input));
     for i in 0..challenges_length {
-        match i.try_into() {
-            Ok(index) => {
-                if let Some(ch) = bitstring.chars().nth(index) {
-                    if ch == '0' {
-                        // your logic here
-                        let (am_perm_desc, am_reencrypt_factors) =
-                            (&am_permutations[&i].0, &am_permutations[&i].2); /* plucking the first and third elements of the returned tuple */
-                        proof.insert(
-                            i + 1_u32,
-                            StrainProof::AMPermutations((
-                                am_perm_desc.clone(),
-                                am_reencrypt_factors.clone(),
-                            )),
-                        );
-                    } else {
-                        let (me_perm_desc, me_reencrypt_factors) =
-                            (&me_permutations[&i].0, &me_permutations[&i].2);
-                        proof.insert(
-                            i + 1_u32,
-                            StrainProof::MEPermutations((
-                                me_perm_desc.clone(),
-                                me_reencrypt_factors.clone(),
-                            )),
-                        );
-                    }
-                } else {
-                    return Err("Index out of bounds");
-                }
-            }
-            Err(_) => return Err("Index conversion failed"),
+        if bitstring.chars().nth(i.try_into().unwrap()).unwrap() == '0' {
+            let (am_perm_desc, am_reencrypt_factors) =
+                (&am_permutations[&i].0, &am_permutations[&i].2); /* plucking the first and third elements of the returned tuple */
+            proof.insert(
+                i + 1_u32,
+                StrainProof::AMPermutations((am_perm_desc.clone(), am_reencrypt_factors.clone())),
+            );
+        } else {
+            let (me_perm_desc, me_reencrypt_factors) =
+                (&me_permutations[&i].0, &me_permutations[&i].2);
+            proof.insert(
+                i + 1_u32,
+                StrainProof::MEPermutations((me_perm_desc.clone(), me_reencrypt_factors.clone())),
+            );
         }
     }
 
-    Ok(proof)
+    proof
 }
 
 fn gm_eval_honest(
