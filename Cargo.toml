@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["methods"]
+members = ["methods", "protocols"]
 
 [dependencies]
 zk-auctions-core = { path = "core" }
