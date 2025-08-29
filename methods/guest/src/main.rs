@@ -12,7 +12,7 @@ use zk_auctions_core::gm::{
 use zk_auctions_core::utils::{
     compute_permutation, divm, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
 };
-use zk_auctions_protocols::strain::{Strain, StrainProtocol};
+use zk_auctions_core::protocols::strain::{Strain, StrainProtocol, StrainConfig};
 
 fn main() {
     let mut rng = rand::thread_rng();
