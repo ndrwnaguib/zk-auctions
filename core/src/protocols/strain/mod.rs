@@ -11,6 +11,11 @@ use crate::utils::{
 };
 use num_traits::{One, Zero};
 
+pub mod auctioneer;
+pub mod bidder;
+pub use auctioneer::{Auctioneer, StrainAuctioneer};
+pub use bidder::{Bidder, StrainBidder};
+
 /// Configuration struct for the Strain protocol
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StrainConfig {
