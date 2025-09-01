@@ -8,6 +8,7 @@ use rand::{rngs::StdRng, Rng, SeedableRng};
 
 const AND_SIZE_FACTOR: usize = 40;
 
+// TODO: That is related to Strain, we should move it to the strain module
 /* the following generator is created to match the original implementation of
  * `getNextRandom`, there is a good chance that it will be replaced */
 pub struct StrainRandomGenerator {

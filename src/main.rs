@@ -12,9 +12,9 @@ use rand::{Rng, SeedableRng};
 use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
-use zk_auctions_core::utils::{
-    compare_leq_honest, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
-};
+use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
+use zk_auctions_core::protocols::strain::bidder::{Bidder, StrainBidder};
+use zk_auctions_core::utils::{compare_leq_honest, rand32, StrainProof};
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
@@ -83,195 +83,27 @@ fn main() {
         (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
     ) = receipt.journal.decode().expect("Failed to decode all results");
 
-    let eval_res =
-        Some(verify_eval(proof_eval.clone(), plaintext_and_coins.clone(), n_i, &n_j, sound_param));
+    let auctioneer = Auctioneer::new();
+    let bidder = Bidder::new();
+
+    let eval_res = auctioneer.verify_eval(
+        proof_eval.clone(),
+        plaintext_and_coins.clone(),
+        n_i,
+        &n_j,
+        sound_param,
+    );
     assert!(eval_res.is_some(), "`proof_eval` verification failed.");
 
-    assert!(verify_proof_enc(proof_enc));
+    assert!(bidder.verify_proof_enc(proof_enc));
 
-    assert!(verify_dlog_eq(&n_j, &y_j, &y_pow_r, &z_pow_r, &proof_dlog, Some(sound_param)));
+    assert!(bidder.verify_dlog_eq(&n_j, &y_j, &y_pow_r, &z_pow_r, &proof_dlog, Some(sound_param)));
 
-    let success = verify_shuffle(&proof_shuffle, &n_j, &res);
+    let success = bidder.verify_shuffle(&proof_shuffle, &n_j, &res);
     assert!(success, "verify_shuffle failed");
     if compare_leq_honest(&res, &keys_i.priv_key) {
         println!("The second bidder's bid is less than or equal to the first bidder's bid.");
     } else {
         println!("The second bidder's bid is greater than the first bidder's bid.");
     }
-}
-
-fn verify_proof_enc(proof: Vec<Vec<Vec<BigInt>>>) -> bool {
-    let n1 = &proof[0][0][0];
-
-    let c1: &Vec<BigInt> = &proof[1][0];
-
-    let r1t4s: &Vec<Vec<BigInt>> = &proof[2];
-
-    let h = hash_flat(r1t4s);
-    let bitstring =
-        format!("{:0256b}", BigInt::from_bytes_be(num_bigint::Sign::Plus, &h.to_be_bytes()));
-
-    let mut success = true;
-
-    for (i, bit) in bitstring.chars().enumerate().take(40) {
-        let q = if bit == '1' { 1 } else { 0 };
-
-        let proof_per_bit: &Vec<BigInt> = &proof[i + 3 /* this is how proof is structured */][0];
-
-        for (j, c1_val) in c1.iter().enumerate() {
-            let a = &r1t4s[i][j];
-            let rhs = (a * c1_val.modpow(&BigInt::from(2 * q), n1)) % n1;
-
-            let r = &proof_per_bit[j];
-            let lhs = r.modpow(&BigInt::from(4), n1);
-
-            if lhs != rhs {
-                success = false;
-            }
-        }
-    }
-
-    success
-}
-
-fn verify_eval(
-    p_eval: Vec<Vec<Vec<BigInt>>>,
-    plaintext_and_coins: Vec<Vec<(BigInt, BigInt, BigInt)>>,
-    n1: &BigInt,
-    n2: &BigInt,
-    sound_param: usize,
-) -> Option<()> {
-    let (gamma, gamma2, cipher_i, _cipher_j, cipher_ij) =
-        (&p_eval[0], &p_eval[1], &p_eval[2], &p_eval[3], &p_eval[4]);
-
-    let h = hash_flat(&p_eval);
-    let mut rng_seed = StdRng::seed_from_u64(h);
-
-    for l in 0..32 {
-        assert_eq!(plaintext_and_coins[l].len(), sound_param as usize);
-        for m in 0..(sound_param as usize) {
-            let (plaintext, coins_gamma, coins_gamma2) = &plaintext_and_coins[l][m];
-            if rng_seed.gen::<u8>() % 2 == 0 {
-                let detc1 = encrypt_bit_gm_coin(plaintext, n1, coins_gamma.clone());
-                let detc2 = encrypt_bit_gm_coin(plaintext, n2, coins_gamma2.clone());
-                if detc1 != gamma[l][m] || detc2 != gamma2[l][m] {
-                    return None;
-                }
-            } else {
-                let product1 = (&gamma[l][m] * &cipher_i[0][l]/* this 0 is the result of the extra enclosing happened in `p_eval`*/)
-                    % n1;
-                let product2 = (&gamma2[l][m] * &cipher_ij[0][l]) % n2;
-                if encrypt_bit_gm_coin(plaintext, n1, coins_gamma.clone()) != product1
-                    || encrypt_bit_gm_coin(plaintext, n2, coins_gamma2.clone()) != product2
-                {
-                    return None;
-                }
-            }
-        }
-    }
-    Some(())
-}
-
-fn verify_dlog_eq(
-    n: &BigInt,
-    y: &BigInt,
-    y_pow_r: &BigInt,
-    z_pow_r: &BigInt,
-    p_dlog: &[(BigInt, BigInt, BigInt)],
-    k: Option<usize>,
-) -> bool {
-    let k = k.unwrap_or(/* default value */ 10) as usize;
-    if p_dlog.len() < k {
-        // println!("Insufficient number of rounds");
-        return false;
-    }
-
-    // println!("Sufficient number of rounds test: Passed");
-
-    let z = n - BigInt::one();
-
-    for (i, proof) in p_dlog.iter().take(k).enumerate() {
-        let (t1, t2, s) = proof;
-        let rng = set_rand_seed(&[
-            y.clone(),
-            z.clone(),
-            y_pow_r.clone(),
-            z_pow_r.clone(),
-            t1.clone(),
-            t2.clone(),
-            BigInt::from(i),
-        ]);
-
-        let c = get_rand_jn1(n, Some(rng));
-
-        if y.modpow(s, n) != t1 * y_pow_r.modpow(&c, n) % n {
-            return false;
-        }
-
-        if z.modpow(s, n) != t2 * z_pow_r.modpow(&c, n) % n {
-            return false;
-        }
-    }
-    true
-}
-
-fn verify_shuffle(proof: &HashMap<u32, StrainProof>, n2: &BigInt, res: &[Vec<BigInt>]) -> bool {
-    let challenges_length = 40;
-    let StrainProof::HashInput(hash_input) = &proof[&0] else { todo!() };
-
-    let h = hash_flat(hash_input);
-    let bitstring =
-        format!("{:0256b}", BigInt::from_bytes_be(num_bigint::Sign::Plus, &h.to_be_bytes()));
-
-    let ae_permutation = &hash_input[&0].0;
-    let mut am_permutations = HashMap::new();
-    let mut me_permutations = HashMap::new();
-
-    for i in 0..challenges_length {
-        let (am_permutation, me_permutation) = &hash_input[&(i + 1)];
-        am_permutations.insert(i, am_permutation.clone());
-        me_permutations.insert(i, me_permutation.clone());
-    }
-
-    let mut success = true;
-
-    for (i, bit) in bitstring.chars().enumerate().take(challenges_length as usize) {
-        if bit == '0' {
-            // Open A-M permutation
-            if let Some(StrainProof::AMPermutations((am_perm_desc, am_reencrypt_factors))) =
-                &proof.get(&((i as u32) + 1))
-            {
-                for j in 0..am_perm_desc.len() {
-                    for k in 0..challenges_length {
-                        let lhs = &am_permutations[&(i as u32)][&am_perm_desc[&(j as u32)]][&k];
-                        let r: &_ = &am_reencrypt_factors[j][k as usize];
-                        let rsquare = r.modpow(&BigInt::from(2), n2);
-                        let rhs = (rsquare * &res[j][k as usize]) % n2;
-                        if lhs != &rhs {
-                            success = false;
-                        }
-                    }
-                }
-            }
-        } else {
-            // Open M-E permutation
-            if let Some(StrainProof::MEPermutations((me_perm_desc, me_reencrypt_factors))) =
-                &proof.get(&((i as u32) + 1))
-            {
-                for j in 0..me_perm_desc.len() {
-                    for k in 0..challenges_length {
-                        let lhs = &ae_permutation[&me_perm_desc[&(j as u32)]][&k];
-                        let r: &BigInt = &me_reencrypt_factors[&(j as u32)][&k];
-                        let rsquare = r.modpow(&BigInt::from(2), n2);
-                        let rhs = (rsquare * &me_permutations[&(i as u32)][&(j as u32)][&k]) % n2;
-                        if lhs != &rhs {
-                            success = false;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    success
 }
