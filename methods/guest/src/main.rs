@@ -9,14 +9,15 @@ use zk_auctions_core::gm::{
     StrainRandomGenerator,
 };
 
+use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
+use zk_auctions_core::protocols::strain::bidder::{Bidder, StrainBidder};
 use zk_auctions_core::utils::{
     compute_permutation, divm, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
 };
-use zk_auctions_core::protocols::strain::{Strain, StrainProtocol, StrainConfig};
 
 fn main() {
     let mut rng = rand::thread_rng();
-    let strain_protocol = StrainProtocol::new(StrainConfig::low_security());
+    let bidder = Bidder::new();
 
     let keys_j: Keys = generate_keys(None);
     let (p_j, q_j): &(BigInt, BigInt) = &keys_j.priv_key;
@@ -39,7 +40,7 @@ fn main() {
     let c_j_proofeval = encrypt_gm(&v_j, &n_j);
     let c_ji = encrypt_gm(&v_j, &n_i);
     let r_ji = rand32(&n_i);
-    let (proof_eval, plaintext_and_coins) = strain_protocol.proof_eval(
+    let (proof_eval, plaintext_and_coins) = bidder.proof_eval(
         &c_j_proofeval,
         &c_i,
         &c_ji,
@@ -53,7 +54,7 @@ fn main() {
     );
 
     let c_j_proofenc = encrypt_gm_coin(&v_j.clone(), &n_j, &r_j);
-    let proof_enc: Vec<Vec<Vec<BigInt>>> = strain_protocol.compare_proof_enc(c_j_proofenc, &n_j, &r_j);
+    let proof_enc: Vec<Vec<Vec<BigInt>>> = bidder.compare_proof_enc(c_j_proofenc, &n_j, &r_j);
 
     let z_j = n_j.clone() - BigInt::one();
     let r_j_dlog = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
@@ -62,12 +63,12 @@ fn main() {
     let y_pow_r = y_j.modpow(&r_j_dlog, &n_j);
     let z_pow_r = z_j.modpow(&r_j_dlog, &n_j);
 
-    let proof_dlog = strain_protocol.proof_dlog_eq(&r_j_dlog, &y_j, &n_j, Some(sound_param));
+    let proof_dlog = bidder.proof_dlog_eq(&r_j_dlog, &y_j, &n_j, Some(sound_param));
 
     let r_ji = rand32(&n_i);
     let c_ji = encrypt_gm_coin(&v_j, &n_i, &r_ji);
-    let res = strain_protocol.gm_eval_honest(&v_j, &c_ji, &c_i, &n_i, &rand1, &rand2, &rand3, &rand4);
-    let proof_shuffle = strain_protocol.compute_proof_shuffle(&res, &n_i);
+    let res = bidder.gm_eval_honest(&v_j, &c_ji, &c_i, &n_i, &rand1, &rand2, &rand3, &rand4);
+    let proof_shuffle = bidder.compute_proof_shuffle(&res, &n_i);
 
     /* only seen by auctioneer */
     let private_data = (&proof_eval, &plaintext_and_coins);

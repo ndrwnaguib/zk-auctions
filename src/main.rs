@@ -12,12 +12,9 @@ use rand::{Rng, SeedableRng};
 use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
-use zk_auctions_core::protocols::strain::{
-    Auctioneer, Bidder, StrainAuctioneer, StrainBidder, StrainConfig, StrainProtocol,
-};
-use zk_auctions_core::utils::{
-    compare_leq_honest, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
-};
+use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
+use zk_auctions_core::protocols::strain::bidder::{Bidder, StrainBidder};
+use zk_auctions_core::utils::{compare_leq_honest, rand32, StrainProof};
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
@@ -86,7 +83,6 @@ fn main() {
         (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
     ) = receipt.journal.decode().expect("Failed to decode all results");
 
-    let strain_protocol = StrainProtocol::new(StrainConfig::default());
     let auctioneer = Auctioneer::new();
     let bidder = Bidder::new();
 
