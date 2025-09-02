@@ -5,105 +5,100 @@ extern crate risc0_zkvm;
 extern crate zk_auctions_core;
 extern crate zk_auctions_methods;
 
+pub mod auctioneer_host;
+pub mod bidder_host;
+
+use crate::auctioneer_host::AuctioneerHost;
+use crate::bidder_host::BidderHost;
 use num_bigint::{BigInt, RandBigInt};
-use num_traits::One;
-use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
-use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
-use std::collections::HashMap;
-use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
-use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
-use zk_auctions_core::protocols::strain::bidder::{Bidder, StrainBidder};
-use zk_auctions_core::utils::{compare_leq_honest, rand32, StrainProof};
-use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
+use rand::Rng;
+use risc0_zkvm::Receipt;
+use zk_auctions_core::protocols::strain::StrainSecurityParams;
+
+fn run_four_bidders_scenario() {
+    // Shared soundness parameters
+    let soundness = StrainSecurityParams::default();
+
+    // Create auctioneer
+    let mut auctioneer = AuctioneerHost::new(soundness.clone());
+
+    // Create 4 bidders with different specific bid values
+    let bid_values = vec![
+        BigInt::from(1000u32), // Bidder 0: $1000
+        BigInt::from(1500u32), // Bidder 1: $1500
+        BigInt::from(800u32),  // Bidder 2: $800
+        BigInt::from(2000u32), // Bidder 3: $2000
+    ];
+
+    let mut bidders: Vec<BidderHost> =
+        bid_values.into_iter().map(|v| BidderHost::new(v, soundness.clone())).collect();
+
+    // Helper function to get receipt index for bidder i proving against bidder j
+    let get_receipt_index = |i: usize, j: usize| -> usize {
+        if j < i {
+            j
+        } else {
+            j - 1
+        }
+    };
+
+    // For n bidders, we need n*(n-1) pairwise comparisons
+    // Each bidder (j) proves against every other bidder (i)
+    let mut all_proofs: Vec<Vec<(Receipt, Vec<u8>)>> = Vec::new();
+
+    // Generate proofs for each bidder against every other bidder
+    for j in 0..bidders.len() {
+        let mut bidder_proofs: Vec<(Receipt, Vec<u8>)> = Vec::new();
+
+        for i in 0..bidders.len() {
+            if i == j {
+                continue; // Skip self-comparison
+            }
+
+            // Bidder j proves against bidder i
+            // j is the prover (*_j), i is the other bidder (*_i)
+            let proof = bidders[j].prove(
+                bidders[i].get_c_j(), // c_i: encrypted bid of bidder i
+                bidders[i].get_n_j(), // n_i: public key of bidder i
+                bidders[i].get_r_j(), // r_i: random values of bidder i
+            );
+            bidder_proofs.push(proof);
+        }
+
+        all_proofs.push(bidder_proofs);
+    }
+
+    // Auctioneer verifies each receipt + private output and records bidders
+    for (bidder_idx, receipts) in all_proofs.iter().enumerate() {
+        for (proof_idx, (receipt, private_output)) in receipts.iter().enumerate() {
+            let other_bidder_idx = if proof_idx >= bidder_idx { proof_idx + 1 } else { proof_idx };
+            let is_verified = auctioneer.verify(receipt, private_output);
+            assert!(
+                is_verified,
+                "Auctioneer failed to verify bidder {} against bidder {}",
+                bidder_idx, other_bidder_idx
+            );
+        }
+    }
+
+    // Each bidder verifies every other bidder
+    for i in 0..bidders.len() {
+        for j in 0..bidders.len() {
+            if i == j {
+                continue;
+            }
+            // Get the receipt where bidder i was the prover against bidder j
+            let receipt_idx = get_receipt_index(i, j);
+            let (ref receipt, _) = all_proofs[i][receipt_idx];
+            let is_verified = bidders[i].verify_other_bidder(receipt);
+            assert!(is_verified, "Bidder {} failed to verify bidder {}", i, j);
+        }
+    }
+
+    println!("Scenario completed: all verifications passed for 4 bidders and 1 auctioneer.");
+    println!("Total pairwise comparisons: {}", bidders.len() * (bidders.len() - 1));
+}
 
 fn main() {
-    // The host code here plays the role of the auctioneer and a second bidder
-    // Ideally, the second bidder would be a separate entity, but for simplicity, we run it in the same process.
-    let mut rng = rand::thread_rng();
-
-    let keys_i = generate_keys(None);
-    let n_i = &keys_i.pub_key;
-
-    let v_i: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-
-    let r_i: Vec<BigInt> = rand32(n_i);
-    let c_i: Vec<BigInt> = encrypt_gm(&v_i, n_i);
-
-    let sound_param: usize = 40;
-    let sigma: BigInt = BigInt::from(40);
-
-    let mut rand1: Vec<Vec<BigInt>> = Vec::with_capacity(32);
-    let mut rand2: Vec<Vec<BigInt>> = Vec::with_capacity(32);
-    let mut rand3: Vec<Vec<BigInt>> = Vec::with_capacity(32);
-    let mut rand4: Vec<Vec<BigInt>> = Vec::with_capacity(32);
-
-    for _ in 0..32 {
-        let mut x = Vec::with_capacity(128);
-        let mut y = Vec::with_capacity(128);
-        let mut x2 = Vec::with_capacity(128);
-        let mut y2 = Vec::with_capacity(128);
-        for _ in 0..128 {
-            x.push(get_next_random(n_i));
-            y.push(get_next_random(n_i));
-            x2.push(get_next_random(n_i));
-            y2.push(get_next_random(n_i));
-        }
-        rand1.push(x);
-        rand2.push(y);
-        rand3.push(x2);
-        rand4.push(y2);
-    }
-
-    let mut private_output = Vec::new();
-    let env = ExecutorEnv::builder()
-        .write(&(&c_i, &n_i, &r_i))
-        .expect("Failed to add encryption proof input")
-        .write(&(&sigma, &(sound_param as u32)))
-        .expect("Failed to add discrete-log input")
-        .write(&(&rand1, &rand2, &rand3, &rand4))
-        .expect("Failed to add shuffle proof input")
-        .stdout(&mut private_output)
-        .build()
-        .unwrap();
-
-    let session = default_prover();
-    let receipt = session.prove(env, GUEST_ELF).unwrap().receipt;
-    receipt.verify(GUEST_ID).unwrap();
-
-    let (proof_eval, plaintext_and_coins): (
-        Vec<Vec<Vec<BigInt>>>,
-        Vec<Vec<(BigInt, BigInt, BigInt)>>,
-    ) = from_slice(&private_output).expect("Failed to deserialize private data");
-
-    let (n_j, proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res)): (
-        BigInt,
-        Vec<Vec<Vec<BigInt>>>,
-        (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
-        (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
-    ) = receipt.journal.decode().expect("Failed to decode all results");
-
-    let auctioneer = Auctioneer::new();
-    let bidder = Bidder::new();
-
-    let eval_res = auctioneer.verify_eval(
-        proof_eval.clone(),
-        plaintext_and_coins.clone(),
-        n_i,
-        &n_j,
-        sound_param,
-    );
-    assert!(eval_res.is_some(), "`proof_eval` verification failed.");
-
-    assert!(bidder.verify_proof_enc(proof_enc));
-
-    assert!(bidder.verify_dlog_eq(&n_j, &y_j, &y_pow_r, &z_pow_r, &proof_dlog, Some(sound_param)));
-
-    let success = bidder.verify_shuffle(&proof_shuffle, &n_j, &res);
-    assert!(success, "verify_shuffle failed");
-    if compare_leq_honest(&res, &keys_i.priv_key) {
-        println!("The second bidder's bid is less than or equal to the first bidder's bid.");
-    } else {
-        println!("The second bidder's bid is greater than the first bidder's bid.");
-    }
+    run_four_bidders_scenario();
 }

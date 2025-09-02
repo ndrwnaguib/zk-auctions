@@ -12,3 +12,4 @@ num-iter = "0.1.45"
 num-traits = "0.2.19"
 num-integer = "0.1.46"
 rand_chacha = "0.3.1"
+risc0-zkvm = { version = "1.2.2", default-features = false, features = ["std", "getrandom", "heap-embedded-alloc"] }

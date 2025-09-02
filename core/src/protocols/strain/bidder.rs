@@ -11,6 +11,8 @@ use crate::utils::{
 };
 use num_traits::{One, Zero};
 
+use crate::protocols::strain::soundness::StrainSecurityParams;
+
 /// Configuration struct for the Strain protocol
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StrainConfig {
@@ -64,7 +66,6 @@ pub trait StrainBidder {
         pub_key_j: &BigInt,
         r1: &Vec<BigInt>,
         r12: &Vec<BigInt>,
-        sound_param: usize,
     ) -> (Vec<Vec<Vec<BigInt>>>, Vec<Vec<(BigInt, BigInt, BigInt)>>);
 
     /// Generate proof of discrete logarithm equality
@@ -117,17 +118,21 @@ pub trait StrainBidder {
 
 pub struct Bidder {
     config: StrainConfig,
+    soundness_params: StrainSecurityParams,
 }
 
 impl Bidder {
     /// Create a new bidder instance with default configuration
     pub fn new() -> Self {
-        Self { config: StrainConfig::default() }
+        Self { 
+            config: StrainConfig::default(),
+            soundness_params: StrainSecurityParams::default(),
+        }
     }
 
     /// Create a new bidder instance with custom configuration
-    pub fn with_config(config: StrainConfig) -> Self {
-        Self { config }
+    pub fn with_config(config: StrainConfig, soundness_params: StrainSecurityParams) -> Self {
+        Self { config, soundness_params }
     }
 }
 
@@ -197,7 +202,6 @@ impl StrainBidder for Bidder {
         pub_key_j: &BigInt,
         r1: &Vec<BigInt>,
         r12: &Vec<BigInt>,
-        sound_param: usize,
     ) -> (Vec<Vec<Vec<BigInt>>>, Vec<Vec<(BigInt, BigInt, BigInt)>>) {
         assert_eq!(cipher_i.len(), self.config.bit_length);
         assert_eq!(cipher_j.len(), self.config.bit_length);
@@ -208,13 +212,16 @@ impl StrainBidder for Bidder {
         let mut strain_rng = StrainRandomGenerator::new();
 
         // Generate coins_delta, coins_gamma, and coins_gamma2
-        let mut coins_delta = vec![vec![BigInt::zero(); sound_param]; self.config.bit_length];
-        let mut coins_gamma = vec![vec![BigInt::zero(); sound_param]; self.config.bit_length];
-        let mut coins_gamma2 = vec![vec![BigInt::zero(); sound_param]; self.config.bit_length];
+        let mut coins_delta =
+            vec![vec![BigInt::zero(); self.soundness_params.sound_param]; self.config.bit_length];
+        let mut coins_gamma =
+            vec![vec![BigInt::zero(); self.soundness_params.sound_param]; self.config.bit_length];
+        let mut coins_gamma2 =
+            vec![vec![BigInt::zero(); self.soundness_params.sound_param]; self.config.bit_length];
 
         let mut rng = StdRng::from_entropy();
         for l in 0..self.config.bit_length {
-            for m in 0..sound_param {
+            for m in 0..self.soundness_params.sound_param {
                 coins_delta[l][m] = BigInt::from(rng.gen_range(0..2));
                 coins_gamma[l][m] = strain_rng.get_next_random(&(pub_key_i - BigInt::one()));
                 coins_gamma2[l][m] = strain_rng.get_next_random(&(pub_key_j - BigInt::one()));
@@ -266,7 +273,7 @@ impl StrainBidder for Bidder {
 
         let plaintext_and_coins: Vec<Vec<(BigInt, BigInt, BigInt)>> = (0..self.config.bit_length)
             .map(|l| {
-                (0..sound_param)
+                (0..self.soundness_params.sound_param)
                     .map(|m| {
                         if rng_seed.gen::<u8>() % 2 == 0 {
                             (

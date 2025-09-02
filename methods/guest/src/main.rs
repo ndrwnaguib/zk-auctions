@@ -19,15 +19,28 @@ fn main() {
     let mut rng = rand::thread_rng();
     let bidder = Bidder::new();
 
-    let keys_j: Keys = generate_keys(None);
-    let (p_j, q_j): &(BigInt, BigInt) = &keys_j.priv_key;
-    let n_j: BigInt = keys_j.pub_key;
-
-    // Generate a second random value for v2.
-    let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-
     // Read inputs from the environment.
-    let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
+    let (
+        c_j,
+        n_j,
+        r_j,
+        v_j,
+        p_j,
+        q_j,
+        c_i,
+        n_i,
+        r_i
+    ): (
+        Vec<BigInt>,
+        BigInt,
+        Vec<BigInt>,
+        BigInt,
+        BigInt,
+        BigInt,
+        Vec<BigInt>,
+        BigInt,
+        Vec<BigInt>
+    ) = env::read();
     let (sigma, sound_param): (BigInt, u32) = env::read();
     let (rand1, rand2, rand3, rand4): (
         Vec<Vec<BigInt>>,
@@ -74,8 +87,15 @@ fn main() {
     let private_data = (&proof_eval, &plaintext_and_coins);
     env::write(&private_data);
 
-    let public_results =
-        (n_j.clone(), proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res));
+    let public_results = (
+        n_j.clone(),
+        n_i.clone(),
+        c_j.clone(),
+        c_i.clone(),
+        proof_enc,
+        (proof_dlog, y_j, y_pow_r, z_pow_r),
+        (proof_shuffle, res),
+    );
 
     // Single commit
     env::commit(&public_results);
