@@ -1,7 +1,7 @@
 use num_bigint::BigInt;
 use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv, Receipt};
 use std::collections::HashMap;
-use zk_auctions_core::protocols::strain::{StrainSecurityParams};
+use zk_auctions_core::protocols::strain::StrainSecurityParams;
 use zk_auctions_core::protocols::strain::VerifiedReceipt;
 use zk_auctions_core::utils::StrainProof;
 use zk_auctions_methods::AUCTIONEER_VERIFY_ELF;
@@ -30,9 +30,15 @@ impl Default for AuctioneerHost {
 impl StrainAuctioneerHost for AuctioneerHost {
     /// Verify a receipt from a bidder
     /// Returns true if verification succeeds, false otherwise
-    fn verify(&mut self, bidder_prover_receipt: &risc0_zkvm::Receipt, private_output: &[u8]) -> bool {
+    fn verify(
+        &mut self,
+        bidder_prover_receipt: &risc0_zkvm::Receipt,
+        private_output: &[u8],
+    ) -> bool {
         // First verify the receipt itself using BIDDER_PROVER_ID
-        bidder_prover_receipt.verify(zk_auctions_methods::BIDDER_PROVER_ID).expect("Failed to verify the receipt"); 
+        bidder_prover_receipt
+            .verify(zk_auctions_methods::BIDDER_PROVER_ID)
+            .expect("Failed to verify the receipt");
 
         // Decode the public results from the receipt
         let (
@@ -51,7 +57,10 @@ impl StrainAuctioneerHost for AuctioneerHost {
             Vec<Vec<Vec<BigInt>>>,
             (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
             (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
-        ) = bidder_prover_receipt.journal.decode().expect("Failed to decode all the journal results");
+        ) = bidder_prover_receipt
+            .journal
+            .decode()
+            .expect("Failed to decode all the journal results");
 
         // Read the private output for additional verification
         let (proof_eval, plaintext_and_coins): (
@@ -80,10 +89,14 @@ impl StrainAuctioneerHost for AuctioneerHost {
 
         // Execute the auctioneer-verify guest circuit
         let session = default_prover();
-        let verification_receipt = session.prove(env, AUCTIONEER_VERIFY_ELF).expect("Failed to prove auctioneer verification").receipt;
+        let verification_receipt = session
+            .prove(env, AUCTIONEER_VERIFY_ELF)
+            .expect("Failed to prove auctioneer verification")
+            .receipt;
 
         // Extract the verification result
-        let is_eval_verified: bool = verification_receipt.journal.decode().expect("Failed to decode verification result");
+        let is_eval_verified: bool =
+            verification_receipt.journal.decode().expect("Failed to decode verification result");
 
         if !is_eval_verified {
             return false;
@@ -110,10 +123,7 @@ impl StrainAuctioneerHost for AuctioneerHost {
 impl AuctioneerHost {
     /// Create a new auctioneer host
     pub fn new(sound_param: StrainSecurityParams) -> Self {
-        Self {
-            verified_receipts: HashMap::new(),
-            soundness_param: sound_param,
-        }
+        Self { verified_receipts: HashMap::new(), soundness_param: sound_param }
     }
 
     /// Get information about a verified receipt keyed by "n_j|n_i"
@@ -139,7 +149,11 @@ impl AuctioneerHost {
     }
 
     /// Remove a verified receipt for (n_j, n_i)
-    pub fn remove_verified_receipt(&mut self, n_j: &BigInt, n_i: &BigInt) -> Option<VerifiedReceipt> {
+    pub fn remove_verified_receipt(
+        &mut self,
+        n_j: &BigInt,
+        n_i: &BigInt,
+    ) -> Option<VerifiedReceipt> {
         let key = format!("{}|{}", n_j, n_i);
         self.verified_receipts.remove(&key)
     }

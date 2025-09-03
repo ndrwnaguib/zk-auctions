@@ -10,4 +10,3 @@ pub struct VerifiedReceipt {
     pub c_j: Vec<BigInt>,
     pub c_i: Vec<BigInt>,
 }
-

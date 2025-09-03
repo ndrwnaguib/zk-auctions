@@ -3,17 +3,19 @@ use risc0_zkvm::serde::from_slice;
 use risc0_zkvm::{default_prover, ExecutorEnv, Receipt};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_gm, generate_keys, get_next_random, Keys};
-use zk_auctions_core::utils::rand32;
+use zk_auctions_core::protocols::strain::StrainSecurityParams;
 use zk_auctions_core::protocols::strain::VerifiedReceipt;
-use zk_auctions_core::protocols::strain::{StrainSecurityParams};
+use zk_auctions_core::utils::rand32;
 use zk_auctions_core::utils::StrainProof;
-use zk_auctions_methods::{BIDDER_JOIN_ELF, BIDDER_PROVER_ELF, BIDDER_PROVER_ID, BIDDER_VERIFY_ELF};
+use zk_auctions_methods::{
+    BIDDER_JOIN_ELF, BIDDER_PROVER_ELF, BIDDER_PROVER_ID, BIDDER_VERIFY_ELF,
+};
 
 /// Trait defining the bidder host operations in the Strain protocol
 pub trait StrainBidderHost {
     /// Joins Auction by generating keys and encrypting the bid.
     fn new(v_j: BigInt, security_param: StrainSecurityParams) -> Self;
-    
+
     /// Generate a zero-knowledge proof receipt for this bidder's bid
     fn prove(&mut self, c_i: &Vec<BigInt>, n_i: &BigInt, r_i: &Vec<BigInt>) -> (Receipt, Vec<u8>);
 
@@ -78,23 +80,26 @@ impl StrainBidderHost for BidderHost {
     fn new(v_j: BigInt, security_param: StrainSecurityParams) -> Self {
         // Use the keygen guest circuit to generate keys and encrypt the bid
         // Create the execution environment
-        //let mut private_output = Vec::new();
+        let mut private_output = Vec::new();
         let env = ExecutorEnv::builder()
             .write(&v_j)
             .expect("Failed to write bid value to ExecutorEnv")
-            //.stdout(&mut private_output)
+            .stdout(&mut private_output)
             .build()
-            .unwrap();
+            .expect("Failed to build ExecutorEnv");
 
         // Execute the keygen guest circuit
         let session = default_prover();
-        let bidder_join_receipt = session.prove(env, BIDDER_JOIN_ELF).expect("Failed to prove keygen").receipt;
+        let bidder_join_receipt =
+            session.prove(env, BIDDER_JOIN_ELF).expect("Failed to prove keygen").receipt;
 
         // Extract the results from the receipt
         // Private output contains: (p_j, q_j)
-        //let (p_j, c_j, q_j): (BigInt, BigInt, BigInt) = from_slice(&private_output).expect("Failed to decode private output");
+        let (p_j, q_j): (BigInt, BigInt) =
+            from_slice(&private_output).expect("Failed to decode private output");
         // Journal contains: (n_j, c_j, r_j)
-        let (n_j, c_j, r_j): (BigInt, Vec<BigInt>, Vec<BigInt>) = bidder_join_receipt.journal.decode().expect("Failed to decode keygen results");
+        let (n_j, c_j, r_j): (BigInt, Vec<BigInt>, Vec<BigInt>) =
+            bidder_join_receipt.journal.decode().expect("Failed to decode keygen results");
 
         // Generate keys
         // let keys_j = generate_keys(None);
@@ -135,12 +140,7 @@ impl StrainBidderHost for BidderHost {
     ///
     /// # Returns
     /// A tuple containing the ZK proof receipt and the private output as a byte vector.
-    fn prove(
-        &mut self,
-        c_i: &Vec<BigInt>,
-        n_i: &BigInt,
-        r_i: &Vec<BigInt>,
-    ) -> (Receipt, Vec<u8>) {
+    fn prove(&mut self, c_i: &Vec<BigInt>, n_i: &BigInt, r_i: &Vec<BigInt>) -> (Receipt, Vec<u8>) {
         // Generate random values for the shuffle proof
         let (rand1, rand2, rand3, rand4) = self.generate_shuffle_randoms();
 
@@ -161,7 +161,8 @@ impl StrainBidderHost for BidderHost {
 
         // Create the prover and generate the receipt
         let session = default_prover();
-        let bidder_prover_receipt = session.prove(env, BIDDER_PROVER_ELF).expect("Failed to prove").receipt;
+        let bidder_prover_receipt =
+            session.prove(env, BIDDER_PROVER_ELF).expect("Failed to prove").receipt;
 
         // Store the receipt
         self.receipts.bidder_prover_receipts.push(bidder_prover_receipt.clone());
@@ -172,7 +173,10 @@ impl StrainBidderHost for BidderHost {
     /// Verify another bidder's receipt
     /// Performs all three verification steps: proof_enc, dlog_eq, and shuffle
     /// Also performs comparison and reveals the bid value if this bidder won
-    fn verify_other_bidder(&mut self, other_bidder_receipt: &risc0_zkvm::Receipt) -> BidderVerificationResult {
+    fn verify_other_bidder(
+        &mut self,
+        other_bidder_receipt: &risc0_zkvm::Receipt,
+    ) -> BidderVerificationResult {
         // First verify the receipt itself using BIDDER_PROVER_ID
         other_bidder_receipt.verify(BIDDER_PROVER_ID).expect("Failed to verify the receipt");
 
@@ -193,10 +197,7 @@ impl StrainBidderHost for BidderHost {
             Vec<Vec<Vec<BigInt>>>,
             (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
             (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
-        ) = other_bidder_receipt
-            .journal
-            .decode()
-            .expect("Failed to decode receipt journal");
+        ) = other_bidder_receipt.journal.decode().expect("Failed to decode receipt journal");
 
         // Use the bidder-verify guest circuit to perform verification and comparison
         let env = ExecutorEnv::builder()
@@ -210,7 +211,7 @@ impl StrainBidderHost for BidderHost {
                 (proof_shuffle.clone(), res.clone()),
                 self.security_param.clone(),
                 (self.p_j.clone(), self.q_j.clone()), // Use this bidder's private key
-                self.v_j.clone(), // Use this bidder's bid value
+                self.v_j.clone(),                     // Use this bidder's bid value
             ))
             .expect("Failed to write inputs to ExecutorEnv")
             .build()
@@ -218,13 +219,16 @@ impl StrainBidderHost for BidderHost {
 
         // Execute the bidder-verify guest circuit
         let session = default_prover();
-        let bidder_verify_receipt = session.prove(env, BIDDER_VERIFY_ELF).expect("Failed to prove bidder verification").receipt;
+        let bidder_verify_receipt = session
+            .prove(env, BIDDER_VERIFY_ELF)
+            .expect("Failed to prove bidder verification")
+            .receipt;
 
         // Store the receipt
         self.receipts.bidder_verify_receipts.push(bidder_verify_receipt.clone());
 
         // Extract the verification and comparison results
-        let (verification_success, is_won, revealed_v_i): (bool, bool, Option<BigInt>) = 
+        let (verification_success, is_won, revealed_v_i): (bool, bool, Option<BigInt>) =
             bidder_verify_receipt.journal.decode().expect("Failed to decode verification result");
 
         if !verification_success {
@@ -236,20 +240,19 @@ impl StrainBidderHost for BidderHost {
         }
 
         // If all verifications pass, register the verified bidder
-        self.verified_bidders_receipts.insert(n_j.to_string(), VerifiedReceipt {
-            bidder_prover_receipt: other_bidder_receipt.clone(),
-            auctioneer_verify_receipt: None,
-            n_j: n_j.clone(),
-            n_i: n_i.clone(),
-            c_j: c_j.clone(),
-            c_i: c_i.clone(),
-        });
+        self.verified_bidders_receipts.insert(
+            n_j.to_string(),
+            VerifiedReceipt {
+                bidder_prover_receipt: other_bidder_receipt.clone(),
+                auctioneer_verify_receipt: None,
+                n_j: n_j.clone(),
+                n_i: n_i.clone(),
+                c_j: c_j.clone(),
+                c_i: c_i.clone(),
+            },
+        );
 
-        BidderVerificationResult {
-            is_verified: true,
-            is_won,
-            revealed_bid: revealed_v_i,
-        }
+        BidderVerificationResult { is_verified: true, is_won, revealed_bid: revealed_v_i }
     }
 }
 

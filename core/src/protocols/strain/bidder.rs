@@ -123,10 +123,7 @@ pub struct Bidder {
 impl Bidder {
     /// Create a new bidder instance with default configuration
     pub fn new() -> Self {
-        Self { 
-            config: StrainConfig::default(),
-            soundness_params: StrainSecurityParams::default(),
-        }
+        Self { config: StrainConfig::default(), soundness_params: StrainSecurityParams::default() }
     }
 
     /// Create a new bidder instance with custom configuration
@@ -302,7 +299,7 @@ impl StrainBidder for Bidder {
         &self,
         sigma: &BigInt,
         y: &BigInt,
-        n: &BigInt
+        n: &BigInt,
     ) -> Vec<(BigInt, BigInt, BigInt)> {
         let iters = self.config.default_dlog_iters;
 
