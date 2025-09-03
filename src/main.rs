@@ -8,97 +8,239 @@ extern crate zk_auctions_methods;
 pub mod auctioneer_host;
 pub mod bidder_host;
 
-use crate::auctioneer_host::AuctioneerHost;
-use crate::bidder_host::BidderHost;
-use num_bigint::{BigInt, RandBigInt};
-use rand::Rng;
+use crate::auctioneer_host::{AuctioneerHost, StrainAuctioneerHost};
+use crate::bidder_host::{BidderHost, StrainBidderHost};
+use num_bigint::BigInt;
 use risc0_zkvm::Receipt;
 use zk_auctions_core::protocols::strain::StrainSecurityParams;
 
-fn run_four_bidders_scenario() {
+/// Configuration for a bidder in the auction
+#[derive(Debug, Clone)]
+pub struct BidderConfig {
+    pub name: String,
+    pub bid_value: BigInt,
+}
+
+/// Result of the auction process
+#[derive(Debug)]
+pub struct AuctionResult {
+    pub winner_name: String,
+    pub winner_bid: BigInt,
+    pub winner_index: usize,
+    pub all_bids: Vec<(String, BigInt)>,
+}
+
+/// Run a complete auction scenario with n bidders
+pub fn run_auction_scenario(bidder_configs: Vec<BidderConfig>) -> Option<AuctionResult> {
+    let num_bidders = bidder_configs.len();
+    println!("Starting auction with {} bidders", num_bidders);
+    
+    // Print bidder information
+    for (i, config) in bidder_configs.iter().enumerate() {
+        println!("Bidder {}: {} with bid ${}", i, config.name, config.bid_value);
+    }
+    
     // Shared soundness parameters
     let soundness = StrainSecurityParams::default();
-
+    
+    // PHASE 1: JOIN PHASE
+    println!("\n=== PHASE 1: JOIN PHASE ===");
+    println!("Auctioneer starts auction with 1 minute join time...");
+    
     // Create auctioneer
     let mut auctioneer = AuctioneerHost::new(soundness.clone());
-
-    // Create 4 bidders with different specific bid values
-    let bid_values = vec![
-        BigInt::from(1000u32), // Bidder 0: $1000
-        BigInt::from(1500u32), // Bidder 1: $1500
-        BigInt::from(800u32),  // Bidder 2: $800
-        BigInt::from(2000u32), // Bidder 3: $2000
-    ];
-
-    let mut bidders: Vec<BidderHost> =
-        bid_values.into_iter().map(|v| BidderHost::new(v, soundness.clone())).collect();
-
-    // Helper function to get receipt index for bidder i proving against bidder j
-    let get_receipt_index = |i: usize, j: usize| -> usize {
-        if j < i {
-            j
-        } else {
-            j - 1
-        }
-    };
-
-    // For n bidders, we need n*(n-1) pairwise comparisons
-    // Each bidder (j) proves against every other bidder (i)
-    let mut all_proofs: Vec<Vec<(Receipt, Vec<u8>)>> = Vec::new();
-
-    // Generate proofs for each bidder against every other bidder
-    for j in 0..bidders.len() {
-        let mut bidder_proofs: Vec<(Receipt, Vec<u8>)> = Vec::new();
-
-        for i in 0..bidders.len() {
-            if i == j {
-                continue; // Skip self-comparison
-            }
-
-            // Bidder j proves against bidder i
-            // j is the prover (*_j), i is the other bidder (*_i)
-            let proof = bidders[j].prove(
-                bidders[i].get_c_j(), // c_i: encrypted bid of bidder i
-                bidders[i].get_n_j(), // n_i: public key of bidder i
-                bidders[i].get_r_j(), // r_i: random values of bidder i
-            );
-            bidder_proofs.push(proof);
-        }
-
-        all_proofs.push(bidder_proofs);
+    
+    // Create bidders - each bidder joins the auction
+    let mut bidders: Vec<BidderHost> = Vec::new();
+    for config in &bidder_configs {
+        println!("{} joining auction with bid ${}...", config.name, config.bid_value);
+        let bidder = BidderHost::new(config.bid_value.clone(), soundness.clone());
+        bidders.push(bidder);
     }
+    
+    // println!("All {} bidders have joined the auction", num_bidders);
+    
+    // // PHASE 2: EVALUATION PHASE
+    // println!("\n=== PHASE 2: EVALUATION PHASE ===");
+    
+    // // 2.1 Each bidder sends their c_i, n_i, r_i to other bidders
+    // println!("2.1 Bidders exchanging encrypted bids and public keys...");
+    
+    // // 2.2 Each bidder generates proofs against every other bidder
+    // println!("2.2 Bidders generating proofs against each other...");
+    // let mut all_proofs: Vec<Vec<(Receipt, Vec<u8>)>> = Vec::new();
+    
+    // // First, collect all the public information from bidders
+    // let mut bidder_public_info: Vec<(Vec<BigInt>, BigInt, Vec<BigInt>)> = Vec::new();
+    // for bidder in &bidders {
+    //     bidder_public_info.push((
+    //         bidder.get_c_j().clone(),
+    //         bidder.get_n_j().clone(),
+    //         bidder.get_r_j().clone(),
+    //     ));
+    // }
+    
+    // // Now generate proofs using the collected public information
+    // for j in 0..bidders.len() {
+    //     let mut bidder_proofs: Vec<(Receipt, Vec<u8>)> = Vec::new();
+        
+    //     for i in 0..bidders.len() {
+    //         if i == j {
+    //             continue; // Skip self-comparison
+    //         }
+            
+    //         // Bidder j proves against bidder i using collected public info
+    //         let (c_i, n_i, r_i) = &bidder_public_info[i];
+    //         let proof = bidders[j].prove(c_i, n_i, r_i);
+    //         bidder_proofs.push(proof);
+    //         println!("  {} generated proof against {}", bidder_configs[j].name, bidder_configs[i].name);
+    //     }
+        
+    //     all_proofs.push(bidder_proofs);
+    // }
+    
+    // // 2.3 Each bidder sends their receipts and private outputs to auctioneer for verification
+    // println!("2.3 Bidders sending proofs to auctioneer for verification...");
+    // let mut auctioneer_verification_results: Vec<Vec<bool>> = Vec::new();
+    
+    // for (bidder_idx, proofs) in all_proofs.iter().enumerate() {
+    //     let mut bidder_verification_results: Vec<bool> = Vec::new();
+        
+    //     for (proof_idx, (receipt, private_output)) in proofs.iter().enumerate() {
+    //         let other_bidder_idx = if proof_idx >= bidder_idx { proof_idx + 1 } else { proof_idx };
+    //         let is_verified = auctioneer.verify(receipt, private_output);
+    //         bidder_verification_results.push(is_verified);
+            
+    //         if is_verified {
+    //             println!("  ✓ Auctioneer verified {}'s proof against {}", 
+    //                 bidder_configs[bidder_idx].name, bidder_configs[other_bidder_idx].name);
+    //         } else {
+    //             println!("  ✗ Auctioneer failed to verify {}'s proof against {}", 
+    //                 bidder_configs[bidder_idx].name, bidder_configs[other_bidder_idx].name);
+    //         }
+    //     }
+        
+    //     auctioneer_verification_results.push(bidder_verification_results);
+    // }
+    
+    // // 2.4 Bidders exchange receipts for verification
+    // println!("2.4 Bidders exchanging receipts for verification...");
+    
+    // // PHASE 3: SELECTING WINNER
+    // println!("\n=== PHASE 3: SELECTING WINNER ===");
+    
+    // // 3.1 Check if all auctioneer verifications passed
+    // println!("3.1 Checking auctioneer verification results...");
+    // let mut all_auctioneer_verifications_passed = true;
+    
+    // for (bidder_idx, verification_results) in auctioneer_verification_results.iter().enumerate() {
+    //     for (proof_idx, &is_verified) in verification_results.iter().enumerate() {
+    //         if !is_verified {
+    //             all_auctioneer_verifications_passed = false;
+    //             let other_bidder_idx = if proof_idx >= bidder_idx { proof_idx + 1 } else { proof_idx };
+    //             println!("  ✗ {}'s proof against {} failed auctioneer verification", 
+    //                 bidder_configs[bidder_idx].name, bidder_configs[other_bidder_idx].name);
+    //         }
+    //     }
+    // }
+    
+    // if !all_auctioneer_verifications_passed {
+    //     panic!("Auctioneer verification failed - cannot proceed to winner selection");
+    // }
+    
+    // println!("  ✓ All auctioneer verifications passed");
+    
+    // // 3.2 Each bidder verifies other bidders and determines winner
+    // println!("3.2 Bidders performing verification and comparison...");
+    
+    // let mut bidder_wins: Vec<usize> = vec![0; num_bidders]; // Count wins for each bidder
+    
+    // for i in 0..bidders.len() {
+    //     for j in 0..bidders.len() {
+    //         if i == j {
+    //             continue;
+    //         }
+            
+    //         // Get the receipt where bidder j was the prover against bidder i
+    //         let receipt_idx = if j < i { j } else { j - 1 };
+    //         let (ref receipt, _) = all_proofs[j][receipt_idx];
+            
+    //         let verification_result = bidders[i].verify_other_bidder(receipt);
+            
+    //         if verification_result.is_verified {
+    //             if verification_result.is_won {
+    //                 bidder_wins[i] += 1;
+    //                 println!("  ✓ {} verified {}'s proof and WON the comparison", 
+    //                     bidder_configs[i].name, bidder_configs[j].name);
+    //             } else {
+    //                 println!("  ✓ {} verified {}'s proof but LOST the comparison", 
+    //                     bidder_configs[i].name, bidder_configs[j].name);
+    //             }
+    //         } else {
+    //             println!("  ✗ {} failed to verify {}'s proof", 
+    //                 bidder_configs[i].name, bidder_configs[j].name);
+    //         }
+    //     }
+    // }
+    
+    // // Determine the winner (bidder with most wins)
+    // let max_wins = bidder_wins.iter().max().unwrap();
+    // let winner_indices: Vec<usize> = bidder_wins.iter()
+    //     .enumerate()
+    //     .filter(|(_, &wins)| wins == *max_wins)
+    //     .map(|(idx, _)| idx)
+    //     .collect();
+    
+    // if winner_indices.len() > 1 {
+    //     println!("  ⚠ Multiple bidders tied with {} wins each", max_wins);
+    // }
+    
+    // let winner_idx = winner_indices[0]; // In case of tie, pick first one
+    // let winner_config = &bidder_configs[winner_idx];
+    
+    // println!("\n🎉 AUCTION COMPLETED!");
+    // println!("Winner: {} with bid ${}", winner_config.name, winner_config.bid_value);
+    // println!("Total pairwise comparisons: {}", num_bidders * (num_bidders - 1));
+    
+    // // Create result
+    // let all_bids: Vec<(String, BigInt)> = bidder_configs.iter()
+    //     .map(|config| (config.name.clone(), config.bid_value.clone()))
+    //     .collect();
+    
+    // AuctionResult {
+    //     winner_name: winner_config.name.clone(),
+    //     winner_bid: winner_config.bid_value.clone(),
+    //     winner_index: winner_idx,
+    //     all_bids,
+    // }
 
-    // Auctioneer verifies each receipt + private output and records bidders
-    for (bidder_idx, receipts) in all_proofs.iter().enumerate() {
-        for (proof_idx, (receipt, private_output)) in receipts.iter().enumerate() {
-            let other_bidder_idx = if proof_idx >= bidder_idx { proof_idx + 1 } else { proof_idx };
-            let is_verified = auctioneer.verify(receipt, private_output);
-            assert!(
-                is_verified,
-                "Auctioneer failed to verify bidder {} against bidder {}",
-                bidder_idx, other_bidder_idx
-            );
-        }
-    }
-
-    // Each bidder verifies every other bidder
-    for i in 0..bidders.len() {
-        for j in 0..bidders.len() {
-            if i == j {
-                continue;
-            }
-            // Get the receipt where bidder i was the prover against bidder j
-            let receipt_idx = get_receipt_index(i, j);
-            let (ref receipt, _) = all_proofs[i][receipt_idx];
-            let is_verified = bidders[i].verify_other_bidder(receipt);
-            assert!(is_verified, "Bidder {} failed to verify bidder {}", i, j);
-        }
-    }
-
-    println!("Scenario completed: all verifications passed for 4 bidders and 1 auctioneer.");
-    println!("Total pairwise comparisons: {}", bidders.len() * (bidders.len() - 1));
+    None
 }
 
 fn main() {
-    run_four_bidders_scenario();
+    // Example: 3 bidders scenario
+    let bidder_configs = vec![
+        BidderConfig {
+            name: "Alice".to_string(),
+            bid_value: BigInt::from(1000u32),
+        },
+        BidderConfig {
+            name: "Bob".to_string(),
+            bid_value: BigInt::from(1500u32),
+        },
+        BidderConfig {
+            name: "Charlie".to_string(),
+            bid_value: BigInt::from(800u32),
+        },
+    ];
+    
+    let result = run_auction_scenario(bidder_configs);
+    
+    //println!("\n=== FINAL RESULTS ===");
+    // println!("Winner: {} (Bidder {}) with bid ${}", 
+    //     result.winner_name, result.winner_index, result.winner_bid);
+    // println!("All bids:");
+    // for (name, bid) in result.all_bids {
+    //     println!("  {}: ${}", name, bid);
+    // }
 }

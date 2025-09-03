@@ -74,7 +74,6 @@ pub trait StrainBidder {
         sigma: &BigInt,
         y: &BigInt,
         n: &BigInt,
-        iters: Option<u32>,
     ) -> Vec<(BigInt, BigInt, BigInt)>;
 
     /// Compute proof of shuffle
@@ -303,10 +302,9 @@ impl StrainBidder for Bidder {
         &self,
         sigma: &BigInt,
         y: &BigInt,
-        n: &BigInt,
-        iters: Option<u32>,
+        n: &BigInt
     ) -> Vec<(BigInt, BigInt, BigInt)> {
-        let iters = iters.unwrap_or(self.config.default_dlog_iters);
+        let iters = self.config.default_dlog_iters;
 
         let mut p_dlog = Vec::new();
         let z = n - BigInt::one();

@@ -41,7 +41,6 @@ fn main() {
         BigInt,
         Vec<BigInt>
     ) = env::read();
-    let (sigma, sound_param): (BigInt, u32) = env::read();
     let (rand1, rand2, rand3, rand4): (
         Vec<Vec<BigInt>>,
         Vec<Vec<BigInt>>,
@@ -63,7 +62,6 @@ fn main() {
         &n_i,
         &r_j,
         &r_ji,
-        sound_param as usize,
     );
 
     let c_j_proofenc = encrypt_gm_coin(&v_j.clone(), &n_j, &r_j);
@@ -76,7 +74,7 @@ fn main() {
     let y_pow_r = y_j.modpow(&r_j_dlog, &n_j);
     let z_pow_r = z_j.modpow(&r_j_dlog, &n_j);
 
-    let proof_dlog = bidder.proof_dlog_eq(&r_j_dlog, &y_j, &n_j, Some(sound_param));
+    let proof_dlog = bidder.proof_dlog_eq(&r_j_dlog, &y_j, &n_j);
 
     let r_ji = rand32(&n_i);
     let c_ji = encrypt_gm_coin(&v_j, &n_i, &r_ji);
