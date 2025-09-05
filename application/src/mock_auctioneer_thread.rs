@@ -167,12 +167,14 @@ impl AuctioneerThread {
             let is_valid = auctioneer_host.verify(&receipt, &private_output);
             verification_results.push((prover_id, target_id, is_valid));
 
-            // Notify bidders about verification results
-            tprintln!(tag, "📤 2.4: Sending verification result to all bidders...");
-            for bidder_tx in &self.bidder_txs {
-                bidder_tx
+            // Notify the target bidder about verification results
+            tprintln!(tag, "📤 2.4: Sending verification result to target bidder {}...", target_id);
+            if let Some(target_bidder_tx) = self.bidder_txs.get(target_id) {
+                target_bidder_tx
                     .send(AuctionMessage::ProofVerified { prover_id, target_id, is_valid })
-                    .expect("Failed to send verification result to all bidders");
+                    .expect("Failed to send verification result to target bidder");
+            } else {
+                teprintln!(tag, "Error: Target bidder {} not found in bidder_txs", target_id);
             }
 
             tprintln!(
