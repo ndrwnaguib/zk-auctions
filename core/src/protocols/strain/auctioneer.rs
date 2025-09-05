@@ -1,7 +1,15 @@
 use num_bigint::BigInt;
 use rand::{rngs::StdRng, Rng, SeedableRng};
+use risc0_zkvm::Receipt;
 
 use crate::{gm::encrypt_bit_gm_coin, utils::hash_flat};
+
+/// Trait defining the auctioneer host operations in the Strain protocol
+/// This trait is implemented by the auctioneer host in the Strain protocol
+pub trait StrainAuctioneerHost {
+    /// Verify a receipt from a bidder
+    fn verify(&mut self, bidder_prover_receipt: &Receipt, private_output: &[u8]) -> bool;
+}
 
 /// Trait defining the auctioneer's verification operations in the Strain protocol
 pub trait StrainAuctioneer {

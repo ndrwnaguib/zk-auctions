@@ -4,6 +4,7 @@ use rand::seq::SliceRandom;
 use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use risc0_zkvm::Receipt;
 
 use crate::gm::{dot_mod, embed_and, encrypt_bit_gm_coin, StrainRandomGenerator};
 use crate::utils::{
@@ -43,6 +44,19 @@ impl StrainConfig {
     pub fn low_security() -> Self {
         Self { challenges_length: 40, bit_length: 32, default_dlog_iters: 10, modpow_exponent: 4 }
     }
+}
+
+/// Trait defining the bidder host operations in the Strain protocol
+/// This trait is implemented by the bidder host in the Strain protocol
+pub trait StrainBidderHost {
+    /// Joins Auction by generating keys and encrypting the bid.
+    fn new(v_j: BigInt, security_param: StrainSecurityParams) -> Self;
+
+    /// Generate a zero-knowledge proof receipt for this bidder's bid
+    fn prove(&mut self, c_i: &Vec<BigInt>, n_i: &BigInt, r_i: &Vec<BigInt>) -> (Receipt, Vec<u8>);
+
+    /// Verify another bidder's receipt and perform comparison
+    fn verify_other_bidders(&mut self, other_bidder_prover_receipts: &Vec<Receipt>) -> Option<BigInt>;
 }
 
 /// Trait defining the bidder's verification operations in the Strain protocol

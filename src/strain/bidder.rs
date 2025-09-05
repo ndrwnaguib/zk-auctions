@@ -1,48 +1,42 @@
+use std::collections::HashMap;
+
 use num_bigint::{BigInt, RandBigInt};
 use risc0_zkvm::serde::from_slice;
 use risc0_zkvm::{default_prover, ExecutorEnv, Receipt};
-use std::collections::HashMap;
-use zk_auctions_core::gm::{encrypt_gm, generate_keys, get_next_random, Keys};
+use zk_auctions_core::gm::get_next_random;
+use zk_auctions_core::protocols::strain::bidder::StrainBidderHost;
 use zk_auctions_core::protocols::strain::StrainSecurityParams;
-use zk_auctions_core::protocols::strain::VerifiedReceipt;
-use zk_auctions_core::utils::rand32;
-use zk_auctions_core::utils::StrainProof;
 use zk_auctions_methods::{
     BIDDER_JOIN_ELF, BIDDER_PROVER_ELF, BIDDER_PROVER_ID, BIDDER_VERIFY_ELF,
 };
 
-/// Trait defining the bidder host operations in the Strain protocol
-pub trait StrainBidderHost {
-    /// Joins Auction by generating keys and encrypting the bid.
-    fn new(v_j: BigInt, security_param: StrainSecurityParams) -> Self;
-
-    /// Generate a zero-knowledge proof receipt for this bidder's bid
-    fn prove(&mut self, c_i: &Vec<BigInt>, n_i: &BigInt, r_i: &Vec<BigInt>) -> (Receipt, Vec<u8>);
-
-    /// Verify another bidder's receipt and perform comparison
-    fn verify_other_bidder(&mut self, other_bidder_receipt: &Receipt) -> BidderVerificationResult;
+/// Bidder verifier results
+#[derive(Debug, Clone)]
+pub struct BidderVerifierResult {
+    /// The other bidder's prover receipt
+    pub prover_receipt: Receipt,
+    /// Whether the other bidder is verified
+    pub is_verified: bool,
 }
 
-/// Result of verifying another bidder's receipt
+/// Bidder prover results
 #[derive(Debug, Clone)]
-pub struct BidderVerificationResult {
-    /// Whether the verification succeeded
-    pub is_verified: bool,
-    /// Whether this bidder won the comparison
-    pub is_won: bool,
-    /// The revealed bid value if this bidder won, None otherwise
-    pub revealed_bid: Option<BigInt>,
+pub struct BidderProverResult {
+    /// The prover receipt
+    pub prover_receipt: Receipt,
+    /// The private output
+    pub private_output: Vec<u8>,
 }
 
 /// Collection of all receipts for a bidder across all stages
 #[derive(Debug, Clone)]
 pub struct BidderReceipts {
     /// Receipt from the bidder-join guest circuit (key generation)
-    pub bidder_join_receipt: Option<Receipt>,
+    pub join_receipt: Option<Receipt>,
     /// Receipts from the bidder-prover guest circuit (one for each other bidder)
-    pub bidder_prover_receipts: Vec<Receipt>,
-    /// Receipts from the bidder-verify guest circuit (one for each other bidder)
-    pub bidder_verify_receipts: Vec<Receipt>,
+    pub prover_receipts: Vec<Receipt>,
+    /// Receipt from the bidder-verify guest circuit
+    pub verify_receipt: Option<Receipt>,
 }
 
 /// BidderHost represents a bidder in the auction system
@@ -60,12 +54,14 @@ pub struct BidderHost {
     c_j: Vec<BigInt>,
     /// The bidder's random values
     r_j: Vec<BigInt>,
+    //// The bidder receipts based on the phase
+    receipts: BidderReceipts,
+    /// The bidder's prover results, key is the other bidder's public key
+    prover_results: HashMap<BigInt, BidderProverResult>,
+    /// The bidder's verifier results, key is the other bidder's public key
+    verifier_results: HashMap<BigInt, BidderVerifierResult>,
     /// The bidder's security parameters
     security_param: StrainSecurityParams,
-    /// Registry of verified other bidder receipts
-    verified_bidders_receipts: HashMap<String, VerifiedReceipt>,
-    /// Collection of all receipts from all stages
-    receipts: BidderReceipts,
 }
 
 impl StrainBidderHost for BidderHost {
@@ -101,17 +97,6 @@ impl StrainBidderHost for BidderHost {
         let (n_j, c_j, r_j): (BigInt, Vec<BigInt>, Vec<BigInt>) =
             bidder_join_receipt.journal.decode().expect("Failed to decode keygen results");
 
-        // Generate keys
-        // let keys_j = generate_keys(None);
-        // let n_j = keys_j.pub_key;
-        // let (p_j, q_j) = keys_j.priv_key;
-
-        // // Generate random values
-        // let r_j: Vec<BigInt> = rand32(&n_j);
-
-        // // Encrypt the bid value
-        // let c_j = encrypt_gm(&v_j, &n_j);
-
         Self {
             p_j: BigInt::from(0),
             q_j: BigInt::from(0),
@@ -119,13 +104,14 @@ impl StrainBidderHost for BidderHost {
             v_j,
             c_j,
             r_j,
-            verified_bidders_receipts: HashMap::new(),
-            security_param,
             receipts: BidderReceipts {
-                bidder_join_receipt: None,
-                bidder_prover_receipts: Vec::new(),
-                bidder_verify_receipts: Vec::new(),
+                join_receipt: Some(bidder_join_receipt),
+                prover_receipts: Vec::new(),
+                verify_receipt: None,
             },
+            prover_results: HashMap::new(),
+            verifier_results: HashMap::new(),
+            security_param,
         }
     }
 
@@ -164,8 +150,12 @@ impl StrainBidderHost for BidderHost {
         let bidder_prover_receipt =
             session.prove(env, BIDDER_PROVER_ELF).expect("Failed to prove").receipt;
 
-        // Store the receipt
-        self.receipts.bidder_prover_receipts.push(bidder_prover_receipt.clone());
+        // Store the receipt and private output
+        self.receipts.prover_receipts.push(bidder_prover_receipt.clone());
+        self.prover_results.insert(n_i.clone(), BidderProverResult {
+            prover_receipt: bidder_prover_receipt.clone(),
+            private_output: private_output.clone(),
+        });
 
         (bidder_prover_receipt, private_output)
     }
@@ -173,45 +163,22 @@ impl StrainBidderHost for BidderHost {
     /// Verify another bidder's receipt
     /// Performs all three verification steps: proof_enc, dlog_eq, and shuffle
     /// Also performs comparison and reveals the bid value if this bidder won
-    fn verify_other_bidder(
+    fn verify_other_bidders(
         &mut self,
-        other_bidder_receipt: &risc0_zkvm::Receipt,
-    ) -> BidderVerificationResult {
+        other_bidders_prover_receipts: &Vec<risc0_zkvm::Receipt>,
+    ) -> Option<BigInt> {
         // First verify the receipt itself using BIDDER_PROVER_ID
-        other_bidder_receipt.verify(BIDDER_PROVER_ID).expect("Failed to verify the receipt");
-
-        // Decode the public results from the receipt journal
-        let (
-            n_j,
-            n_i,
-            c_j,
-            c_i,
-            proof_enc,
-            (proof_dlog, y_j, y_pow_r, z_pow_r),
-            (proof_shuffle, res),
-        ): (
-            BigInt,
-            BigInt,
-            Vec<BigInt>,
-            Vec<BigInt>,
-            Vec<Vec<Vec<BigInt>>>,
-            (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
-            (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
-        ) = other_bidder_receipt.journal.decode().expect("Failed to decode receipt journal");
+        other_bidders_prover_receipts.iter().for_each(|receipt| {
+            receipt.verify(BIDDER_PROVER_ID).expect("Failed to verify the receipt");
+        }); 
 
         // Use the bidder-verify guest circuit to perform verification and comparison
         let env = ExecutorEnv::builder()
             .write(&(
-                n_j.clone(),
-                n_i.clone(),
-                c_j.clone(),
-                c_i.clone(),
-                proof_enc.clone(),
-                (proof_dlog.clone(), y_j.clone(), y_pow_r.clone(), z_pow_r.clone()),
-                (proof_shuffle.clone(), res.clone()),
+                other_bidders_prover_receipts,
                 self.security_param.clone(),
-                (self.p_j.clone(), self.q_j.clone()), // Use this bidder's private key
-                self.v_j.clone(),                     // Use this bidder's bid value
+                (self.p_j.clone(), self.q_j.clone()),
+                self.v_j.clone(),
             ))
             .expect("Failed to write inputs to ExecutorEnv")
             .build()
@@ -219,40 +186,20 @@ impl StrainBidderHost for BidderHost {
 
         // Execute the bidder-verify guest circuit
         let session = default_prover();
-        let bidder_verify_receipt = session
+        let bidder_verify_prove_info = session
             .prove(env, BIDDER_VERIFY_ELF)
-            .expect("Failed to prove bidder verification")
-            .receipt;
+            .expect("Failed to prove bidder verification");
 
-        // Store the receipt
-        self.receipts.bidder_verify_receipts.push(bidder_verify_receipt.clone());
+        let bidder_verify_receipt = bidder_verify_prove_info.receipt;
 
         // Extract the verification and comparison results
-        let (verification_success, is_won, revealed_v_i): (bool, bool, Option<BigInt>) =
+        let (revealed_v_i): Option<BigInt> =
             bidder_verify_receipt.journal.decode().expect("Failed to decode verification result");
 
-        if !verification_success {
-            return BidderVerificationResult {
-                is_verified: false,
-                is_won: false,
-                revealed_bid: None,
-            };
-        }
+        // Store the receipt
+        self.receipts.verify_receipt = Some(bidder_verify_receipt);
 
-        // If all verifications pass, register the verified bidder
-        self.verified_bidders_receipts.insert(
-            n_j.to_string(),
-            VerifiedReceipt {
-                bidder_prover_receipt: other_bidder_receipt.clone(),
-                auctioneer_verify_receipt: None,
-                n_j: n_j.clone(),
-                n_i: n_i.clone(),
-                c_j: c_j.clone(),
-                c_i: c_i.clone(),
-            },
-        );
-
-        BidderVerificationResult { is_verified: true, is_won, revealed_bid: revealed_v_i }
+        revealed_v_i
     }
 }
 
@@ -262,36 +209,6 @@ impl BidderHost {
         let mut rng = rand::thread_rng();
         let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
         Self::new(v_j, security_param)
-    }
-
-    /// Get information about a verified bidder
-    pub fn get_verified_bidder(&self, n_j: &BigInt) -> Option<&VerifiedReceipt> {
-        self.verified_bidders_receipts.get(&n_j.to_string())
-    }
-
-    /// Get all verified bidders
-    pub fn get_all_verified_bidders(&self) -> &HashMap<String, VerifiedReceipt> {
-        &self.verified_bidders_receipts
-    }
-
-    /// Get the total number of verified bidders
-    pub fn verified_bidder_count(&self) -> usize {
-        self.verified_bidders_receipts.len()
-    }
-
-    /// Check if a bidder with the given strain_id is verified
-    pub fn is_bidder_verified(&self, n_j: &BigInt) -> bool {
-        self.verified_bidders_receipts.contains_key(&n_j.to_string())
-    }
-
-    /// Remove a bidder from the verified registry
-    pub fn remove_verified_bidder(&mut self, n_j: &BigInt) -> Option<VerifiedReceipt> {
-        self.verified_bidders_receipts.remove(&n_j.to_string())
-    }
-
-    /// Clear all verified bidders (useful for starting a new auction)
-    pub fn clear_verified_bidders(&mut self) {
-        self.verified_bidders_receipts.clear();
     }
 
     /// Get the encrypted bid (c_j)
@@ -312,6 +229,46 @@ impl BidderHost {
     /// Get all receipts from all stages
     pub fn get_receipts(&self) -> &BidderReceipts {
         &self.receipts
+    }
+
+    /// Get the bidder's private key components
+    pub fn get_private_key(&self) -> (BigInt, BigInt) {
+        (self.p_j.clone(), self.q_j.clone())
+    }
+
+    /// Get the bidder's bid value
+    pub fn get_bid_value(&self) -> &BigInt {
+        &self.v_j
+    }
+
+    /// Get the bidder's security parameters
+    pub fn get_security_params(&self) -> &StrainSecurityParams {
+        &self.security_param
+    }
+
+    /// Get the verified other bidder receipts
+    pub fn get_other_bidders_prover_receipts(&self) -> &HashMap<BigInt, BidderVerifierResult> {
+        &self.verifier_results
+    }
+
+    /// Check if a specific other bidder is verified
+    pub fn is_other_bidder_verified(&self, n_j: &BigInt) -> Option<bool> {
+        self.verifier_results.get(n_j).map(|receipt| receipt.is_verified)
+    }
+
+    /// Get the join receipt
+    pub fn get_join_receipt(&self) -> Option<&Receipt> {
+        self.receipts.join_receipt.as_ref()
+    }
+
+    /// Get the verify receipt
+    pub fn get_verify_receipt(&self) -> Option<&Receipt> {
+        self.receipts.verify_receipt.as_ref()
+    }
+
+    /// Get all prover receipts
+    pub fn get_prover_receipts(&self) -> &Vec<Receipt> {
+        &self.receipts.prover_receipts
     }
 
     /// Generate random values for shuffle proof

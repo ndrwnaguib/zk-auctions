@@ -5,11 +5,13 @@ extern crate risc0_zkvm;
 extern crate zk_auctions_core;
 extern crate zk_auctions_methods;
 
-pub mod auctioneer_host;
-pub mod bidder_host;
 
-use crate::auctioneer_host::{AuctioneerHost, StrainAuctioneerHost};
-use crate::bidder_host::{BidderHost, StrainBidderHost};
+pub mod strain;
+use strain::auctioneer::AuctioneerHost;
+use strain::bidder::BidderHost;
+use zk_auctions_core::protocols::strain::bidder::StrainBidderHost;
+use zk_auctions_core::protocols::strain::auctioneer::StrainAuctioneerHost;
+
 use num_bigint::BigInt;
 use risc0_zkvm::Receipt;
 use zk_auctions_core::protocols::strain::StrainSecurityParams;
@@ -166,36 +168,34 @@ pub fn run_auction_scenario(bidder_configs: Vec<BidderConfig>) -> AuctionResult 
     let mut bidder_wins: Vec<usize> = vec![0; num_bidders]; // Count wins for each bidder
 
     for i in 0..bidders.len() {
+        // Collect all receipts where other bidders proved against bidder i
+        let mut receipts_for_bidder_i: Vec<Receipt> = Vec::new();
+        
         for j in 0..bidders.len() {
             if i == j {
-                continue;
+                continue; // Skip self
             }
-
+            
             // Get the receipt where bidder j was the prover against bidder i
             let receipt_idx = if j < i { j } else { j - 1 };
             let (ref receipt, _) = all_proofs[j][receipt_idx];
+            receipts_for_bidder_i.push(receipt.clone());
+        }
 
-            let verification_result = bidders[i].verify_other_bidder(receipt);
-
-            if verification_result.is_verified {
-                if verification_result.is_won {
-                    bidder_wins[i] += 1;
-                    println!(
-                        "  ✓ {} verified {}'s proof and WON the comparison",
-                        bidder_configs[i].name, bidder_configs[j].name
-                    );
-                } else {
-                    println!(
-                        "  ✓ {} verified {}'s proof but LOST the comparison",
-                        bidder_configs[i].name, bidder_configs[j].name
-                    );
-                }
-            } else {
-                println!(
-                    "  ✗ {} failed to verify {}'s proof",
-                    bidder_configs[i].name, bidder_configs[j].name
-                );
-            }
+        // Bidder i verifies all other bidders' proofs against them
+        let revealed_bid = bidders[i].verify_other_bidders(&receipts_for_bidder_i);
+        
+        if let Some(revealed_value) = revealed_bid {
+            bidder_wins[i] += 1;
+            println!(
+                "  ✓ {} verified all other bidders' proofs and WON with revealed bid ${}",
+                bidder_configs[i].name, revealed_value
+            );
+        } else {
+            println!(
+                "  ✗ {} lost the auction (verification failed or bid was lower)",
+                bidder_configs[i].name
+            );
         }
     }
 
@@ -208,11 +208,11 @@ pub fn run_auction_scenario(bidder_configs: Vec<BidderConfig>) -> AuctionResult 
         .map(|(idx, _)| idx)
         .collect();
 
-    if winner_indices.len() > 1 {
-        println!("  ⚠ Multiple bidders tied with {} wins each", max_wins);
+    if winner_indices.len() != 1 {
+        panic!("Auction error: Expected exactly 1 winner, but found {} winners with {} wins each. This indicates a problem with the verification logic.", winner_indices.len(), max_wins);
     }
 
-    let winner_idx = winner_indices[0]; // In case of tie, pick first one
+    let winner_idx = winner_indices[0];
     let winner_config = &bidder_configs[winner_idx];
 
     println!("\n🎉 AUCTION COMPLETED!");

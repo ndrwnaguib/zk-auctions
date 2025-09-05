@@ -1,16 +1,11 @@
 use num_bigint::BigInt;
-use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv, Receipt};
+use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
 use std::collections::HashMap;
+use zk_auctions_core::protocols::strain::auctioneer::StrainAuctioneerHost;
 use zk_auctions_core::protocols::strain::StrainSecurityParams;
 use zk_auctions_core::protocols::strain::VerifiedReceipt;
 use zk_auctions_core::utils::StrainProof;
 use zk_auctions_methods::AUCTIONEER_VERIFY_ELF;
-
-/// Trait defining the auctioneer host operations in the Strain protocol
-pub trait StrainAuctioneerHost {
-    /// Verify a receipt from a bidder
-    fn verify(&mut self, bidder_prover_receipt: &Receipt, private_output: &[u8]) -> bool;
-}
 
 /// AuctioneerHost represents the auctioneer in the auction system
 /// The auctioneer receives receipts from bidders and verifies them using strain_id

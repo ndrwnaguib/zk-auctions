@@ -4,7 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["methods"]
+members = [
+    "core",
+    "methods",
+    "methods/auctioneer-verify",
+    "methods/bidder-join", 
+    "methods/bidder-prover",
+    "methods/bidder-verify",
+    "application"
+]
 
 [dependencies]
 zk-auctions-core = { path = "core" }
@@ -19,6 +27,8 @@ rand_chacha = "0.3.1"
 num-traits = "0.2.19"
 sha2 = { git = "https://github.com/risc0/RustCrypto-hashes", tag = "sha2-v0.10.6-risczero.0" }
 anyhow = "1.0"
+
+## examples live under examples/, run with: cargo run --example <name>
 
 [features]
 cuda = ["risc0-zkvm/cuda"]

@@ -1,0 +1,18 @@
+[package]
+name = "zk-auctions-application"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zk-auctions = { path = ".." }
+zk-auctions-core = { path = "../core" }
+zk-auctions-methods = { path = "../methods" }
+num-bigint = { version = "0.4.6", features = ["rand", "serde"] }
+rand = "0.8"
+risc0-zkvm = { version = "1.2.2", default-features = false, features = ["std", "getrandom", "client", "heap-embedded-alloc"] }
+serde = { version = "1.0", features = ["derive"] }
+
+[lib]
+name = "zk_auctions_application"
+path = "src/lib.rs"
+
