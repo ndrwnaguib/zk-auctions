@@ -5,6 +5,7 @@ use zk_auctions_core::protocols::strain::{Auctioneer, StrainAuctioneer};
 use zk_auctions_core::utils::StrainProof;
 
 fn main() {
+    eprintln!("r0vm-strain-auction:auctioneer-verify: Starting main()");
     // Read inputs from the environment
     let (
         n_j,
@@ -29,11 +30,14 @@ fn main() {
         Vec<Vec<(BigInt, BigInt, BigInt)>>,
         u32,
     ) = env::read();
+    eprintln!("r0vm-strain-auction:auctioneer-verify: Inputs read from environment.");
 
     // Create auctioneer instance
     let auctioneer = Auctioneer::new();
+    eprintln!("r0vm-strain-auction:auctioneer-verify: Auctioneer instance created.");
 
     // Verify the evaluation proof
+    eprintln!("r0vm-strain-auction:auctioneer-verify: Verifying evaluation proof...");
     let eval_verification = auctioneer.verify_eval(
         proof_eval.clone(),
         plaintext_and_coins.clone(),
@@ -44,10 +48,18 @@ fn main() {
 
     // Check if verification succeeded
     let is_eval_verified = match eval_verification {
-        Some(_) => true,
-        None => false,
+        Some(_) => {
+            eprintln!("r0vm-strain-auction:auctioneer-verify: Evaluation proof verified successfully.");
+            true
+        },
+        None => {
+            eprintln!("r0vm-strain-auction:auctioneer-verify: Evaluation proof verification failed.");
+            false
+        },
     };
 
     // Commit the verification result
+    eprintln!("r0vm-strain-auction:auctioneer-verify: Committing verification result: {}", is_eval_verified);
     env::commit(&is_eval_verified);
+    eprintln!("r0vm-strain-auction:auctioneer-verify: Done.");
 }
