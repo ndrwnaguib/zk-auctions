@@ -5,12 +5,11 @@ extern crate risc0_zkvm;
 extern crate zk_auctions_core;
 extern crate zk_auctions_methods;
 
-
 pub mod strain;
 use strain::auctioneer::AuctioneerHost;
 use strain::bidder::BidderHost;
-use zk_auctions_core::protocols::strain::bidder::StrainBidderHost;
 use zk_auctions_core::protocols::strain::auctioneer::StrainAuctioneerHost;
+use zk_auctions_core::protocols::strain::bidder::StrainBidderHost;
 
 use num_bigint::BigInt;
 use risc0_zkvm::Receipt;
@@ -55,7 +54,7 @@ pub fn run_auction_scenario(bidder_configs: Vec<BidderConfig>) -> AuctionResult 
     // Create bidders - each bidder joins the auction
     let mut bidders: Vec<BidderHost> = Vec::new();
     for config in &bidder_configs {
-        // println!("{} joining auction with bid ${}...", config.name, config.bid_value);
+        println!("{} joining auction with bid ${}...", config.name, config.bid_value);
         let bidder = BidderHost::new(config.bid_value.clone(), soundness.clone());
         bidders.push(bidder);
     }
@@ -170,12 +169,12 @@ pub fn run_auction_scenario(bidder_configs: Vec<BidderConfig>) -> AuctionResult 
     for i in 0..bidders.len() {
         // Collect all receipts where other bidders proved against bidder i
         let mut receipts_for_bidder_i: Vec<Receipt> = Vec::new();
-        
+
         for j in 0..bidders.len() {
             if i == j {
                 continue; // Skip self
             }
-            
+
             // Get the receipt where bidder j was the prover against bidder i
             let receipt_idx = if j < i { j } else { j - 1 };
             let (ref receipt, _) = all_proofs[j][receipt_idx];
@@ -184,7 +183,7 @@ pub fn run_auction_scenario(bidder_configs: Vec<BidderConfig>) -> AuctionResult 
 
         // Bidder i verifies all other bidders' proofs against them
         let revealed_bid = bidders[i].verify_other_bidders(&receipts_for_bidder_i);
-        
+
         if let Some(revealed_value) = revealed_bid {
             bidder_wins[i] += 1;
             println!(
@@ -217,9 +216,7 @@ pub fn run_auction_scenario(bidder_configs: Vec<BidderConfig>) -> AuctionResult 
 
     println!("\n🎉 AUCTION COMPLETED!");
     println!("Winner: {} with bid ${}", winner_config.name, winner_config.bid_value);
-    println!("Total pairwise comparisons: {}", num_bidders * (num_bidders - 1));
-
-    // Create result
+    println!("Total pairwise comparisons: {}", num_bidders * (num_bidders - 1)); // Create result
     let all_bids: Vec<(String, BigInt)> = bidder_configs
         .iter()
         .map(|config| (config.name.clone(), config.bid_value.clone()))

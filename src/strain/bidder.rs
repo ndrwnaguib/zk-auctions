@@ -98,8 +98,8 @@ impl StrainBidderHost for BidderHost {
             bidder_join_receipt.journal.decode().expect("Failed to decode keygen results");
 
         Self {
-            p_j: BigInt::from(0),
-            q_j: BigInt::from(0),
+            p_j,
+            q_j,
             n_j,
             v_j,
             c_j,
@@ -128,7 +128,7 @@ impl StrainBidderHost for BidderHost {
     /// A tuple containing the ZK proof receipt and the private output as a byte vector.
     fn prove(&mut self, c_i: &Vec<BigInt>, n_i: &BigInt, r_i: &Vec<BigInt>) -> (Receipt, Vec<u8>) {
         // Generate random values for the shuffle proof
-        let (rand1, rand2, rand3, rand4) = self.generate_shuffle_randoms();
+        let (rand1, rand2, rand3, rand4) = self.generate_shuffle_randoms(n_i);
 
         let mut private_output = Vec::new();
         // Set up the execution environment
@@ -152,10 +152,13 @@ impl StrainBidderHost for BidderHost {
 
         // Store the receipt and private output
         self.receipts.prover_receipts.push(bidder_prover_receipt.clone());
-        self.prover_results.insert(n_i.clone(), BidderProverResult {
-            prover_receipt: bidder_prover_receipt.clone(),
-            private_output: private_output.clone(),
-        });
+        self.prover_results.insert(
+            n_i.clone(),
+            BidderProverResult {
+                prover_receipt: bidder_prover_receipt.clone(),
+                private_output: private_output.clone(),
+            },
+        );
 
         (bidder_prover_receipt, private_output)
     }
@@ -170,7 +173,7 @@ impl StrainBidderHost for BidderHost {
         // First verify the receipt itself using BIDDER_PROVER_ID
         other_bidders_prover_receipts.iter().for_each(|receipt| {
             receipt.verify(BIDDER_PROVER_ID).expect("Failed to verify the receipt");
-        }); 
+        });
 
         // Use the bidder-verify guest circuit to perform verification and comparison
         let env = ExecutorEnv::builder()
@@ -186,9 +189,8 @@ impl StrainBidderHost for BidderHost {
 
         // Execute the bidder-verify guest circuit
         let session = default_prover();
-        let bidder_verify_prove_info = session
-            .prove(env, BIDDER_VERIFY_ELF)
-            .expect("Failed to prove bidder verification");
+        let bidder_verify_prove_info =
+            session.prove(env, BIDDER_VERIFY_ELF).expect("Failed to prove bidder verification");
 
         let bidder_verify_receipt = bidder_verify_prove_info.receipt;
 
@@ -274,6 +276,7 @@ impl BidderHost {
     /// Generate random values for shuffle proof
     fn generate_shuffle_randoms(
         &mut self,
+        n_i: &BigInt,
     ) -> (Vec<Vec<BigInt>>, Vec<Vec<BigInt>>, Vec<Vec<BigInt>>, Vec<Vec<BigInt>>) {
         let mut rand1: Vec<Vec<BigInt>> = Vec::with_capacity(32);
         let mut rand2: Vec<Vec<BigInt>> = Vec::with_capacity(32);
@@ -287,10 +290,10 @@ impl BidderHost {
             let mut y2 = Vec::with_capacity(128);
 
             for _ in 0..128 {
-                x.push(get_next_random(&self.n_j));
-                y.push(get_next_random(&self.n_j));
-                x2.push(get_next_random(&self.n_j));
-                y2.push(get_next_random(&self.n_j));
+                x.push(get_next_random(n_i));
+                y.push(get_next_random(n_i));
+                x2.push(get_next_random(n_i));
+                y2.push(get_next_random(n_i));
             }
 
             rand1.push(x);

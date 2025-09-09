@@ -23,17 +23,7 @@ fn main() {
 
     // Read inputs from the environment.
     eprintln!("r0vm-strain-auction:bidder-prove: Reading inputs from environment");
-    let (
-        c_j_proofeval,
-        n_j,
-        r_j,
-        v_j,
-        p_j,
-        q_j,
-        c_i,
-        n_i,
-        r_i
-    ): (
+    let (c_j_proofeval, n_j, r_j, v_j, p_j, q_j, c_i, n_i, r_i): (
         Vec<BigInt>,
         BigInt,
         Vec<BigInt>,
@@ -42,7 +32,7 @@ fn main() {
         BigInt,
         Vec<BigInt>,
         BigInt,
-        Vec<BigInt>
+        Vec<BigInt>,
     ) = env::read();
     let (rand1, rand2, rand3, rand4): (
         Vec<Vec<BigInt>>,
@@ -53,7 +43,6 @@ fn main() {
     eprintln!("r0vm-strain-auction:bidder-prove: Successfully read all inputs from environment");
 
     eprintln!("r0vm-strain-auction:bidder-prove: Generating random values and encrypting");
-    //let c_j_proofeval = encrypt_gm(&v_j, &n_j);
     let c_ji = encrypt_gm(&v_j, &n_i);
     let r_ji = rand32(&n_i);
     eprintln!("r0vm-strain-auction:bidder-prove: Computing proof_eval");
@@ -71,6 +60,7 @@ fn main() {
     eprintln!("r0vm-strain-auction:bidder-prove: Completed proof_eval computation");
 
     eprintln!("r0vm-strain-auction:bidder-prove: Computing proof_enc");
+    // TODO: this also could be computed in the bidder-join guest instead
     let c_j_proofenc = encrypt_gm_coin(&v_j.clone(), &n_j, &r_j);
     let proof_enc: Vec<Vec<Vec<BigInt>>> = bidder.compare_proof_enc(c_j_proofenc, &n_j, &r_j);
     eprintln!("r0vm-strain-auction:bidder-prove: Completed proof_enc computation");
@@ -109,8 +99,8 @@ fn main() {
         c_i.clone(),
         proof_enc,
         (proof_dlog, y_j, y_pow_r, z_pow_r),
-        //(proof_shuffle, res),
-        (res),
+        // (proof_shuffle, res),
+        res,
     );
 
     eprintln!("r0vm-strain-auction:bidder-prove: Committing public results");

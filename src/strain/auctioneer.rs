@@ -43,7 +43,8 @@ impl StrainAuctioneerHost for AuctioneerHost {
             c_i,
             proof_enc,
             (proof_dlog, y_j, y_pow_r, z_pow_r),
-            (proof_shuffle, res),
+            // (proof_shuffle, res),
+            res
         ): (
             BigInt,
             BigInt,
@@ -51,7 +52,8 @@ impl StrainAuctioneerHost for AuctioneerHost {
             Vec<BigInt>,
             Vec<Vec<Vec<BigInt>>>,
             (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
-            (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
+            // (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
+            Vec<Vec<BigInt>>
         ) = bidder_prover_receipt
             .journal
             .decode()
@@ -73,7 +75,8 @@ impl StrainAuctioneerHost for AuctioneerHost {
                 c_i.clone(),
                 proof_enc.clone(),
                 (proof_dlog.clone(), y_j.clone(), y_pow_r.clone(), z_pow_r.clone()),
-                (proof_shuffle.clone(), res.clone()),
+                // (proof_shuffle.clone(), res.clone()),
+                res.clone(),
                 proof_eval.clone(),
                 plaintext_and_coins.clone(),
                 self.soundness_param.sound_param,
