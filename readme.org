@@ -126,6 +126,29 @@ reasons:
  * Rapid performance.
  * Seamless porting to web browsers with `wasm-pack`.
 
+
+* Demo
+
+Currently, the host represents both an auctioneer and a bidder, where the guest code represents the other bidder. The bid values are currently fixed to 1500 and 5000.
+
+To run, without generating proofs (i.e., in DEV mode), please run:
+
+#+BEGIN_SRC
+   export RISC0_DEV_MODE=true; cargo run --release
+#+END_SRC
+
+To generate the proofs, please run:
+
+#+begin_src
+  cargo run --release
+#+end_src
+
+You should expect the following output
+
+#+begin_src
+  The second bidder's bid is greater than the first bidder's bid.
+#+end_src
+
 * Team
 
 ** Team members
