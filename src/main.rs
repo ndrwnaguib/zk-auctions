@@ -25,7 +25,8 @@ fn main() {
     let keys_i = generate_keys(None);
     let n_i = &keys_i.pub_key;
 
-    let v_i: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+    // let v_i: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+    let v_i: BigInt = BigInt::from(1500);
 
     let r_i: Vec<BigInt> = rand32(n_i);
     let c_i: Vec<BigInt> = encrypt_gm(&v_i, n_i);

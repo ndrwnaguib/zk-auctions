@@ -21,7 +21,8 @@ fn main() {
     let n_j: BigInt = keys_j.pub_key;
 
     // Generate a second random value for v2.
-    let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+    // let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+    let v_j: BigInt = BigInt::from(5000);
 
     // Read inputs from the environment.
     let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
