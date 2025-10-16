@@ -25,8 +25,9 @@ fn main() {
     eprintln!("[zkvm-guest] Keys generated, n_j bit length: {}", n_j.bits());
 
     // Generate a second random value for v2.
-    // let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let v_j: BigInt = BigInt::from(5000);
+    //let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+    let v_j: BigInt = BigInt::from(219134682);
+    eprintln!("[zkvm-guest] Second bidder's bid v_j = {}", v_j);
 
     // Read inputs from the environment.
     eprintln!("[zkvm-guest] Reading inputs from environment");

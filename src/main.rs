@@ -15,6 +15,7 @@ use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_n
 use zk_auctions_core::utils::{
     compare_leq_honest, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
 };
+use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
@@ -26,8 +27,9 @@ fn main() {
     let n_i = &keys_i.pub_key;
     println!("[DEBUG] Public key n_i = {}", n_i);
 
-    // let v_i: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let v_i: BigInt = BigInt::from(1500);
+    //let v_i: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
+    let v_i: BigInt = BigInt::from(1595375260);
+    eprintln!("[DEBUG] First bidder's bid v_i = {}", v_i);
 
     let r_i: Vec<BigInt> = rand32(n_i);
     let c_i: Vec<BigInt> = encrypt_gm(&v_i, n_i);
@@ -97,8 +99,9 @@ fn main() {
     println!("[DEBUG] Got n_j = {}", n_j);
 
     println!("[DEBUG] Verifying proof_eval...");
+    let auctioneer = Auctioneer::new();
     let eval_res =
-        Some(verify_eval(proof_eval.clone(), plaintext_and_coins.clone(), n_i, &n_j, sound_param));
+        Some(auctioneer.verify_eval(proof_eval.clone(), plaintext_and_coins.clone(), n_i, &n_j, sound_param));
     assert!(eval_res.is_some(), "`proof_eval` verification failed.");
     println!("[DEBUG] proof_eval verification passed.");
 
