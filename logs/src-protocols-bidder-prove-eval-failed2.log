@@ -1,0 +1,129 @@
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)     Compiling zk-auctions-methods v0.1.0 (/home/iskander/Projects/zk-auctions-archive/methods)
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  warning: unused variable: `cipher_i_and`
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)     --> core/src/protocols/strain/bidder.rs:446:13
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)      |
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  446 |         let cipher_i_and = embed_and(cipher_i, pub_key_j, rand1);
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)      |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_cipher_i_and`
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)      |
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)      = note: `#[warn(unused_variables)]` on by default
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  warning: unused variable: `number1`
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)     --> core/src/protocols/strain/bidder.rs:431:9
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)      |
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  431 |         number1: &BigInt,
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)      |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_number1`
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  warning: `zk-auctions-core` (lib) generated 2 warnings
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)     Compiling zk-auctions v0.1.0 (/home/iskander/Projects/zk-auctions-archive)
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  warning: unused import: `RandBigInt`
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)   --> src/main.rs:8:26
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)    |
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  8 | use num_bigint::{BigInt, RandBigInt};
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)    |                          ^^^^^^^^^^
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)    |
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)    = note: `#[warn(unused_imports)]` on by default
+[2025-10-17 09:55:29] (+0.00 mins | took: 0.00 mins)  
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.02 mins)  warning: unused variable: `rng`
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)    --> src/main.rs:24:13
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  24 |     let mut rng = rand::thread_rng();
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |             ^^^ help: if this is intentional, prefix it with an underscore: `_rng`
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     = note: `#[warn(unused_variables)]` on by default
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  warning: unused variable: `proof_shuffle`
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)    --> src/main.rs:93:64
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  93 |     let (n_j, proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res)): (
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |                                                                ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_proof_shuffle`
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  warning: variable does not need to be mutable
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)    --> src/main.rs:24:9
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  24 |     let mut rng = rand::thread_rng();
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |         ----^^^
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |         |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |         help: remove this `mut`
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     = note: `#[warn(unused_mut)]` on by default
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  warning: function `verify_eval` is never used
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     --> src/main.rs:159:4
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)      |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  159 | fn verify_eval(
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)      |    ^^^^^^^^^^^
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)      |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)      = note: `#[warn(dead_code)]` on by default
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  warning: function `verify_shuffle` is never used
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)     --> src/main.rs:240:4
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)      |
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  240 | fn verify_shuffle(proof: &HashMap<u32, StrainProof>, n2: &BigInt, res: &[Vec<BigInt>]) -> bool {
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)      |    ^^^^^^^^^^^^^^
+[2025-10-17 09:55:30] (+0.02 mins | took: 0.00 mins)  
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.02 mins)  warning: `zk-auctions` (bin "zk-auctions") generated 6 warnings (run `cargo fix --bin "zk-auctions"` to apply 2 suggestions)
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)      Finished `release` profile [optimized] target(s) in 1.96s
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)       Running `target/release/zk-auctions`
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [DEBUG] Public key n_i = 1208636823964853353486538974806551967619693273138155579848851197589875515070704020558292165987040341488924069597526142272856950377916317844731922676407724555096008396717434260057210076844484943301290794236795668433503590260111766536077083119934691394155993326334552244361461814582711662070443469843403415374921953703399901034155664887073140502049565343282318517324105611095247073167739689201272167181833364478667802207323347036272833805098263866068517194450876129
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [DEBUG] First bidder's bid v_i = 1500
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [DEBUG] First bidder's encrypted value c_i (len=32)
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [DEBUG] sound_param = 40 sigma = 40
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [DEBUG] Building ExecutorEnv...
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [DEBUG] ExecutorEnv built successfully.
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [DEBUG] Running zkVM (prove)...
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  WARNING: proving in dev mode. This will not generate valid, secure proofs.
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [zkvm-guest] Starting main function
+[2025-10-17 09:55:31] (+0.03 mins | took: 0.00 mins)  [zkvm-guest] Generating keys_j
+[2025-10-17 10:06:59] (+11.50 mins | took: 11.47 mins)  [zkvm-guest] Keys generated, n_j bit length: 1536
+[2025-10-17 10:06:59] (+11.50 mins | took: 0.00 mins)  [zkvm-guest] Second bidder's bid v_j = 5000
+[2025-10-17 10:06:59] (+11.50 mins | took: 0.00 mins)  [zkvm-guest] Reading inputs from environment
+[2025-10-17 10:06:59] (+11.50 mins | took: 0.00 mins)  [zkvm-guest] Read c_i (len: 32), n_i (bits: 1536), r_i (len: 32)
+[2025-10-17 10:06:59] (+11.50 mins | took: 0.00 mins)  [zkvm-guest] Read sigma and sound_param: 40
+[2025-10-17 10:07:11] (+11.70 mins | took: 0.20 mins)  [zkvm-guest] Read random values
+[2025-10-17 10:07:11] (+11.70 mins | took: 0.00 mins)  [zkvm-guest] Computing proof_eval
+[2025-10-17 10:13:34] (+18.08 mins | took: 6.38 mins)  [zkvm-guest] proof_eval completed
+[2025-10-17 10:13:34] (+18.08 mins | took: 0.00 mins)  [zkvm-guest] Computing proof_enc
+[2025-10-17 10:19:29] (+24.00 mins | took: 5.92 mins)  [zkvm-guest] proof_enc completed
+[2025-10-17 10:19:29] (+24.00 mins | took: 0.00 mins)  [zkvm-guest] Computing proof_dlog
+[2025-10-17 10:30:45] (+35.27 mins | took: 11.27 mins)  [zkvm-guest] proof_dlog completed
+[2025-10-17 10:30:45] (+35.27 mins | took: 0.00 mins)  [zkvm-guest] Computing gm_eval_honest
+[2025-10-17 10:37:30] (+42.02 mins | took: 6.75 mins)  [zkvm-guest] gm_eval_honest completed, res length: 32
+[2025-10-17 10:37:30] (+42.02 mins | took: 0.00 mins)  [zkvm-guest] Using empty proof_shuffle
+[2025-10-17 10:37:30] (+42.02 mins | took: 0.00 mins)  [zkvm-guest] Writing private data
+[2025-10-17 10:37:39] (+42.17 mins | took: 0.15 mins)  [zkvm-guest] Committing public results
+[2025-10-17 10:37:42] (+42.22 mins | took: 0.05 mins)  [zkvm-guest] Main function completed successfully
+[2025-10-17 10:37:42] (+42.22 mins | took: 0.00 mins)  WARNING: Proving in dev mode does not generate a valid receipt. Receipts generated from this process are invalid and should never be used in production.
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.02 mins)  [DEBUG] zkVM proof generated. Verifying...
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  [DEBUG] zkVM proof verified.
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  [DEBUG] Reading private output...
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  [DEBUG] Private output deserialization successful.
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  [DEBUG] Decoding public results from journal...
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  [DEBUG] Got n_j = 1208075349235585928229343688062625025911203069734829989651775352415042955194672990876554851883321199620127308202805071295829722957503442805229272525987088750783149851428210863036312162543444980029772563289436289805867736586868727071842497627612576909984184454673941203981150510128215578029249508210825418539570288449646468047514044546433030683675534546755749818867179659158305123243217178003378471870032104474599683928327026209424946142480274918351227533781492997
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  [DEBUG] Verifying proof_eval...
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  thread 'main' panicked at core/src/gm.rs:75:5:
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  assertion failed: r >= BigInt::zero() && r < *n
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)  stack backtrace:
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     0:     0x561f25162812 - <std::sys::backtrace::BacktraceLock::print::DisplayBacktrace as core::fmt::Display>::fmt::hdcfcb6d4c8489523
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     1:     0x561f2518a593 - core::fmt::write::h8a494366950f23bb
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     2:     0x561f2515f113 - std::io::Write::write_fmt::h6556609fca33d0b1
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     3:     0x561f25162662 - std::sys::backtrace::BacktraceLock::print::hb2a626a81e06b2dc
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     4:     0x561f25163893 - std::panicking::default_hook::{{closure}}::h4f78485264f12d10
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     5:     0x561f25163675 - std::panicking::default_hook::h2c66fc99e962531d
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     6:     0x561f251642a5 - std::panicking::rust_panic_with_hook::h33ac55f64bbd807d
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     7:     0x561f25164006 - std::panicking::begin_panic_handler::{{closure}}::h30e7cb89678a57fe
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     8:     0x561f25162d19 - std::sys::backtrace::__rust_end_short_backtrace::hed60f27456c16ced
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)     9:     0x561f25163ccd - __rustc[de2ca18b4c54d5b8]::rust_begin_unwind
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    10:     0x561f251883a0 - core::panicking::panic_fmt::h62f63d096dd276af
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    11:     0x561f2518842c - core::panicking::panic::h89a5f2df32b0508a
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    12:     0x561f24f12275 - zk_auctions_core::gm::encrypt_bit_gm_coin::h81506600ed9bd837
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    13:     0x561f24f1de4f - <zk_auctions_core::protocols::strain::auctioneer::Auctioneer as zk_auctions_core::protocols::strain::auctioneer::StrainAuctioneer>::verify_eval::he935104a8f7bc5fc
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    14:     0x561f24ef97a4 - zk_auctions::main::hb091adefd5b0f642
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    15:     0x561f24f0b983 - std::sys::backtrace::__rust_begin_short_backtrace::h9061e530fbcdd265
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    16:     0x561f24f0b979 - std::rt::lang_start::{{closure}}::h0fcc048e9a9bacfc
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    17:     0x561f251579f0 - std::rt::lang_start_internal::h34f9328d113fd60a
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    18:     0x561f24efc925 - main
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    19:     0x7fc5c4827675 - <unknown>
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    20:     0x7fc5c4827729 - __libc_start_main
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    21:     0x561f24ef7025 - _start
+[2025-10-17 10:37:43] (+42.23 mins | took: 0.00 mins)    22:                0x0 - <unknown>
