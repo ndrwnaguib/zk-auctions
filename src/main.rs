@@ -12,10 +12,10 @@ use rand::{Rng, SeedableRng};
 use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
 use std::collections::HashMap;
 use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
+use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
 use zk_auctions_core::utils::{
     compare_leq_honest, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
 };
-use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
 use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
 
 fn main() {
@@ -106,8 +106,13 @@ fn main() {
     println!("[DEBUG] sound_param = {:?}", sound_param);
 
     let auctioneer = Auctioneer::new();
-    let eval_res =
-        Some(auctioneer.verify_eval(proof_eval.clone(), plaintext_and_coins.clone(), n_i, &n_j, sound_param));
+    let eval_res = Some(auctioneer.verify_eval(
+        proof_eval.clone(),
+        plaintext_and_coins.clone(),
+        n_i,
+        &n_j,
+        sound_param,
+    ));
     assert!(eval_res.is_some(), "`proof_eval` verification failed.");
     println!("[DEBUG] proof_eval verification passed.");
 
