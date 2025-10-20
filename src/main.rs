@@ -28,7 +28,7 @@ fn main() {
     println!("[DEBUG] Public key n_i = {}", n_i);
 
     //let v_i: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let v_i: BigInt = BigInt::from(1595375260);
+    let v_i: BigInt = BigInt::from(1500);
     eprintln!("[DEBUG] First bidder's bid v_i = {}", v_i);
 
     let r_i: Vec<BigInt> = rand32(n_i);
@@ -99,6 +99,12 @@ fn main() {
     println!("[DEBUG] Got n_j = {}", n_j);
 
     println!("[DEBUG] Verifying proof_eval...");
+    println!("[DEBUG] proof_eval = {:?}", proof_eval);
+    println!("[DEBUG] plaintext_and_coins = {:?}", plaintext_and_coins);
+    println!("[DEBUG] n_i = {:?}", n_i);
+    println!("[DEBUG] n_j = {:?}", n_j);
+    println!("[DEBUG] sound_param = {:?}", sound_param);
+
     let auctioneer = Auctioneer::new();
     let eval_res =
         Some(auctioneer.verify_eval(proof_eval.clone(), plaintext_and_coins.clone(), n_i, &n_j, sound_param));

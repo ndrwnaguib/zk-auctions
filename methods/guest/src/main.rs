@@ -14,6 +14,8 @@ use zk_auctions_core::utils::{
     compute_permutation, divm, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
 };
 
+use zk_auctions_core::protocols::strain::bidder::{Bidder, StrainBidder};
+
 fn main() {
     eprintln!("[zkvm-guest] Starting main function");
     let mut rng = rand::thread_rng();
@@ -26,7 +28,7 @@ fn main() {
 
     // Generate a second random value for v2.
     //let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let v_j: BigInt = BigInt::from(219134682);
+    let v_j: BigInt = BigInt::from(5000);
     eprintln!("[zkvm-guest] Second bidder's bid v_j = {}", v_j);
 
     // Read inputs from the environment.
@@ -48,7 +50,8 @@ fn main() {
     let c_j_proofeval = encrypt_gm(&v_j, &n_j);
     let c_ji = encrypt_gm(&v_j, &n_i);
     let r_ji = rand32(&n_i);
-    let (proof_eval, plaintext_and_coins) = proof_eval(
+    let bidder = Bidder::new();
+    let (proof_eval, plaintext_and_coins) = bidder.proof_eval(
         &c_j_proofeval,
         &c_i,
         &c_ji,
