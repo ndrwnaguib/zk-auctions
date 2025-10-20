@@ -2,9 +2,9 @@ use num_bigint::{BigInt, RandBigInt};
 use rand::rngs::StdRng;
 use rand::seq::SliceRandom;
 use rand::{Rng, SeedableRng};
+use risc0_zkvm::Receipt;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use risc0_zkvm::Receipt;
 
 use crate::gm::{dot_mod, embed_and, encrypt_bit_gm_coin, StrainRandomGenerator};
 use crate::utils::{
@@ -56,13 +56,16 @@ pub trait StrainBidderHost {
     fn prove(&mut self, c_i: &Vec<BigInt>, n_i: &BigInt, r_i: &Vec<BigInt>) -> (Receipt, Vec<u8>);
 
     /// Verify another bidder's receipt and perform comparison
-    fn verify_other_bidders(&mut self, other_bidder_prover_receipts: &Vec<Receipt>) -> Option<BigInt>;
+    fn verify_other_bidders(
+        &mut self,
+        other_bidder_prover_receipts: &Vec<Receipt>,
+    ) -> Option<BigInt>;
 }
 
 /// Trait defining the bidder's verification operations in the Strain protocol
 pub trait StrainBidder {
     /// Compute proof of encryption
-    fn compare_proof_enc(
+    fn compute_proof_enc(
         &self,
         c1: Vec<BigInt>,
         n1: &BigInt,
@@ -89,6 +92,7 @@ pub trait StrainBidder {
         sigma: &BigInt,
         y: &BigInt,
         n: &BigInt,
+        iters: Option<u32>,
     ) -> Vec<(BigInt, BigInt, BigInt)>;
 
     /// Compute proof of shuffle
@@ -154,7 +158,7 @@ impl Default for Bidder {
 }
 
 impl StrainBidder for Bidder {
-    fn compare_proof_enc(
+    fn compute_proof_enc(
         &self,
         c1: Vec<BigInt>,
         n1: &BigInt,
@@ -165,14 +169,14 @@ impl StrainBidder for Bidder {
         let mut r1s: Vec<Vec<BigInt>> = Vec::new();
         let mut r1t4s: Vec<Vec<BigInt>> = Vec::new();
 
-        for _ in 0..self.config.challenges_length {
+        for _ in 0..40 {
             let mut r1s_per_bit: Vec<BigInt> = Vec::new();
             let mut r1t4s_per_bit: Vec<BigInt> = Vec::new();
 
             for _ in &c1 {
                 let r_1 = rng.gen_bigint_range(&BigInt::zero(), n1);
                 r1s_per_bit.push(r_1.clone());
-                r1t4s_per_bit.push(r_1.modpow(&BigInt::from(self.config.modpow_exponent), n1));
+                r1t4s_per_bit.push(r_1.modpow(&BigInt::from(4), n1));
             }
 
             r1s.push(r1s_per_bit);
@@ -188,7 +192,7 @@ impl StrainBidder for Bidder {
         proof.push(vec![c1.clone()]);
         proof.push(r1t4s.clone());
 
-        for (i, bit) in bitstring.chars().enumerate().take(self.config.challenges_length as usize) {
+        for (i, bit) in bitstring.chars().enumerate().take(40) {
             let mut proof_per_bit: Vec<BigInt> = Vec::new();
             let q = if bit == '1' { BigInt::one() } else { BigInt::zero() };
 
@@ -245,7 +249,9 @@ impl StrainBidder for Bidder {
                 delta_row
                     .iter()
                     .enumerate()
-                    .map(|(m, delta)| encrypt_bit_gm_coin(delta, pub_key_i, coins_gamma[l][m].clone()))
+                    .map(|(m, delta)| {
+                        encrypt_bit_gm_coin(delta, pub_key_i, coins_gamma[l][m].clone())
+                    })
                     .collect()
             })
             .collect();
@@ -257,7 +263,9 @@ impl StrainBidder for Bidder {
                 delta_row
                     .iter()
                     .enumerate()
-                    .map(|(m, delta)| encrypt_bit_gm_coin(delta, pub_key_j, coins_gamma2[l][m].clone()))
+                    .map(|(m, delta)| {
+                        encrypt_bit_gm_coin(delta, pub_key_j, coins_gamma2[l][m].clone())
+                    })
                     .collect()
             })
             .collect();
@@ -309,8 +317,9 @@ impl StrainBidder for Bidder {
         sigma: &BigInt,
         y: &BigInt,
         n: &BigInt,
+        iters: Option<u32>,
     ) -> Vec<(BigInt, BigInt, BigInt)> {
-        let iters = self.config.default_dlog_iters;
+        let iters = iters.unwrap_or(/* default value */ 10);
 
         let mut p_dlog = Vec::new();
         let z = n - BigInt::one();
@@ -432,31 +441,31 @@ impl StrainBidder for Bidder {
         rand3: &Vec<Vec<BigInt>>,
         rand4: &Vec<Vec<BigInt>>,
     ) -> Vec<Vec<BigInt>> {
-        assert_eq!(cipher_j.len(), self.config.bit_length);
-
+        assert_eq!(cipher_j.len(), 32);
+    
         let neg_cipher_i: Vec<BigInt> =
             cipher_i.iter().map(|x| x * (pub_key_j - BigInt::one()) % pub_key_j).collect();
         let c_neg_xor = dot_mod(&neg_cipher_i, cipher_j, pub_key_j);
-
+    
         let cipher_i_and = embed_and(cipher_i, pub_key_j, rand1);
         let cipher_j_and = embed_and(cipher_j, pub_key_j, rand2);
         let neg_cipher_i_and = embed_and(&neg_cipher_i, pub_key_j, rand3);
         let c_neg_xor_and = embed_and(&c_neg_xor, pub_key_j, rand4);
-
+    
         let mut res = Vec::new();
-        for l in 0..self.config.bit_length {
+        for l in 0..32 {
             let mut temp = dot_mod(&cipher_j_and[l], &neg_cipher_i_and[l], pub_key_j);
             for u in 0..l {
                 temp = dot_mod(&temp, &c_neg_xor_and[u], pub_key_j);
             }
             res.push(temp);
         }
-
+    
         let mut rng = rand::thread_rng();
         res.shuffle(&mut rng);
         res
     }
-
+    
     fn verify_proof_enc(&self, proof: Vec<Vec<Vec<BigInt>>>) -> bool {
         let n1 = &proof[0][0][0];
 
