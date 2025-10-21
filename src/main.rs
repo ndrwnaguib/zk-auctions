@@ -12,6 +12,7 @@ use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
 use std::collections::HashMap;
 use std::thread;
 use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
 use zk_auctions_core::gm::{get_next_random, generate_keys, encrypt_gm};
 use zk_auctions_core::utils::rand32;
 use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
@@ -19,6 +20,21 @@ use zk_auctions_core::utils::{
     compare_leq_honest, get_rand_jn1, hash_flat, set_rand_seed, StrainProof,
 };
 use zk_auctions_methods::{BIDDER_PROVER_ELF, BIDDER_PROVER_ID, BIDDER_JOIN_ELF, BIDDER_JOIN_ID};
+
+// Struct to store bidder prove results
+#[derive(Clone)]
+struct BidderProveResult {
+    proof_eval: Vec<Vec<Vec<BigInt>>>,
+    plaintext_and_coins: Vec<Vec<(BigInt, BigInt, BigInt)>>,
+    n_j_from_proof: BigInt,
+    proof_enc: Vec<Vec<Vec<BigInt>>>,
+    proof_dlog: Vec<(BigInt, BigInt, BigInt)>,
+    y_j: BigInt,
+    y_pow_r: BigInt,
+    z_pow_r: BigInt,
+    proof_shuffle: HashMap<u32, StrainProof>,
+    res: Vec<Vec<BigInt>>,
+}
 
 fn auctioneer_verify(
     proof_eval: &Vec<Vec<Vec<BigInt>>>,
@@ -94,6 +110,71 @@ fn mock_bidder_join(bidder_id: String, bid_value: BigInt) -> (BigInt, Vec<BigInt
     println!("[host] Mock bidder {} encrypted value c_j (len={})", bidder_id, c_j.len());
     
     (n_j, c_j, r_j, (p_j, q_j))
+}
+
+fn run_phase2_parallel(
+    bidders: Vec<(String, BigInt, Vec<BigInt>, Vec<BigInt>, BigInt, BigInt, BigInt)>, // (id, n, c, r, v, p, q)
+    sound_param: usize,
+    sigma: BigInt,
+) -> HashMap<String, Vec<BidderProveResult>> {
+    println!("[host] PHASE 2: Running bidder_prove in parallel for all bidder pairs...");
+    
+    let mut results: HashMap<String, Vec<BidderProveResult>> = HashMap::new();
+    let results_mutex = Arc::new(Mutex::new(&mut results));
+    let (tx, rx) = mpsc::channel();
+    
+    // Create all possible bidder pairs
+    let mut threads = Vec::new();
+    
+    for i in 0..bidders.len() {
+        for j in 0..bidders.len() {
+            if i != j {
+                let (bidder_i_id, n_i, c_i, r_i, v_i, p_i, q_i) = bidders[i].clone();
+                let (bidder_j_id, n_j, c_j, r_j, v_j, p_j, q_j) = bidders[j].clone();
+                let tx_clone = tx.clone();
+                let sigma_clone = sigma.clone();
+                
+                let handle = thread::spawn(move || {
+                    println!("[host] Starting bidder_prove: {} vs {}", bidder_j_id, bidder_i_id);
+                    
+                    let (proof_eval, plaintext_and_coins, n_j_from_proof, proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res)) = 
+                        bidder_prove(bidder_j_id.clone(), c_i, n_i, r_i, n_j, r_j, v_j, p_j, q_j, sound_param, sigma_clone);
+                    
+                    let result = BidderProveResult {
+                        proof_eval,
+                        plaintext_and_coins,
+                        n_j_from_proof,
+                        proof_enc,
+                        proof_dlog,
+                        y_j,
+                        y_pow_r,
+                        z_pow_r,
+                        proof_shuffle,
+                        res,
+                    };
+                    
+                    println!("[host] Completed bidder_prove: {} vs {}", bidder_j_id, bidder_i_id);
+                    tx_clone.send((bidder_j_id, bidder_i_id, result)).unwrap();
+                });
+                
+                threads.push(handle);
+            }
+        }
+    }
+    
+    // Collect results
+    for _ in 0..threads.len() {
+        let (bidder_j_id, bidder_i_id, result) = rx.recv().unwrap();
+        results.entry(bidder_j_id).or_insert_with(Vec::new).push(result);
+    }
+    
+    // Wait for all threads to complete
+    for handle in threads {
+        handle.join().unwrap();
+    }
+    
+    println!("[host] PHASE 2: All bidder_prove operations completed");
+    results
 }
 
 fn bidder_prove(
@@ -290,15 +371,36 @@ fn run_two_bidders() {
     // This generates zero-knowledge proofs that bidder j's bid is valid
     // Output: proof_eval, proof_enc, proof_dlog, and comparison results
     // ==================================================================================
-    println!("[host] PHASE 2: Bidder Prove - Generating zero-knowledge proofs...");
+    println!("[host] PHASE 2: Bidder Prove - Generating zero-knowledge proofs in parallel...");
 
     let sound_param: usize = 40;
     let sigma: BigInt = BigInt::from(40);
     println!("[host] sound_param = {} sigma = {}", sound_param, sigma);
 
-    // Call bidder_prove to generate the proof
-    let (proof_eval, plaintext_and_coins, n_j_from_proof, proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res)) = 
-        bidder_prove("bidder2".to_string(), c_1, n_1.clone(), r_1, n_2, r_2, v_2, p_2, q_2, sound_param, sigma);
+    // Prepare bidders data for parallel processing
+    let bidders = vec![
+        ("bidder1".to_string(), n_1.clone(), c_1, r_1, v_1, p_1.clone(), q_1.clone()),
+        ("bidder2".to_string(), n_2, c_2, r_2, v_2, p_2, q_2),
+    ];
+
+    // Run Phase 2 in parallel
+    let phase2_results = run_phase2_parallel(bidders, sound_param, sigma);
+    
+    // For now, let's use the first result for the rest of the protocol
+    // In a full implementation, you'd process all results
+    let bidder2_results = phase2_results.get("bidder2").unwrap();
+    let first_result = &bidder2_results[0];
+    
+    let proof_eval = first_result.proof_eval.clone();
+    let plaintext_and_coins = first_result.plaintext_and_coins.clone();
+    let n_j_from_proof = first_result.n_j_from_proof.clone();
+    let proof_enc = first_result.proof_enc.clone();
+    let proof_dlog = first_result.proof_dlog.clone();
+    let y_j = first_result.y_j.clone();
+    let y_pow_r = first_result.y_pow_r.clone();
+    let z_pow_r = first_result.z_pow_r.clone();
+    let proof_shuffle = first_result.proof_shuffle.clone();
+    let res = first_result.res.clone();
 
     // ==================================================================================
     // PHASE 3: AUCTIONEER VERIFY - Verify all proof_eval from all bidders
