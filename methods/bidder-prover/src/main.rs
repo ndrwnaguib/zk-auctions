@@ -25,16 +25,16 @@ fn main() {
 
     // Read inputs from the environment.
     eprintln!("{} Reading inputs from environment for bidder j", prefix);
-    let (n_j, r_j, v_j, p_j, q_j): (
-        BigInt,
-        Vec<BigInt>,
-        BigInt,
-        BigInt,
-        BigInt,
-    ) = env::read();
+    let (n_j, r_j, v_j, p_j, q_j): (BigInt, Vec<BigInt>, BigInt, BigInt, BigInt) = env::read();
     eprintln!("{} Reading inputs from environment for bidder i", prefix);
     let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
-    eprintln!("{} Read c_i (len: {}), n_i (bits: {}), r_i (len: {})", prefix, c_i.len(), n_i.bits(), r_i.len());
+    eprintln!(
+        "{} Read c_i (len: {}), n_i (bits: {}), r_i (len: {})",
+        prefix,
+        c_i.len(),
+        n_i.bits(),
+        r_i.len()
+    );
     let (sigma, sound_param): (BigInt, u32) = env::read();
     eprintln!("{} Read sigma and sound_param: {}", prefix, sound_param);
     let (rand1, rand2, rand3, rand4): (

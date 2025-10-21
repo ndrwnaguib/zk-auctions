@@ -442,16 +442,16 @@ impl StrainBidder for Bidder {
         rand4: &Vec<Vec<BigInt>>,
     ) -> Vec<Vec<BigInt>> {
         assert_eq!(cipher_j.len(), 32);
-    
+
         let neg_cipher_i: Vec<BigInt> =
             cipher_i.iter().map(|x| x * (pub_key_j - BigInt::one()) % pub_key_j).collect();
         let c_neg_xor = dot_mod(&neg_cipher_i, cipher_j, pub_key_j);
-    
+
         let cipher_i_and = embed_and(cipher_i, pub_key_j, rand1);
         let cipher_j_and = embed_and(cipher_j, pub_key_j, rand2);
         let neg_cipher_i_and = embed_and(&neg_cipher_i, pub_key_j, rand3);
         let c_neg_xor_and = embed_and(&c_neg_xor, pub_key_j, rand4);
-    
+
         let mut res = Vec::new();
         for l in 0..32 {
             let mut temp = dot_mod(&cipher_j_and[l], &neg_cipher_i_and[l], pub_key_j);
@@ -460,12 +460,12 @@ impl StrainBidder for Bidder {
             }
             res.push(temp);
         }
-    
+
         let mut rng = rand::thread_rng();
         res.shuffle(&mut rng);
         res
     }
-    
+
     fn verify_proof_enc(&self, proof: Vec<Vec<Vec<BigInt>>>) -> bool {
         let n1 = &proof[0][0][0];
 
