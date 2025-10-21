@@ -18,3 +18,4 @@ methods/guest/target
 methods/guest/Cargo.lock
 
 .DS_Store
+.vscode

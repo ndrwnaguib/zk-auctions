@@ -17,35 +17,35 @@ use zk_auctions_core::utils::{
 use zk_auctions_core::protocols::strain::bidder::{Bidder, StrainBidder};
 
 fn main() {
-    eprintln!("[zkvm-guest] Starting main function");
+    eprintln!("");
     let mut rng = rand::thread_rng();
-
-    eprintln!("[zkvm-guest] Generating keys_j");
-    let keys_j: Keys = generate_keys(None);
-    let (p_j, q_j): &(BigInt, BigInt) = &keys_j.priv_key;
-    let n_j: BigInt = keys_j.pub_key;
-    eprintln!("[zkvm-guest] Keys generated, n_j bit length: {}", n_j.bits());
-
-    // Generate a second random value for v2.
-    //let v_j: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let v_j: BigInt = BigInt::from(5000);
-    eprintln!("[zkvm-guest] Second bidder's bid v_j = {}", v_j);
+    let guest_id: String = env::read();
+    let prefix = format!("[({})-zkvm-bidder-prover-guest]", guest_id);
+    eprintln!("{} Starting main function", prefix);
 
     // Read inputs from the environment.
-    eprintln!("[zkvm-guest] Reading inputs from environment");
+    eprintln!("{} Reading inputs from environment for bidder j", prefix);
+    let (n_j, r_j, v_j, p_j, q_j): (
+        BigInt,
+        Vec<BigInt>,
+        BigInt,
+        BigInt,
+        BigInt,
+    ) = env::read();
+    eprintln!("{} Reading inputs from environment for bidder i", prefix);
     let (c_i, n_i, r_i): (Vec<BigInt>, BigInt, Vec<BigInt>) = env::read();
-    eprintln!("[zkvm-guest] Read c_i (len: {}), n_i (bits: {}), r_i (len: {})", c_i.len(), n_i.bits(), r_i.len());
+    eprintln!("{} Read c_i (len: {}), n_i (bits: {}), r_i (len: {})", prefix, c_i.len(), n_i.bits(), r_i.len());
     let (sigma, sound_param): (BigInt, u32) = env::read();
-    eprintln!("[zkvm-guest] Read sigma and sound_param: {}", sound_param);
+    eprintln!("{} Read sigma and sound_param: {}", prefix, sound_param);
     let (rand1, rand2, rand3, rand4): (
         Vec<Vec<BigInt>>,
         Vec<Vec<BigInt>>,
         Vec<Vec<BigInt>>,
         Vec<Vec<BigInt>>,
     ) = env::read();
-    eprintln!("[zkvm-guest] Read random values");
+    eprintln!("{} Read random values", prefix);
 
-    eprintln!("[zkvm-guest] Computing proof_eval");
+    eprintln!("{} Computing proof_eval", prefix);
     let r_j: Vec<BigInt> = rand32(&n_j);
     let c_j_proofeval = encrypt_gm(&v_j, &n_j);
     let c_ji = encrypt_gm(&v_j, &n_i);
@@ -63,14 +63,14 @@ fn main() {
         &r_ji,
         sound_param as usize,
     );
-    eprintln!("[zkvm-guest] proof_eval completed");
+    eprintln!("{} proof_eval completed", prefix);
 
-    eprintln!("[zkvm-guest] Computing proof_enc");
+    eprintln!("{} Computing proof_enc", prefix);
     let c_j_proofenc = encrypt_gm_coin(&v_j.clone(), &n_j, &r_j);
     let proof_enc: Vec<Vec<Vec<BigInt>>> = bidder.compute_proof_enc(c_j_proofenc, &n_j, &r_j);
-    eprintln!("[zkvm-guest] proof_enc completed");
+    eprintln!("{} proof_enc completed", prefix);
 
-    eprintln!("[zkvm-guest] Computing proof_dlog");
+    eprintln!("{} Computing proof_dlog", prefix);
     let z_j = n_j.clone() - BigInt::one();
     let r_j_dlog = rng.gen_bigint_range(&BigInt::zero(), &((p_j - 1) * (q_j - 1)));
     let y_j = rng.gen_bigint_range(&BigInt::zero(), &n_j);
@@ -79,29 +79,29 @@ fn main() {
     let z_pow_r = z_j.modpow(&r_j_dlog, &n_j);
 
     let proof_dlog = bidder.proof_dlog_eq(&r_j_dlog, &y_j, &n_j, Some(sound_param));
-    eprintln!("[zkvm-guest] proof_dlog completed");
+    eprintln!("{} proof_dlog completed", prefix);
 
-    eprintln!("[zkvm-guest] Computing gm_eval_honest");
+    eprintln!("{} Computing gm_eval_honest", prefix);
     let r_ji = rand32(&n_i);
     let c_ji = encrypt_gm_coin(&v_j, &n_i, &r_ji);
     let res = bidder.gm_eval_honest(&v_j, &c_ji, &c_i, &n_i, &rand1, &rand2, &rand3, &rand4);
-    eprintln!("[zkvm-guest] gm_eval_honest completed, res length: {}", res.len());
+    eprintln!("{} gm_eval_honest completed, res length: {}", prefix, res.len());
     //let proof_shuffle = compute_proof_shuffle(&res, &n_i);
     let proof_shuffle: HashMap<u32, StrainProof> = HashMap::new();
-    eprintln!("[zkvm-guest] Using empty proof_shuffle");
+    eprintln!("{} Using empty proof_shuffle", prefix);
 
     /* only seen by auctioneer */
-    eprintln!("[zkvm-guest] Writing private data");
+    eprintln!("{} Writing private data", prefix);
     let private_data = (&proof_eval, &plaintext_and_coins);
     env::write(&private_data);
 
-    eprintln!("[zkvm-guest] Committing public results");
+    eprintln!("{} Committing public results", prefix);
     let public_results =
         (n_j.clone(), proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res));
 
     // Single commit
     env::commit(&public_results);
-    eprintln!("[zkvm-guest] Main function completed successfully");
+    eprintln!("{} Main function completed successfully", prefix);
 }
 
 fn compute_proof_shuffle(res: &[Vec<BigInt>], n2: &BigInt) -> HashMap<u32, StrainProof> {
