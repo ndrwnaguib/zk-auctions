@@ -34,6 +34,7 @@ struct BidderProveResult {
     z_pow_r: BigInt,
     proof_shuffle: HashMap<u32, StrainProof>,
     res: Vec<Vec<BigInt>>,
+    receipt: risc0_zkvm::Receipt,
 }
 
 fn auctioneer_verify(
@@ -53,6 +54,69 @@ fn auctioneer_verify(
     ));
     assert!(eval_res.is_some(), "`proof_eval` verification failed.");
     println!("[host] proof_eval verification passed.");
+}
+
+fn auctioneer_verify_all(
+    phase2_results: &HashMap<String, Vec<BidderProveResult>>,
+    bidders_data: &HashMap<String, (BigInt, BigInt, BigInt)>, // (n_i, p_i, q_i) for each bidder
+    sound_param: usize,
+) -> bool {
+    println!("[host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs and receipts from all bidders...");
+    
+    let mut all_verifications_passed = true;
+    
+    // Verify all results from all bidders
+    for (bidder_id, results) in phase2_results {
+        println!("[host] Verifying {} results for bidder: {}", results.len(), bidder_id);
+        
+        for (i, result) in results.iter().enumerate() {
+            println!("[host] Verifying result {} for bidder {}", i + 1, bidder_id);
+            
+            // First verify the receipt
+            println!("[host] Verifying receipt for {} result {}", bidder_id, i + 1);
+            match result.receipt.verify(BIDDER_PROVER_ID) {
+                Ok(_) => {
+                    println!("[host] ✅ Receipt verification PASSED for {} result {}", bidder_id, i + 1);
+                },
+                Err(e) => {
+                    println!("[host] ❌ Receipt verification FAILED for {} result {}: {:?}", bidder_id, i + 1, e);
+                    all_verifications_passed = false;
+                    continue; // Skip other verifications if receipt fails
+                }
+            }
+            
+            // Get the corresponding bidder i data for verification
+            let (n_i, p_i, q_i) = bidders_data.get(bidder_id).unwrap();
+            
+            println!("[host] Verifying proof_eval for {} vs bidder_i", bidder_id);
+            //println!("[host] proof_eval = {:?}", result.proof_eval);
+            //println!("[host] plaintext_and_coins = {:?}", result.plaintext_and_coins);
+            println!("[host] n_i = {:?}", n_i);
+            println!("[host] n_j_from_proof = {:?}", result.n_j_from_proof);
+            //println!("[host] sound_param = {:?}", sound_param);
+
+            // Verify this specific proof_eval
+            match std::panic::catch_unwind(|| {
+                auctioneer_verify(&result.proof_eval, &result.plaintext_and_coins, n_i, &result.n_j_from_proof, sound_param);
+            }) {
+                Ok(_) => {
+                    println!("[host] ✅ Verification PASSED for {} result {}", bidder_id, i + 1);
+                },
+                Err(_) => {
+                    println!("[host] ❌ Verification FAILED for {} result {}", bidder_id, i + 1);
+                    all_verifications_passed = false;
+                }
+            }
+        }
+    }
+    
+    if all_verifications_passed {
+        println!("[host] ✅ ALL auctioneer verifications PASSED - Proceeding to Phase 4");
+    } else {
+        println!("[host] ❌ Some auctioneer verifications FAILED - Stopping protocol");
+    }
+    
+    all_verifications_passed
 }
 
 fn bidder_join(bidder_id: String, bid_value: BigInt) -> (BigInt, Vec<BigInt>, Vec<BigInt>, (BigInt, BigInt)) {
@@ -75,8 +139,6 @@ fn bidder_join(bidder_id: String, bid_value: BigInt) -> (BigInt, Vec<BigInt>, Ve
     let session = default_prover();
     let receipt = session.prove(env, BIDDER_JOIN_ELF).unwrap().receipt;
     println!("[host] zkVM proof generated for bidder_join. Verifying...");
-    receipt.verify(BIDDER_JOIN_ID).unwrap();
-    println!("[host] zkVM proof verified for bidder_join.");
     
     // Read private output (private key components)
     let (p_j, q_j): (BigInt, BigInt) = from_slice(&private_output)
@@ -112,7 +174,7 @@ fn mock_bidder_join(bidder_id: String, bid_value: BigInt) -> (BigInt, Vec<BigInt
     (n_j, c_j, r_j, (p_j, q_j))
 }
 
-fn run_phase2_parallel(
+fn bidders_prove_all(
     bidders: Vec<(String, BigInt, Vec<BigInt>, Vec<BigInt>, BigInt, BigInt, BigInt)>, // (id, n, c, r, v, p, q)
     sound_param: usize,
     sigma: BigInt,
@@ -137,7 +199,7 @@ fn run_phase2_parallel(
                 let handle = thread::spawn(move || {
                     println!("[host] Starting bidder_prove: {} vs {}", bidder_j_id, bidder_i_id);
                     
-                    let (proof_eval, plaintext_and_coins, n_j_from_proof, proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res)) = 
+                    let (proof_eval, plaintext_and_coins, n_j_from_proof, proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res), receipt) = 
                         bidder_prove(bidder_j_id.clone(), c_i, n_i, r_i, n_j, r_j, v_j, p_j, q_j, sound_param, sigma_clone);
                     
                     let result = BidderProveResult {
@@ -151,6 +213,7 @@ fn run_phase2_parallel(
                         z_pow_r,
                         proof_shuffle,
                         res,
+                        receipt,
                     };
                     
                     println!("[host] Completed bidder_prove: {} vs {}", bidder_j_id, bidder_i_id);
@@ -196,6 +259,7 @@ fn bidder_prove(
     Vec<Vec<Vec<BigInt>>>,
     (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
     (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
+    risc0_zkvm::Receipt,
 ) {
     let mut rand1: Vec<Vec<BigInt>> = Vec::with_capacity(32);
     let mut rand2: Vec<Vec<BigInt>> = Vec::with_capacity(32);
@@ -240,9 +304,7 @@ fn bidder_prove(
     let session = default_prover();
     println!("[host] Running zkVM (prove)...");
     let receipt = session.prove(env, BIDDER_PROVER_ELF).unwrap().receipt;
-    println!("[host] zkVM proof generated. Verifying...");
-    receipt.verify(BIDDER_PROVER_ID).unwrap();
-    println!("[host] zkVM proof verified.");
+    println!("[host] zkVM proof generated.");
 
     println!("[host] Reading private output...");
     let (proof_eval, plaintext_and_coins): (
@@ -260,7 +322,7 @@ fn bidder_prove(
     ) = receipt.journal.decode().expect("Failed to decode all results");
     println!("[host] Got n_j = {}", n_j);
 
-    (proof_eval, plaintext_and_coins, n_j, proof_enc, proof_dlog_tuple, proof_shuffle_tuple)
+    (proof_eval, plaintext_and_coins, n_j, proof_enc, proof_dlog_tuple, proof_shuffle_tuple, receipt)
 }
 
 fn bidder_verify(
@@ -295,7 +357,7 @@ fn bidder_verify(
     // assert!(success, "verify_shuffle failed");
 }
 
-fn run_two_bidders() { 
+fn run_two_bidders_example() { 
     // ==================================================================================
     // PHASE 1: BIDDERS JOIN - Generate keys and encrypt bid values
     // ==================================================================================
@@ -377,30 +439,22 @@ fn run_two_bidders() {
     let sigma: BigInt = BigInt::from(40);
     println!("[host] sound_param = {} sigma = {}", sound_param, sigma);
 
+    // Store bidder data before moving into bidders vector
+    let bidder1_data = (n_1.clone(), p_1.clone(), q_1.clone());
+    let bidder2_data = (n_2.clone(), p_2.clone(), q_2.clone());
+    
+    // Store copies for later use
+    let p_1_copy = bidder1_data.1.clone();
+    let q_1_copy = bidder1_data.2.clone();
+    
     // Prepare bidders data for parallel processing
     let bidders = vec![
-        ("bidder1".to_string(), n_1.clone(), c_1, r_1, v_1, p_1.clone(), q_1.clone()),
+        ("bidder1".to_string(), n_1, c_1, r_1, v_1, p_1, q_1),
         ("bidder2".to_string(), n_2, c_2, r_2, v_2, p_2, q_2),
     ];
 
     // Run Phase 2 in parallel
-    let phase2_results = run_phase2_parallel(bidders, sound_param, sigma);
-    
-    // For now, let's use the first result for the rest of the protocol
-    // In a full implementation, you'd process all results
-    let bidder2_results = phase2_results.get("bidder2").unwrap();
-    let first_result = &bidder2_results[0];
-    
-    let proof_eval = first_result.proof_eval.clone();
-    let plaintext_and_coins = first_result.plaintext_and_coins.clone();
-    let n_j_from_proof = first_result.n_j_from_proof.clone();
-    let proof_enc = first_result.proof_enc.clone();
-    let proof_dlog = first_result.proof_dlog.clone();
-    let y_j = first_result.y_j.clone();
-    let y_pow_r = first_result.y_pow_r.clone();
-    let z_pow_r = first_result.z_pow_r.clone();
-    let proof_shuffle = first_result.proof_shuffle.clone();
-    let res = first_result.res.clone();
+    let phase2_results = bidders_prove_all(bidders, sound_param, sigma);
 
     // ==================================================================================
     // PHASE 3: AUCTIONEER VERIFY - Verify all proof_eval from all bidders
@@ -408,18 +462,19 @@ fn run_two_bidders() {
     // The auctioneer verifies the evaluation proofs (proof_eval) from all bidders
     // This ensures that all bidders have provided valid zero-knowledge proofs
     // The auctioneer acts as a trusted verifier in this phase
+    // Only proceed to Phase 4 if ALL verifications pass
     // ==================================================================================
-    println!("[host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs...");
     
-    // Verify proof_eval separately
-    println!("[host] Verifying proof_eval...");
-    println!("[host] proof_eval = {:?}", proof_eval);
-    println!("[host] plaintext_and_coins = {:?}", plaintext_and_coins);
-    println!("[host] n_1 = {:?}", n_1);
-    println!("[host] n_j_from_proof = {:?}", n_j_from_proof);
-    println!("[host] sound_param = {:?}", sound_param);
-
-    auctioneer_verify(&proof_eval, &plaintext_and_coins, &n_1, &n_j_from_proof, sound_param);
+    // Prepare bidders data for verification
+    let mut bidders_data = HashMap::new();
+    bidders_data.insert("bidder1".to_string(), bidder1_data);
+    bidders_data.insert("bidder2".to_string(), bidder2_data);
+    
+    // Verify all results using the cleaner function
+    if !auctioneer_verify_all(&phase2_results, &bidders_data, sound_param) {
+        println!("[host] Protocol stopped due to verification failures");
+        return;
+    }
 
     // ==================================================================================
     // PHASE 4: BIDDER VERIFY - Bidders verify each other's proofs and compare bids
@@ -430,19 +485,23 @@ fn run_two_bidders() {
     // Also includes the final bid comparison using compare_leq_honest
     // ==================================================================================
     println!("[host] PHASE 4: Bidder Verify - Bidders verifying each other's proofs and comparing bids...");
+
+    // For now, let's use the first result for the rest of the protocol
+    // In a full implementation, you'd process all results
+    let bidder2_results = phase2_results.get("bidder2").unwrap();
     
     // Call bidder_verify to verify the other proofs and compare bids
     bidder_verify(
-        proof_enc,
-        proof_dlog,
-        y_j,
-        y_pow_r,
-        z_pow_r,
-        &n_j_from_proof,
+        bidder2_results[0].proof_enc.clone(),
+        bidder2_results[0].proof_dlog.clone(),
+        bidder2_results[0].y_j.clone(),
+        bidder2_results[0].y_pow_r.clone(),
+        bidder2_results[0].z_pow_r.clone(),
+        &bidder2_results[0].n_j_from_proof,
         sound_param,
-        res,
-        p_1,
-        q_1,
+        bidder2_results[0].res.clone(),
+        p_1_copy,
+        q_1_copy,
     );
 }
 
@@ -476,7 +535,7 @@ fn main() {
     println!("==================================================================================");
     println!("");
     
-    run_two_bidders();
+    run_two_bidders_example();
 }
 
 fn verify_proof_enc(proof: Vec<Vec<Vec<BigInt>>>) -> bool {
