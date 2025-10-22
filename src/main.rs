@@ -12,14 +12,13 @@ use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
 use std::collections::HashMap;
 use std::thread;
 use std::sync::mpsc;
-use std::sync::{Arc, Mutex};
 use zk_auctions_core::gm::{get_next_random, generate_keys, encrypt_gm};
 use zk_auctions_core::utils::rand32;
 use zk_auctions_core::protocols::strain::auctioneer::{Auctioneer, StrainAuctioneer};
 use zk_auctions_core::utils::{
     compare_leq_honest, get_rand_jn1, hash_flat, set_rand_seed, StrainProof,
 };
-use zk_auctions_methods::{BIDDER_PROVER_ELF, BIDDER_PROVER_ID, BIDDER_JOIN_ELF, BIDDER_JOIN_ID};
+use zk_auctions_methods::{BIDDER_PROVER_ELF, BIDDER_PROVER_ID, BIDDER_JOIN_ELF};
 
 // Struct to store bidder prove results
 #[derive(Clone)]
@@ -35,6 +34,7 @@ struct BidderProveResult {
     proof_shuffle: HashMap<u32, StrainProof>,
     res: Vec<Vec<BigInt>>,
     receipt: risc0_zkvm::Receipt,
+    other_bidder_id: String,
 }
 
 fn auctioneer_verify(
@@ -53,7 +53,7 @@ fn auctioneer_verify(
         sound_param,
     ));
     assert!(eval_res.is_some(), "`proof_eval` verification failed.");
-    println!("[host] proof_eval verification passed.");
+    println!("[(auctioneer)-host] proof_eval verification passed.");
 }
 
 fn auctioneer_verify_all(
@@ -61,25 +61,24 @@ fn auctioneer_verify_all(
     bidders_data: &HashMap<String, (BigInt, BigInt, BigInt)>, // (n_i, p_i, q_i) for each bidder
     sound_param: usize,
 ) -> bool {
-    println!("[host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs and receipts from all bidders...");
+    println!("[(auctioneer)-host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs and receipts from all bidders...");
     
     let mut all_verifications_passed = true;
     
     // Verify all results from all bidders
     for (bidder_id, results) in phase2_results {
-        println!("[host] Verifying {} results for bidder: {}", results.len(), bidder_id);
+        println!("[(auctioneer)-host] Verifying {} results for bidder: {}", results.len(), bidder_id);
         
         for (i, result) in results.iter().enumerate() {
-            println!("[host] Verifying result {} for bidder {}", i + 1, bidder_id);
+            println!("[(auctioneer)-host] Verifying result {} for bidder {} vs {}", i + 1, bidder_id, result.other_bidder_id);
             
             // First verify the receipt
-            println!("[host] Verifying receipt for {} result {}", bidder_id, i + 1);
             match result.receipt.verify(BIDDER_PROVER_ID) {
                 Ok(_) => {
-                    println!("[host] ✅ Receipt verification PASSED for {} result {}", bidder_id, i + 1);
+                    // Receipt verification passed
                 },
-                Err(e) => {
-                    println!("[host] ❌ Receipt verification FAILED for {} result {}: {:?}", bidder_id, i + 1, e);
+                Err(_e) => {
+                    // Receipt verification failed
                     all_verifications_passed = false;
                     continue; // Skip other verifications if receipt fails
                 }
@@ -88,22 +87,22 @@ fn auctioneer_verify_all(
             // Get the corresponding bidder i data for verification
             let (n_i, p_i, q_i) = bidders_data.get(bidder_id).unwrap();
             
-            println!("[host] Verifying proof_eval for {} vs bidder_i", bidder_id);
-            //println!("[host] proof_eval = {:?}", result.proof_eval);
-            //println!("[host] plaintext_and_coins = {:?}", result.plaintext_and_coins);
-            println!("[host] n_i = {:?}", n_i);
-            println!("[host] n_j_from_proof = {:?}", result.n_j_from_proof);
-            //println!("[host] sound_param = {:?}", sound_param);
+            // println!("[(auctioneer)-host] Verifying proof_eval for {} vs {}", bidder_id, result.other_bidder_id);
+            // println!("[host] proof_eval = {:?}", result.proof_eval);
+            // println!("[host] plaintext_and_coins = {:?}", result.plaintext_and_coins);
+            // println!("[(auctioneer)-host] n_i = {:?}", n_i);
+            // println!("[(auctioneer)-host] n_j_from_proof = {:?}", result.n_j_from_proof);
+            // println!("[host] sound_param = {:?}", sound_param);
 
             // Verify this specific proof_eval
             match std::panic::catch_unwind(|| {
                 auctioneer_verify(&result.proof_eval, &result.plaintext_and_coins, n_i, &result.n_j_from_proof, sound_param);
             }) {
                 Ok(_) => {
-                    println!("[host] ✅ Verification PASSED for {} result {}", bidder_id, i + 1);
+                    println!("[(auctioneer)-host] ✅ Verification PASSED for {} result {} vs {}", bidder_id, i + 1, result.other_bidder_id);
                 },
                 Err(_) => {
-                    println!("[host] ❌ Verification FAILED for {} result {}", bidder_id, i + 1);
+                    println!("[(auctioneer)-host] ❌ Verification FAILED for {} result {} vs {}", bidder_id, i + 1, result.other_bidder_id);
                     all_verifications_passed = false;
                 }
             }
@@ -111,9 +110,9 @@ fn auctioneer_verify_all(
     }
     
     if all_verifications_passed {
-        println!("[host] ✅ ALL auctioneer verifications PASSED - Proceeding to Phase 4");
+        println!("[(auctioneer)-host] ✅ ALL auctioneer verifications PASSED - Proceeding to Phase 4");
     } else {
-        println!("[host] ❌ Some auctioneer verifications FAILED - Stopping protocol");
+        println!("[(auctioneer)-host] ❌ Some auctioneer verifications FAILED - Stopping protocol");
     }
     
     all_verifications_passed
@@ -182,7 +181,6 @@ fn bidders_prove_all(
     println!("[host] PHASE 2: Running bidder_prove in parallel for all bidder pairs...");
     
     let mut results: HashMap<String, Vec<BidderProveResult>> = HashMap::new();
-    let results_mutex = Arc::new(Mutex::new(&mut results));
     let (tx, rx) = mpsc::channel();
     
     // Create all possible bidder pairs
@@ -214,6 +212,7 @@ fn bidders_prove_all(
                         proof_shuffle,
                         res,
                         receipt,
+                        other_bidder_id: bidder_i_id.clone(),
                     };
                     
                     println!("[host] Completed bidder_prove: {} vs {}", bidder_j_id, bidder_i_id);
@@ -284,7 +283,7 @@ fn bidder_prove(
     }
 
     let mut private_output = Vec::new();
-    println!("[host] Building ExecutorEnv...");
+    println!("[({})-host] Building ExecutorEnv...", bidder_id);
     let env = ExecutorEnv::builder()
         .write(&bidder_id)
         .expect("Failed to add guest_id")
@@ -299,33 +298,34 @@ fn bidder_prove(
         .stdout(&mut private_output)
         .build()
         .unwrap();
-    println!("[host] ExecutorEnv built successfully.");
+    println!("[({})-host] ExecutorEnv built successfully.", bidder_id);
 
     let session = default_prover();
-    println!("[host] Running zkVM (prove)...");
+    println!("[({})-host] Running zkVM (prove)...", bidder_id);
     let receipt = session.prove(env, BIDDER_PROVER_ELF).unwrap().receipt;
-    println!("[host] zkVM proof generated.");
+    println!("[({})-host] zkVM proof generated.", bidder_id);
 
-    println!("[host] Reading private output...");
+    println!("[({})-host] Reading private output...", bidder_id);
     let (proof_eval, plaintext_and_coins): (
         Vec<Vec<Vec<BigInt>>>,
         Vec<Vec<(BigInt, BigInt, BigInt)>>,
     ) = from_slice(&private_output).expect("Failed to deserialize private data");
-    println!("[host] Private output deserialization successful.");
+    println!("[({})-host] Private output deserialization successful.", bidder_id);
 
-    println!("[host] Decoding public results from journal...");
+    println!("[({})-host] Decoding public results from journal...", bidder_id);
     let (n_j, proof_enc, proof_dlog_tuple, proof_shuffle_tuple): (
         BigInt,
         Vec<Vec<Vec<BigInt>>>,
         (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
         (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
     ) = receipt.journal.decode().expect("Failed to decode all results");
-    println!("[host] Got n_j = {}", n_j);
+    println!("[({})-host] Got n_j = {}", bidder_id, n_j);
 
     (proof_eval, plaintext_and_coins, n_j, proof_enc, proof_dlog_tuple, proof_shuffle_tuple, receipt)
 }
 
 fn bidder_verify(
+    bidder_label: &str,
     proof_enc: Vec<Vec<Vec<BigInt>>>,
     proof_dlog: Vec<(BigInt, BigInt, BigInt)>,
     y_j: BigInt,
@@ -336,25 +336,127 @@ fn bidder_verify(
     res: Vec<Vec<BigInt>>,
     p_i: BigInt,
     q_i: BigInt,
-) {
-    println!("[host] Verifying proof_enc...");
+) -> bool {
+    println!("[({})-host] Verifying proof_enc...", bidder_label);
     assert!(verify_proof_enc(proof_enc));
-    println!("[host] proof_enc verification passed.");
+    println!("[({})-host] proof_enc verification passed.", bidder_label);
 
-    println!("[host] Verifying dlog proof...");
+    println!("[({})-host] Verifying dlog proof...", bidder_label);
     assert!(verify_dlog_eq(n_j_from_proof, &y_j, &y_pow_r, &z_pow_r, &proof_dlog, Some(sound_param)));
-    println!("[host] dlog proof verification passed.");
+    println!("[({})-host] dlog proof verification passed.", bidder_label);
 
     // Final bid comparison using private key
-    println!("[host] Comparing bids using compare_leq_honest...");
-    if compare_leq_honest(&res, &(p_i, q_i)) {
-        println!("The second bidder's bid is less than or equal to the first bidder's bid.");
+    println!("[({})-host] Comparing bids using compare_leq_honest...", bidder_label);
+    let comparison_result = compare_leq_honest(&res, &(p_i, q_i));
+    
+    if comparison_result {
+        println!("[({})-host] Other bidder's bid is <= current bidder's bid. Continuing...", bidder_label);
+        true
     } else {
-        println!("The second bidder's bid is greater than the first bidder's bid.");
+        println!("[({})-host] Other bidder's bid is > current bidder's bid. Not winner.", bidder_label);
+        false
     }
+}
 
-    // let success = verify_shuffle(&proof_shuffle, &n_j, &res);
-    // assert!(success, "verify_shuffle failed");
+fn bidder_verify_all(
+    phase2_results: &HashMap<String, Vec<BidderProveResult>>,
+    bidders_data: &HashMap<String, (BigInt, BigInt, BigInt)>, // (n_i, p_i, q_i) for each bidder
+    sound_param: usize,
+) -> HashMap<String, bool> {
+    let mut winner_results: HashMap<String, bool> = HashMap::new();
+    let (tx, rx) = mpsc::channel();
+    let mut threads = Vec::new();
+    
+    // Clone the data for use in threads
+    let phase2_results_clone = phase2_results.clone();
+    let bidders_data_clone = bidders_data.clone();
+    
+    // For each bidder, create a thread to verify all results where they are the "other bidder"
+    for (bidder_id, _results) in phase2_results {
+        let bidder_id_clone = bidder_id.clone();
+        let phase2_results_thread = phase2_results_clone.clone();
+        let bidders_data_thread = bidders_data_clone.clone();
+        let tx_clone = tx.clone();
+        
+        let handle = thread::spawn(move || {
+            println!("[({})-host] Starting verification for bidder: {}", bidder_id_clone, bidder_id_clone);
+            
+            // A bidder is a winner if they beat ALL other bidders
+            // We need to find results where this bidder compared against others
+            // and verify that this bidder's bid was higher in ALL comparisons
+            let mut is_winner = true;
+            let mut comparisons_checked = 0;
+            
+            // Look for results where this bidder (bidder_id_clone) compared against others
+            if let Some(this_bidder_results) = phase2_results_thread.get(&bidder_id_clone) {
+                for result in this_bidder_results {
+                    // This result is from bidder_id_clone comparing against some other bidder
+                    println!("[({})-host] Verifying result against {}", bidder_id_clone, result.other_bidder_id);
+                    
+                    // Get the private key for the current bidder (bidder_id_clone)
+                    let (_n_i, p_i, q_i) = bidders_data_thread.get(&bidder_id_clone).unwrap();
+                    
+                    // Verify this result
+                    let comparison_result = bidder_verify(
+                        &bidder_id_clone,
+                        result.proof_enc.clone(),
+                        result.proof_dlog.clone(),
+                        result.y_j.clone(),
+                        result.y_pow_r.clone(),
+                        result.z_pow_r.clone(),
+                        &result.n_j_from_proof,
+                        sound_param,
+                        result.res.clone(),
+                        p_i.clone(),
+                        q_i.clone(),
+                    );
+                    
+                    comparisons_checked += 1;
+                    
+                    // If comparison_result is true, it means this bidder's bid is > other bidder's bid
+                    // If comparison_result is false, it means this bidder's bid is <= other bidder's bid
+                    if !comparison_result {
+                        println!("[({})-host] Lost against another bidder", bidder_id_clone);
+                        is_winner = false;
+                        break;
+                    } else {
+                        println!("[({})-host] Beat another bidder", bidder_id_clone);
+                    }
+                }
+            } else {
+                println!("[({})-host] No results found for bidder {}", bidder_id_clone, bidder_id_clone);
+                is_winner = false;
+            }
+            
+            println!("[({})-host] Verification complete. Is winner: {} (checked {} comparisons)", 
+                     bidder_id_clone, is_winner, comparisons_checked);
+            tx_clone.send((bidder_id_clone, is_winner)).unwrap();
+        });
+        
+        threads.push(handle);
+    }
+    
+    // Collect results
+    for _ in 0..threads.len() {
+        let (bidder_id, is_winner) = rx.recv().unwrap();
+        winner_results.insert(bidder_id, is_winner);
+    }
+    
+    // Wait for all threads to complete
+    for handle in threads {
+        handle.join().unwrap();
+    }
+    
+    // Announce winner
+    for (bidder_id, is_winner) in &winner_results {
+        if *is_winner {
+            println!("[host] 🏆 WINNER: {} is the auction winner!", bidder_id);
+        } else {
+            println!("[host] ❌ {} is not the winner", bidder_id);
+        }
+    }
+    
+    winner_results
 }
 
 fn run_two_bidders_example() { 
@@ -369,7 +471,9 @@ fn run_two_bidders_example() {
     //   - r_j: random values used in encryption
     //   - (p_j, q_j): private key components
     // ==================================================================================
+    println!("[host] ==================================================================================");
     println!("[host] PHASE 1: Bidders Join - Generating keys and encrypting bids...");
+    println!("[host] ==================================================================================");
     
     // Create channels for communication between threads
     let (tx, rx) = mpsc::channel();
@@ -420,6 +524,9 @@ fn run_two_bidders_example() {
     // Extract results
     let (n_1, c_1, r_1, (p_1, q_1), v_1) = bidder1_result.unwrap();
     let (n_2, c_2, r_2, (p_2, q_2), v_2) = bidder2_result.unwrap();
+    // Preserve bid values for final logging before moves elsewhere
+    let v1_for_log = v_1.clone();
+    let v2_for_log = v_2.clone();
     
     println!("[host] First bidder's bid v_1 = {}", v_1);
     println!("[host] Second bidder's bid v_2 = {}", v_2);
@@ -433,7 +540,9 @@ fn run_two_bidders_example() {
     // This generates zero-knowledge proofs that bidder j's bid is valid
     // Output: proof_eval, proof_enc, proof_dlog, and comparison results
     // ==================================================================================
+    println!("[host] ==================================================================================");
     println!("[host] PHASE 2: Bidder Prove - Generating zero-knowledge proofs in parallel...");
+    println!("[host] ==================================================================================");
 
     let sound_param: usize = 40;
     let sigma: BigInt = BigInt::from(40);
@@ -443,9 +552,9 @@ fn run_two_bidders_example() {
     let bidder1_data = (n_1.clone(), p_1.clone(), q_1.clone());
     let bidder2_data = (n_2.clone(), p_2.clone(), q_2.clone());
     
-    // Store copies for later use
-    let p_1_copy = bidder1_data.1.clone();
-    let q_1_copy = bidder1_data.2.clone();
+    // Store copies for later use (not used in current implementation)
+    let _p_1_copy = bidder1_data.1.clone();
+    let _q_1_copy = bidder1_data.2.clone();
     
     // Prepare bidders data for parallel processing
     let bidders = vec![
@@ -477,32 +586,152 @@ fn run_two_bidders_example() {
     }
 
     // ==================================================================================
-    // PHASE 4: BIDDER VERIFY - Bidders verify each other's proofs and compare bids
+    // PHASE 4: BIDDER VERIFY ALL - Each bidder verifies other bidders' results in parallel
     // ==================================================================================
-    // Each bidder verifies the proofs from other bidders using bidder_verify
+    // Each bidder verifies the proofs from other bidders using bidder_verify_all
     // This includes verifying proof_enc (encryption proof) and proof_dlog (discrete log proof)
     // This ensures mutual verification between bidders
     // Also includes the final bid comparison using compare_leq_honest
+    // Each bidder determines if they are the winner by comparing against all other bidders
     // ==================================================================================
-    println!("[host] PHASE 4: Bidder Verify - Bidders verifying each other's proofs and comparing bids...");
-
-    // For now, let's use the first result for the rest of the protocol
-    // In a full implementation, you'd process all results
-    let bidder2_results = phase2_results.get("bidder2").unwrap();
     
-    // Call bidder_verify to verify the other proofs and compare bids
-    bidder_verify(
-        bidder2_results[0].proof_enc.clone(),
-        bidder2_results[0].proof_dlog.clone(),
-        bidder2_results[0].y_j.clone(),
-        bidder2_results[0].y_pow_r.clone(),
-        bidder2_results[0].z_pow_r.clone(),
-        &bidder2_results[0].n_j_from_proof,
-        sound_param,
-        bidder2_results[0].res.clone(),
-        p_1_copy,
-        q_1_copy,
-    );
+    // Run the comprehensive bidder verification
+    let winner_results = bidder_verify_all(&phase2_results, &bidders_data, sound_param);
+    
+    // Final winner announcement (only show winner id and bid value if there is exactly one)
+    let mut winners = Vec::new();
+    for (bidder_id, is_winner) in &winner_results {
+        if *is_winner {
+            winners.push(bidder_id);
+        }
+    }
+    if winners.len() == 1 {
+        let winner_id = winners[0];
+        let winner_bid = if winner_id == &"bidder1" { v1_for_log } else { v2_for_log };
+        println!("[host] 🎉 WINNER: {} (Bid: {})", winner_id, winner_bid);
+    }
+}
+
+fn run_n_bidders_example(bidders: Vec<(String, BigInt)>) {
+    // ==================================================================================
+    // N-BIDDER AUCTION PROTOCOL - Configurable bidders with names and bid values
+    // ==================================================================================
+    println!("[host] ==================================================================================");
+    println!("[host] Starting N-Bidder Auction Protocol...");
+    println!("[host] ==================================================================================");
+    
+    let num_bidders = bidders.len();
+    let sound_param: usize = 40;
+    let sigma: BigInt = BigInt::from(40);
+    
+    println!("[host] Running auction with {} bidders", num_bidders);
+    println!("[host] Bidders: {:?}", bidders);
+    println!("[host] sound_param = {} sigma = {}", sound_param, sigma);
+
+    // ==================================================================================
+    // PHASE 1: BIDDERS JOIN - Generate keys and encrypt bid values (parallel)
+    // ==================================================================================
+    println!("[host] ==================================================================================");
+    println!("[host] PHASE 1: Bidders Join - Generating keys and encrypting bids for {} bidders...", num_bidders);
+    println!("[host] ==================================================================================");
+
+    let (tx, rx) = mpsc::channel();
+    let mut threads = Vec::new();
+    
+    for (bidder_id, bid_value) in bidders {
+        let tx_clone = tx.clone();
+        
+        let handle = thread::spawn(move || {
+            println!("[host] Starting {} thread with bid v = {}", bidder_id, bid_value);
+            let result = mock_bidder_join(bidder_id.clone(), bid_value.clone());
+            println!("[host] {} thread completed", bidder_id);
+            tx_clone.send((bidder_id, bid_value, result)).unwrap();
+        });
+        
+        threads.push(handle);
+    }
+    
+    // Collect results from all bidders
+    let mut bidder_results = HashMap::new();
+    for _ in 0..num_bidders {
+        let (bidder_id, bid_value, (n, c, r, (p, q))) = rx.recv().unwrap();
+        bidder_results.insert(bidder_id.clone(), (n, c, r, p, q, bid_value));
+        println!("[host] Received {} results", bidder_id);
+    }
+    
+    // Wait for all threads to complete
+    for handle in threads {
+        handle.join().unwrap();
+    }
+    
+    println!("[host] PHASE 1: All {} bidders have joined successfully", num_bidders);
+
+    // ==================================================================================
+    // PHASE 2: BIDDER PROVE - Each bidder runs bidder_prove against other bidders (parallel)
+    // ==================================================================================
+    println!("[host] ==================================================================================");
+    println!("[host] PHASE 2: Bidder Prove - Generating zero-knowledge proofs for all bidder pairs...");
+    println!("[host] ==================================================================================");
+    println!("[host] Expected number of proof operations: {} (n*(n-1) where n={})", num_bidders * (num_bidders - 1), num_bidders);
+    
+    // Prepare bidders data for parallel processing
+    let mut bidders_data = Vec::new();
+    let mut bidders_data_map = HashMap::new();
+    
+    for (bidder_id, (n, c, r, p, q, v)) in &bidder_results {
+        bidders_data.push((
+            bidder_id.clone(),
+            n.clone(),
+            c.clone(),
+            r.clone(),
+            v.clone(),
+            p.clone(),
+            q.clone(),
+        ));
+        bidders_data_map.insert(bidder_id.clone(), (n.clone(), p.clone(), q.clone()));
+    }
+    
+    // Run Phase 2 in parallel
+    let phase2_results = bidders_prove_all(bidders_data, sound_param, sigma);
+    
+    println!("[host] PHASE 2: All bidder_prove operations completed for {} bidders", num_bidders);
+
+    // ==================================================================================
+    // PHASE 3: AUCTIONEER VERIFY - Verify all proof_eval and receipts from all bidders
+    // ==================================================================================
+    println!("[host] ==================================================================================");
+    println!("[host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs and receipts...");
+    println!("[host] ==================================================================================");
+    
+    if !auctioneer_verify_all(&phase2_results, &bidders_data_map, sound_param) {
+        println!("[host] Protocol stopped due to verification failures");
+        return;
+    }
+    
+    println!("[host] PHASE 3: All auctioneer verifications passed");
+
+    // ==================================================================================
+    // PHASE 4: BIDDER VERIFY ALL & WINNER DETERMINATION - Each bidder verifies other bidders' results
+    // ==================================================================================
+    println!("[host] ==================================================================================");
+    println!("[host] PHASE 4: Bidder Verify All - Each bidder verifies other bidders' results in parallel...");
+    println!("[host] ==================================================================================");
+    
+    // Run the comprehensive bidder verification
+    let winner_results = bidder_verify_all(&phase2_results, &bidders_data_map, sound_param);
+    
+    // Final winner announcement (only show winner id and bid value if there is exactly one)
+    let mut winners = Vec::new();
+    for (bidder_id, is_winner) in &winner_results {
+        if *is_winner {
+            winners.push(bidder_id);
+        }
+    }
+    if winners.len() == 1 {
+        let winner_id = winners[0];
+        let winner_bid = bidder_results.get(winner_id).unwrap().5.clone();
+        println!("[host] 🎉 WINNER: {} (Bid: {})", winner_id, winner_bid);
+    }
 }
 
 fn main() {
@@ -526,16 +755,34 @@ fn main() {
     println!("  - Ensures all bidders provided valid zero-knowledge proofs");
     println!("  - Auctioneer acts as trusted verifier");
     println!("");
-    println!("PHASE 4: BIDDER VERIFY & COMPARE");
-    println!("  - Each bidder verifies other bidders' proofs using bidder_verify");
+    println!("PHASE 4: BIDDER VERIFY ALL & WINNER DETERMINATION");
+    println!("  - Each bidder verifies other bidders' proofs using bidder_verify_all");
     println!("  - Verifies proof_enc (encryption) and proof_dlog (discrete log)");
     println!("  - Ensures mutual verification between bidders");
     println!("  - Final bid comparison using compare_leq_honest");
-    println!("  - Determines relative ordering of bids using private keys");
+    println!("  - Determines winner by comparing against all other bidders");
+    println!("  - Runs in parallel for efficiency");
     println!("==================================================================================");
-    println!("");
     
-    run_two_bidders_example();
+    // Choose which example to run
+    let run_example = 2; // Change this to 1 or 2 to choose which example to run
+    
+    if run_example == 1 {
+        // Example 1: Run the fixed two-bidders example
+        println!("Running Example 1: Two Bidders Example");
+        run_two_bidders_example();
+    } else if run_example == 2 {
+        // Example 2: Run the configurable n-bidders example
+        println!("Running Example 2: N Bidders Example (Configurable)");
+        let bidders = vec![
+            ("Alice".to_string(), BigInt::from(1500)),
+            ("Bob".to_string(), BigInt::from(5000)),
+            ("Oscar".to_string(), BigInt::from(10000)),
+        ];
+        run_n_bidders_example(bidders);
+    } else {
+        println!("Invalid example number. Please set run_example to 1 or 2.");
+    }
 }
 
 fn verify_proof_enc(proof: Vec<Vec<Vec<BigInt>>>) -> bool {
