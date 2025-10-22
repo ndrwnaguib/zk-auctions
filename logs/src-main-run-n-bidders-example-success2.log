@@ -1,0 +1,454 @@
+[2025-10-22 10:46:55] (+0.00 mins | took: 0.00 mins)     Compiling zk-auctions-methods v0.1.0 (/home/iskander/Projects/zk-auctions-archive/methods)
+[2025-10-22 10:46:55] (+0.00 mins | took: 0.00 mins)     Compiling zk-auctions-core v0.1.0 (/home/iskander/Projects/zk-auctions-archive/core)
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.02 mins)  warning: unused variable: `cipher_i_and`
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)     --> core/src/protocols/strain/bidder.rs:450:13
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  450 |         let cipher_i_and = embed_and(cipher_i, pub_key_j, rand1);
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_cipher_i_and`
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      = note: `#[warn(unused_variables)]` on by default
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  warning: unused variable: `number1`
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)     --> core/src/protocols/strain/bidder.rs:435:9
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  435 |         number1: &BigInt,
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_number1`
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  warning: field `soundness_params` is never read
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)     --> core/src/protocols/strain/bidder.rs:139:5
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  137 | pub struct Bidder {
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |            ------ field in this struct
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  138 |     config: StrainConfig,
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  139 |     soundness_params: StrainSecurityParams,
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |     ^^^^^^^^^^^^^^^^
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)      = note: `#[warn(dead_code)]` on by default
+[2025-10-22 10:46:56] (+0.02 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.03 mins)  warning: `zk-auctions-core` (lib) generated 3 warnings
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     Compiling zk-auctions v0.1.0 (/home/iskander/Projects/zk-auctions-archive)
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: unused variable: `p_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)    --> src/main.rs:89:23
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  89 |             let (n_i, p_i, q_i) = bidders_data.get(bidder_id).unwrap();
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |                       ^^^ help: if this is intentional, prefix it with an underscore: `_p_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     = note: `#[warn(unused_variables)]` on by default
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: unused variable: `q_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)    --> src/main.rs:89:28
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  89 |             let (n_i, p_i, q_i) = bidders_data.get(bidder_id).unwrap();
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |                            ^^^ help: if this is intentional, prefix it with an underscore: `_q_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: unused variable: `v_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     --> src/main.rs:193:50
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  193 |                 let (bidder_i_id, n_i, c_i, r_i, v_i, p_i, q_i) = bidders[i].clone();
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |                                                  ^^^ help: if this is intentional, prefix it with an underscore: `_v_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: unused variable: `p_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     --> src/main.rs:193:55
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  193 |                 let (bidder_i_id, n_i, c_i, r_i, v_i, p_i, q_i) = bidders[i].clone();
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |                                                       ^^^ help: if this is intentional, prefix it with an underscore: `_p_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: unused variable: `q_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     --> src/main.rs:193:60
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  193 |                 let (bidder_i_id, n_i, c_i, r_i, v_i, p_i, q_i) = bidders[i].clone();
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |                                                            ^^^ help: if this is intentional, prefix it with an underscore: `_q_i`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: unused variable: `c_j`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     --> src/main.rs:194:40
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  194 |                 let (bidder_j_id, n_j, c_j, r_j, v_j, p_j, q_j) = bidders[j].clone();
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |                                        ^^^ help: if this is intentional, prefix it with an underscore: `_c_j`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: unused variable: `bidder_i_id`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     --> src/main.rs:230:27
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  230 |         let (bidder_j_id, bidder_i_id, result) = rx.recv().unwrap();
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |                           ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bidder_i_id`
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: field `proof_shuffle` is never read
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)    --> src/main.rs:34:5
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  25 | struct BidderProveResult {
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |        ----------------- field in this struct
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  ...
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  34 |     proof_shuffle: HashMap<u32, StrainProof>,
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |     ^^^^^^^^^^^^^
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     = note: `BidderProveResult` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     = note: `#[warn(dead_code)]` on by default
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: function `bidder_join` is never used
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     --> src/main.rs:122:4
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  122 | fn bidder_join(bidder_id: String, bid_value: BigInt) -> (BigInt, Vec<BigInt>, Vec<BigInt>, (BigInt, BigInt)) {
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |    ^^^^^^^^^^^
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  warning: function `verify_shuffle` is never used
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)     --> src/main.rs:880:4
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  880 | fn verify_shuffle(proof: &HashMap<u32, StrainProof>, n2: &BigInt, res: &[Vec<BigInt>]) -> bool {
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)      |    ^^^^^^^^^^^^^^
+[2025-10-22 10:46:58] (+0.05 mins | took: 0.00 mins)  
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.03 mins)  warning: `zk-auctions` (bin "zk-auctions") generated 10 warnings
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)      Finished `release` profile [optimized] target(s) in 5.33s
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)       Running `target/release/zk-auctions`
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  ==================================================================================
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  ZERO-KNOWLEDGE AUCTION PROTOCOL - 4 PHASE IMPLEMENTATION
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  ==================================================================================
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  This implementation follows a 4-phase zero-knowledge auction protocol:
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  PHASE 1: BIDDERS JOIN
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Each bidder generates GM keypair and encrypts their bid
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Runs in parallel for efficiency
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Output: (n_j, c_j, r_j, (p_j, q_j)) for each bidder
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  PHASE 2: BIDDER PROVE
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Each bidder 'j' runs bidder_prove against bidder 'i'
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - 'j' = bidder running proof, 'i' = other bidder being compared
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Generates zero-knowledge proofs of bid validity
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  PHASE 3: AUCTIONEER VERIFY
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Auctioneer verifies all proof_eval from all bidders
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Ensures all bidders provided valid zero-knowledge proofs
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Auctioneer acts as trusted verifier
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  PHASE 4: BIDDER VERIFY ALL & WINNER DETERMINATION
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Each bidder verifies other bidders' proofs using bidder_verify_all
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Verifies proof_enc (encryption) and proof_dlog (discrete log)
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Ensures mutual verification between bidders
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Final bid comparison using compare_leq_honest
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Determines winner by comparing against all other bidders
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)    - Runs in parallel for efficiency
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  ==================================================================================
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  Running Example 2: N Bidders Example (Configurable)
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Starting N-Bidder Auction Protocol...
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Running auction with 3 bidders
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Bidders: [("Alice", 1500), ("Bob", 5000), ("Oscar", 10000)]
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] sound_param = 40 sigma = 40
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] PHASE 1: Bidders Join - Generating keys and encrypting bids for 3 bidders...
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Starting Alice thread with bid v = 1500
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Starting mock_bidder_join for bidder: Alice
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Starting Oscar thread with bid v = 10000
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Starting mock_bidder_join for bidder: Oscar
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Starting Bob thread with bid v = 5000
+[2025-10-22 10:47:00] (+0.08 mins | took: 0.00 mins)  [host] Starting mock_bidder_join for bidder: Bob
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.02 mins)  [host] Mock bidder Oscar generated public key n_j = 1209451818520463196593256487270285992467831346660141392549734892157074305004646168097286169573862139151041867061131589744308396640242209773292207000773198416809913456625453865436329776183172992094972226815355200590666005542829031049934749872833719799461631839403158158508880024173940116173793198204857288264952910265682456490243051599656464246601891313019636073254828721526522873444287171207321650387880735765395715602856855198076073751158994063673897719252759101
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Mock bidder Oscar encrypted value c_j (len=32)
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Oscar thread completed
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Received Oscar results
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Mock bidder Bob generated public key n_j = 1210287372236171882670486876304868719786741694434583169192557033264240073547320755327535389632990786759882463133827336593719762529291594908980822833269724508189441459000180560033740440248475254283218363072677530630303172019767715708381395748482194374632304812237475959564465117155766274014399689876463856243399392816517633788742067735204105228734796358215336504344921231479598284276252623131582629527007380899988897305905622802549641610708242003675154277087591469
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Mock bidder Bob encrypted value c_j (len=32)
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Bob thread completed
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Received Bob results
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Mock bidder Alice generated public key n_j = 1210038581883347227163754871189341210773514934636601536168577469218635036852084572724528792599660369579006407497269168575665500410393140589543733747870599456148524705551693088266330859434902819743056508110352164743589073872850271782864798234471408998139743586744246511229936661437455825928939001964987110732901236902718871938275082758671663641676051140728056221658809750239119976453257737790662401906977033306082649205353300120606074393373971592520598048031678717
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Mock bidder Alice encrypted value c_j (len=32)
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Alice thread completed
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Received Alice results
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] PHASE 1: All 3 bidders have joined successfully
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] PHASE 2: Bidder Prove - Generating zero-knowledge proofs for all bidder pairs...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Expected number of proof operations: 6 (n*(n-1) where n=3)
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] PHASE 2: Running bidder_prove in parallel for all bidder pairs...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Starting bidder_prove: Alice vs Bob
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Starting bidder_prove: Oscar vs Bob
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Starting bidder_prove: Bob vs Alice
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Starting bidder_prove: Oscar vs Alice
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Starting bidder_prove: Bob vs Oscar
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Starting bidder_prove: Alice vs Oscar
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Building ExecutorEnv...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Building ExecutorEnv...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Building ExecutorEnv...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Building ExecutorEnv...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Building ExecutorEnv...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Building ExecutorEnv...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] ExecutorEnv built successfully.
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Running zkVM (prove)...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] ExecutorEnv built successfully.
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Running zkVM (prove)...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] ExecutorEnv built successfully.
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Running zkVM (prove)...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] ExecutorEnv built successfully.
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Running zkVM (prove)...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] ExecutorEnv built successfully.
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Running zkVM (prove)...
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] ExecutorEnv built successfully.
+[2025-10-22 10:47:01] (+0.10 mins | took: 0.00 mins)  [host] Running zkVM (prove)...
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.02 mins)  WARNING: proving in dev mode. This will not generate valid, secure proofs.
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  WARNING: proving in dev mode. This will not generate valid, secure proofs.
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  WARNING: proving in dev mode. This will not generate valid, secure proofs.
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  WARNING: proving in dev mode. This will not generate valid, secure proofs.
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  WARNING: proving in dev mode. This will not generate valid, secure proofs.
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  WARNING: proving in dev mode. This will not generate valid, secure proofs.
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Starting main function
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder j
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Starting main function
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder j
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Starting main function
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Starting main function
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder j
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder j
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Starting main function
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder j
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Starting main function
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder j
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder i
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest][(Oscar)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder i
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)   Reading inputs from environment for bidder i
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder i
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder i
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Reading inputs from environment for bidder i
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Read c_i (len: 32), n_i (bits: 1536), r_i (len: 32)
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Read sigma and sound_param: 40
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Read c_i (len: 32), n_i (bits: 1536), r_i (len: 32)
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Read sigma and sound_param: 40
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Read c_i (len: 32), n_i (bits: 1536), r_i (len: 32)
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Read sigma and sound_param: 40
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Read c_i (len: 32), n_i (bits: 1536), r_i (len: 32)
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Read sigma and sound_param: 40
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Read c_i (len: 32), n_i (bits: 1536), r_i (len: 32)
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Read sigma and sound_param: 40
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Read c_i (len: 32), n_i (bits: 1536), r_i (len: 32)
+[2025-10-22 10:47:02] (+0.12 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Read sigma and sound_param: 40
+[2025-10-22 10:47:15] (+0.33 mins | took: 0.22 mins)  [(Bob)-zkvm-bidder-prover-guest] Read random values
+[2025-10-22 10:47:15] (+0.33 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Computing proof_eval
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.02 mins)  [(Alice)-zkvm-bidder-prover-guest] Read random values
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Computing proof_eval
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Read random values
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Computing proof_eval
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Read random values
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Computing proof_eval
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Read random values
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Computing proof_eval
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Read random values
+[2025-10-22 10:47:16] (+0.35 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Computing proof_eval
+[2025-10-22 10:54:56] (+8.02 mins | took: 7.67 mins)  [(Bob)-zkvm-bidder-prover-guest] proof_eval completed
+[2025-10-22 10:54:56] (+8.02 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Computing proof_enc
+[2025-10-22 10:55:01] (+8.10 mins | took: 0.08 mins)  [(Alice)-zkvm-bidder-prover-guest] proof_eval completed
+[2025-10-22 10:55:01] (+8.10 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Computing proof_enc
+[2025-10-22 10:55:09] (+8.23 mins | took: 0.13 mins)  [(Oscar)-zkvm-bidder-prover-guest] proof_eval completed
+[2025-10-22 10:55:09] (+8.23 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Computing proof_enc
+[2025-10-22 10:55:12] (+8.28 mins | took: 0.05 mins)  [(Oscar)-zkvm-bidder-prover-guest] proof_eval completed
+[2025-10-22 10:55:12] (+8.28 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Computing proof_enc
+[2025-10-22 10:55:22] (+8.45 mins | took: 0.17 mins)  [(Bob)-zkvm-bidder-prover-guest] proof_eval completed
+[2025-10-22 10:55:22] (+8.45 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Computing proof_enc
+[2025-10-22 10:55:24] (+8.48 mins | took: 0.03 mins)  [(Alice)-zkvm-bidder-prover-guest] proof_eval completed
+[2025-10-22 10:55:24] (+8.48 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Computing proof_enc
+[2025-10-22 11:02:00] (+15.08 mins | took: 6.60 mins)  [(Alice)-zkvm-bidder-prover-guest] proof_enc completed
+[2025-10-22 11:02:00] (+15.08 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Computing proof_dlog
+[2025-10-22 11:02:08] (+15.22 mins | took: 0.13 mins)  [(Bob)-zkvm-bidder-prover-guest] proof_enc completed
+[2025-10-22 11:02:08] (+15.22 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Computing proof_dlog
+[2025-10-22 11:02:16] (+15.35 mins | took: 0.13 mins)  [(Alice)-zkvm-bidder-prover-guest] proof_enc completed
+[2025-10-22 11:02:16] (+15.35 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Computing proof_dlog
+[2025-10-22 11:02:23] (+15.47 mins | took: 0.12 mins)  [(Oscar)-zkvm-bidder-prover-guest] proof_enc completed
+[2025-10-22 11:02:23] (+15.47 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Computing proof_dlog
+[2025-10-22 11:02:35] (+15.67 mins | took: 0.20 mins)  [(Oscar)-zkvm-bidder-prover-guest] proof_enc completed
+[2025-10-22 11:02:35] (+15.67 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Computing proof_dlog
+[2025-10-22 11:03:00] (+16.08 mins | took: 0.42 mins)  [(Bob)-zkvm-bidder-prover-guest] proof_enc completed
+[2025-10-22 11:03:00] (+16.08 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Computing proof_dlog
+[2025-10-22 11:15:22] (+28.45 mins | took: 12.37 mins)  [(Alice)-zkvm-bidder-prover-guest] proof_dlog completed
+[2025-10-22 11:15:22] (+28.45 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Computing gm_eval_honest
+[2025-10-22 11:15:23] (+28.47 mins | took: 0.02 mins)  [(Alice)-zkvm-bidder-prover-guest] proof_dlog completed
+[2025-10-22 11:15:23] (+28.47 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Computing gm_eval_honest
+[2025-10-22 11:15:36] (+28.68 mins | took: 0.22 mins)  [(Bob)-zkvm-bidder-prover-guest] proof_dlog completed
+[2025-10-22 11:15:36] (+28.68 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Computing gm_eval_honest
+[2025-10-22 11:15:50] (+28.92 mins | took: 0.23 mins)  [(Bob)-zkvm-bidder-prover-guest] proof_dlog completed
+[2025-10-22 11:15:50] (+28.92 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Computing gm_eval_honest
+[2025-10-22 11:15:50] (+28.92 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] proof_dlog completed
+[2025-10-22 11:15:50] (+28.92 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Computing gm_eval_honest
+[2025-10-22 11:16:03] (+29.13 mins | took: 0.22 mins)  [(Oscar)-zkvm-bidder-prover-guest] proof_dlog completed
+[2025-10-22 11:16:03] (+29.13 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Computing gm_eval_honest
+[2025-10-22 11:23:20] (+36.42 mins | took: 7.28 mins)  [(Alice)-zkvm-bidder-prover-guest] gm_eval_honest completed, res length: 32
+[2025-10-22 11:23:20] (+36.42 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Using empty proof_shuffle
+[2025-10-22 11:23:20] (+36.42 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Writing private data
+[2025-10-22 11:23:22] (+36.45 mins | took: 0.03 mins)  [(Alice)-zkvm-bidder-prover-guest] gm_eval_honest completed, res length: 32
+[2025-10-22 11:23:22] (+36.45 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Using empty proof_shuffle
+[2025-10-22 11:23:22] (+36.45 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Writing private data
+[2025-10-22 11:23:35] (+36.67 mins | took: 0.22 mins)  [(Alice)-zkvm-bidder-prover-guest] Committing public results
+[2025-10-22 11:23:38] (+36.72 mins | took: 0.05 mins)  [(Alice)-zkvm-bidder-prover-guest] Committing public results
+[2025-10-22 11:23:38] (+36.72 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] gm_eval_honest completed, res length: 32
+[2025-10-22 11:23:38] (+36.72 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Using empty proof_shuffle
+[2025-10-22 11:23:38] (+36.72 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Writing private data
+[2025-10-22 11:23:38] (+36.72 mins | took: 0.00 mins)  [(Alice)-zkvm-bidder-prover-guest] Main function completed successfully
+[2025-10-22 11:23:39] (+36.73 mins | took: 0.02 mins)  WARNING: Proving in dev mode does not generate a valid receipt. Receipts generated from this process are invalid and should never be used in production.
+[2025-10-22 11:23:39] (+36.73 mins | took: 0.00 mins)  [host] zkVM proof generated.
+[2025-10-22 11:23:39] (+36.73 mins | took: 0.00 mins)  [host] Reading private output...
+[2025-10-22 11:23:39] (+36.73 mins | took: 0.00 mins)  [host] Private output deserialization successful.
+[2025-10-22 11:23:39] (+36.73 mins | took: 0.00 mins)  [host] Decoding public results from journal...
+[2025-10-22 11:23:39] (+36.73 mins | took: 0.00 mins)  [host] Got n_j = 1210038581883347227163754871189341210773514934636601536168577469218635036852084572724528792599660369579006407497269168575665500410393140589543733747870599456148524705551693088266330859434902819743056508110352164743589073872850271782864798234471408998139743586744246511229936661437455825928939001964987110732901236902718871938275082758671663641676051140728056221658809750239119976453257737790662401906977033306082649205353300120606074393373971592520598048031678717
+[2025-10-22 11:23:39] (+36.73 mins | took: 0.00 mins)  [host] Completed bidder_prove: Alice vs Bob
+[2025-10-22 11:23:41] (+36.77 mins | took: 0.03 mins)  [(Alice)-zkvm-bidder-prover-guest] Main function completed successfully
+[2025-10-22 11:23:41] (+36.77 mins | took: 0.00 mins)  WARNING: Proving in dev mode does not generate a valid receipt. Receipts generated from this process are invalid and should never be used in production.
+[2025-10-22 11:23:41] (+36.77 mins | took: 0.00 mins)  [host] zkVM proof generated.
+[2025-10-22 11:23:41] (+36.77 mins | took: 0.00 mins)  [host] Reading private output...
+[2025-10-22 11:23:41] (+36.77 mins | took: 0.00 mins)  [host] Private output deserialization successful.
+[2025-10-22 11:23:41] (+36.77 mins | took: 0.00 mins)  [host] Decoding public results from journal...
+[2025-10-22 11:23:41] (+36.77 mins | took: 0.00 mins)  [host] Got n_j = 1210038581883347227163754871189341210773514934636601536168577469218635036852084572724528792599660369579006407497269168575665500410393140589543733747870599456148524705551693088266330859434902819743056508110352164743589073872850271782864798234471408998139743586744246511229936661437455825928939001964987110732901236902718871938275082758671663641676051140728056221658809750239119976453257737790662401906977033306082649205353300120606074393373971592520598048031678717
+[2025-10-22 11:23:41] (+36.77 mins | took: 0.00 mins)  [host] Completed bidder_prove: Alice vs Oscar
+[2025-10-22 11:23:42] (+36.78 mins | took: 0.02 mins)  [(Bob)-zkvm-bidder-prover-guest] gm_eval_honest completed, res length: 32
+[2025-10-22 11:23:43] (+36.80 mins | took: 0.02 mins)  [(Bob)-zkvm-bidder-prover-guest] Using empty proof_shuffle
+[2025-10-22 11:23:43] (+36.80 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Writing private data
+[2025-10-22 11:23:50] (+36.92 mins | took: 0.12 mins)  [(Oscar)-zkvm-bidder-prover-guest] Committing public results
+[2025-10-22 11:23:52] (+36.95 mins | took: 0.03 mins)  [(Oscar)-zkvm-bidder-prover-guest] Main function completed successfully
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.02 mins)  WARNING: Proving in dev mode does not generate a valid receipt. Receipts generated from this process are invalid and should never be used in production.
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [host] zkVM proof generated.
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [host] Reading private output...
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [host] Private output deserialization successful.
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [host] Decoding public results from journal...
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [host] Got n_j = 1209451818520463196593256487270285992467831346660141392549734892157074305004646168097286169573862139151041867061131589744308396640242209773292207000773198416809913456625453865436329776183172992094972226815355200590666005542829031049934749872833719799461631839403158158508880024173940116173793198204857288264952910265682456490243051599656464246601891313019636073254828721526522873444287171207321650387880735765395715602856855198076073751158994063673897719252759101
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [host] Completed bidder_prove: Oscar vs Bob
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] gm_eval_honest completed, res length: 32
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Using empty proof_shuffle
+[2025-10-22 11:23:53] (+36.97 mins | took: 0.00 mins)  [(Bob)-zkvm-bidder-prover-guest] Writing private data
+[2025-10-22 11:23:55] (+37.00 mins | took: 0.03 mins)  [(Bob)-zkvm-bidder-prover-guest] Committing public results
+[2025-10-22 11:23:57] (+37.03 mins | took: 0.03 mins)  [(Bob)-zkvm-bidder-prover-guest] Main function completed successfully
+[2025-10-22 11:23:57] (+37.03 mins | took: 0.00 mins)  WARNING: Proving in dev mode does not generate a valid receipt. Receipts generated from this process are invalid and should never be used in production.
+[2025-10-22 11:23:57] (+37.03 mins | took: 0.00 mins)  [host] zkVM proof generated.
+[2025-10-22 11:23:57] (+37.03 mins | took: 0.00 mins)  [host] Reading private output...
+[2025-10-22 11:23:57] (+37.03 mins | took: 0.00 mins)  [host] Private output deserialization successful.
+[2025-10-22 11:23:57] (+37.03 mins | took: 0.00 mins)  [host] Decoding public results from journal...
+[2025-10-22 11:23:57] (+37.03 mins | took: 0.00 mins)  [host] Got n_j = 1210287372236171882670486876304868719786741694434583169192557033264240073547320755327535389632990786759882463133827336593719762529291594908980822833269724508189441459000180560033740440248475254283218363072677530630303172019767715708381395748482194374632304812237475959564465117155766274014399689876463856243399392816517633788742067735204105228734796358215336504344921231479598284276252623131582629527007380899988897305905622802549641610708242003675154277087591469
+[2025-10-22 11:23:57] (+37.03 mins | took: 0.00 mins)  [host] Completed bidder_prove: Bob vs Oscar
+[2025-10-22 11:24:03] (+37.13 mins | took: 0.10 mins)  [(Oscar)-zkvm-bidder-prover-guest] gm_eval_honest completed, res length: 32
+[2025-10-22 11:24:03] (+37.13 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Using empty proof_shuffle
+[2025-10-22 11:24:03] (+37.13 mins | took: 0.00 mins)  [(Oscar)-zkvm-bidder-prover-guest] Writing private data
+[2025-10-22 11:24:04] (+37.15 mins | took: 0.02 mins)  [(Bob)-zkvm-bidder-prover-guest] Committing public results
+[2025-10-22 11:24:06] (+37.18 mins | took: 0.03 mins)  [(Bob)-zkvm-bidder-prover-guest] Main function completed successfully
+[2025-10-22 11:24:07] (+37.20 mins | took: 0.02 mins)  WARNING: Proving in dev mode does not generate a valid receipt. Receipts generated from this process are invalid and should never be used in production.
+[2025-10-22 11:24:07] (+37.20 mins | took: 0.00 mins)  [host] zkVM proof generated.
+[2025-10-22 11:24:07] (+37.20 mins | took: 0.00 mins)  [host] Reading private output...
+[2025-10-22 11:24:07] (+37.20 mins | took: 0.00 mins)  [host] Private output deserialization successful.
+[2025-10-22 11:24:07] (+37.20 mins | took: 0.00 mins)  [host] Decoding public results from journal...
+[2025-10-22 11:24:07] (+37.20 mins | took: 0.00 mins)  [host] Got n_j = 1210287372236171882670486876304868719786741694434583169192557033264240073547320755327535389632990786759882463133827336593719762529291594908980822833269724508189441459000180560033740440248475254283218363072677530630303172019767715708381395748482194374632304812237475959564465117155766274014399689876463856243399392816517633788742067735204105228734796358215336504344921231479598284276252623131582629527007380899988897305905622802549641610708242003675154277087591469
+[2025-10-22 11:24:07] (+37.20 mins | took: 0.00 mins)  [host] Completed bidder_prove: Bob vs Alice
+[2025-10-22 11:24:14] (+37.32 mins | took: 0.12 mins)  [(Oscar)-zkvm-bidder-prover-guest] Committing public results
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.03 mins)  [(Oscar)-zkvm-bidder-prover-guest] Main function completed successfully
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  WARNING: Proving in dev mode does not generate a valid receipt. Receipts generated from this process are invalid and should never be used in production.
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] zkVM proof generated.
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] Reading private output...
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] Private output deserialization successful.
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] Decoding public results from journal...
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] Got n_j = 1209451818520463196593256487270285992467831346660141392549734892157074305004646168097286169573862139151041867061131589744308396640242209773292207000773198416809913456625453865436329776183172992094972226815355200590666005542829031049934749872833719799461631839403158158508880024173940116173793198204857288264952910265682456490243051599656464246601891313019636073254828721526522873444287171207321650387880735765395715602856855198076073751158994063673897719252759101
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] Completed bidder_prove: Oscar vs Alice
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] PHASE 2: All bidder_prove operations completed
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] PHASE 2: All bidder_prove operations completed for 3 bidders
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs and receipts...
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs and receipts from all bidders...
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying 2 results for bidder: Bob
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying result 1 for bidder Bob vs Oscar
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying receipt for Bob result 1 vs Oscar
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Receipt verification PASSED for Bob result 1 vs Oscar
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying proof_eval for Bob vs Oscar
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] n_i = 1210287372236171882670486876304868719786741694434583169192557033264240073547320755327535389632990786759882463133827336593719762529291594908980822833269724508189441459000180560033740440248475254283218363072677530630303172019767715708381395748482194374632304812237475959564465117155766274014399689876463856243399392816517633788742067735204105228734796358215336504344921231479598284276252623131582629527007380899988897305905622802549641610708242003675154277087591469
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] n_j_from_proof = 1210287372236171882670486876304868719786741694434583169192557033264240073547320755327535389632990786759882463133827336593719762529291594908980822833269724508189441459000180560033740440248475254283218363072677530630303172019767715708381395748482194374632304812237475959564465117155766274014399689876463856243399392816517633788742067735204105228734796358215336504344921231479598284276252623131582629527007380899988897305905622802549641610708242003675154277087591469
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] proof_eval verification passed.
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Verification PASSED for Bob result 1 vs Oscar
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying result 2 for bidder Bob vs Alice
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying receipt for Bob result 2 vs Alice
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Receipt verification PASSED for Bob result 2 vs Alice
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying proof_eval for Bob vs Alice
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] n_i = 1210287372236171882670486876304868719786741694434583169192557033264240073547320755327535389632990786759882463133827336593719762529291594908980822833269724508189441459000180560033740440248475254283218363072677530630303172019767715708381395748482194374632304812237475959564465117155766274014399689876463856243399392816517633788742067735204105228734796358215336504344921231479598284276252623131582629527007380899988897305905622802549641610708242003675154277087591469
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] n_j_from_proof = 1210287372236171882670486876304868719786741694434583169192557033264240073547320755327535389632990786759882463133827336593719762529291594908980822833269724508189441459000180560033740440248475254283218363072677530630303172019767715708381395748482194374632304812237475959564465117155766274014399689876463856243399392816517633788742067735204105228734796358215336504344921231479598284276252623131582629527007380899988897305905622802549641610708242003675154277087591469
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] proof_eval verification passed.
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Verification PASSED for Bob result 2 vs Alice
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying 2 results for bidder: Oscar
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying result 1 for bidder Oscar vs Bob
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying receipt for Oscar result 1 vs Bob
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Receipt verification PASSED for Oscar result 1 vs Bob
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying proof_eval for Oscar vs Bob
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] n_i = 1209451818520463196593256487270285992467831346660141392549734892157074305004646168097286169573862139151041867061131589744308396640242209773292207000773198416809913456625453865436329776183172992094972226815355200590666005542829031049934749872833719799461631839403158158508880024173940116173793198204857288264952910265682456490243051599656464246601891313019636073254828721526522873444287171207321650387880735765395715602856855198076073751158994063673897719252759101
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] n_j_from_proof = 1209451818520463196593256487270285992467831346660141392549734892157074305004646168097286169573862139151041867061131589744308396640242209773292207000773198416809913456625453865436329776183172992094972226815355200590666005542829031049934749872833719799461631839403158158508880024173940116173793198204857288264952910265682456490243051599656464246601891313019636073254828721526522873444287171207321650387880735765395715602856855198076073751158994063673897719252759101
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] proof_eval verification passed.
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Verification PASSED for Oscar result 1 vs Bob
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying result 2 for bidder Oscar vs Alice
+[2025-10-22 11:24:16] (+37.35 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying receipt for Oscar result 2 vs Alice
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.02 mins)  [(auctioneer)-host] ✅ Receipt verification PASSED for Oscar result 2 vs Alice
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying proof_eval for Oscar vs Alice
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] n_i = 1209451818520463196593256487270285992467831346660141392549734892157074305004646168097286169573862139151041867061131589744308396640242209773292207000773198416809913456625453865436329776183172992094972226815355200590666005542829031049934749872833719799461631839403158158508880024173940116173793198204857288264952910265682456490243051599656464246601891313019636073254828721526522873444287171207321650387880735765395715602856855198076073751158994063673897719252759101
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] n_j_from_proof = 1209451818520463196593256487270285992467831346660141392549734892157074305004646168097286169573862139151041867061131589744308396640242209773292207000773198416809913456625453865436329776183172992094972226815355200590666005542829031049934749872833719799461631839403158158508880024173940116173793198204857288264952910265682456490243051599656464246601891313019636073254828721526522873444287171207321650387880735765395715602856855198076073751158994063673897719252759101
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] proof_eval verification passed.
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Verification PASSED for Oscar result 2 vs Alice
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying 2 results for bidder: Alice
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying result 1 for bidder Alice vs Bob
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying receipt for Alice result 1 vs Bob
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Receipt verification PASSED for Alice result 1 vs Bob
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying proof_eval for Alice vs Bob
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] n_i = 1210038581883347227163754871189341210773514934636601536168577469218635036852084572724528792599660369579006407497269168575665500410393140589543733747870599456148524705551693088266330859434902819743056508110352164743589073872850271782864798234471408998139743586744246511229936661437455825928939001964987110732901236902718871938275082758671663641676051140728056221658809750239119976453257737790662401906977033306082649205353300120606074393373971592520598048031678717
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] n_j_from_proof = 1210038581883347227163754871189341210773514934636601536168577469218635036852084572724528792599660369579006407497269168575665500410393140589543733747870599456148524705551693088266330859434902819743056508110352164743589073872850271782864798234471408998139743586744246511229936661437455825928939001964987110732901236902718871938275082758671663641676051140728056221658809750239119976453257737790662401906977033306082649205353300120606074393373971592520598048031678717
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] proof_eval verification passed.
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Verification PASSED for Alice result 1 vs Bob
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying result 2 for bidder Alice vs Oscar
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying receipt for Alice result 2 vs Oscar
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Receipt verification PASSED for Alice result 2 vs Oscar
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] Verifying proof_eval for Alice vs Oscar
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] n_i = 1210038581883347227163754871189341210773514934636601536168577469218635036852084572724528792599660369579006407497269168575665500410393140589543733747870599456148524705551693088266330859434902819743056508110352164743589073872850271782864798234471408998139743586744246511229936661437455825928939001964987110732901236902718871938275082758671663641676051140728056221658809750239119976453257737790662401906977033306082649205353300120606074393373971592520598048031678717
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] n_j_from_proof = 1210038581883347227163754871189341210773514934636601536168577469218635036852084572724528792599660369579006407497269168575665500410393140589543733747870599456148524705551693088266330859434902819743056508110352164743589073872850271782864798234471408998139743586744246511229936661437455825928939001964987110732901236902718871938275082758671663641676051140728056221658809750239119976453257737790662401906977033306082649205353300120606074393373971592520598048031678717
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] proof_eval verification passed.
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ Verification PASSED for Alice result 2 vs Oscar
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(auctioneer)-host] ✅ ALL auctioneer verifications PASSED - Proceeding to Phase 4
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [host] PHASE 3: All auctioneer verifications passed
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [host] PHASE 4: Bidder Verify All - Each bidder verifies other bidders' results in parallel...
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Bob)-host] Starting verification for bidder: Bob
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Bob)-host] Verifying result against Oscar
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Bob)-host] Verifying proof_enc...
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Oscar)-host] Starting verification for bidder: Oscar
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Oscar)-host] Verifying result against Bob
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Oscar)-host] Verifying proof_enc...
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Alice)-host] Starting verification for bidder: Alice
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Alice)-host] Verifying result against Bob
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Alice)-host] Verifying proof_enc...
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Bob)-host] proof_enc verification passed.
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Bob)-host] Verifying dlog proof...
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Oscar)-host] proof_enc verification passed.
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Oscar)-host] Verifying dlog proof...
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Alice)-host] proof_enc verification passed.
+[2025-10-22 11:24:17] (+37.37 mins | took: 0.00 mins)  [(Alice)-host] Verifying dlog proof...
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.02 mins)  [(Bob)-host] dlog proof verification passed.
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Bob)-host] Comparing bids using compare_leq_honest...
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Oscar)-host] dlog proof verification passed.
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Oscar)-host] Comparing bids using compare_leq_honest...
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Alice)-host] dlog proof verification passed.
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Alice)-host] Comparing bids using compare_leq_honest...
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Oscar)-host] Other bidder's bid is <= current bidder's bid. Continuing...
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Oscar)-host] Beat another bidder
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Oscar)-host] Verifying result against Alice
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Oscar)-host] Verifying proof_enc...
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Bob)-host] Other bidder's bid is > current bidder's bid. Not winner.
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Bob)-host] Lost against another bidder
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Bob)-host] Verification complete. Is winner: false (checked 1 comparisons)
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Alice)-host] Other bidder's bid is > current bidder's bid. Not winner.
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Alice)-host] Lost against another bidder
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Alice)-host] Verification complete. Is winner: false (checked 1 comparisons)
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Oscar)-host] proof_enc verification passed.
+[2025-10-22 11:24:18] (+37.38 mins | took: 0.00 mins)  [(Oscar)-host] Verifying dlog proof...
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.02 mins)  [(Oscar)-host] dlog proof verification passed.
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [(Oscar)-host] Comparing bids using compare_leq_honest...
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [(Oscar)-host] Other bidder's bid is <= current bidder's bid. Continuing...
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [(Oscar)-host] Beat another bidder
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [(Oscar)-host] Verification complete. Is winner: true (checked 2 comparisons)
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] ❌ Bob is not the winner
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] ❌ Alice is not the winner
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] 🏆 WINNER: Oscar is the auction winner!
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] ==================================================================================
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] FINAL AUCTION RESULTS
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] ==================================================================================
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] 🎉 WINNER: Oscar is the sole winner!
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] Detailed Results:
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] Bob: ❌ Lost (Bid: 5000)
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] Alice: ❌ Lost (Bid: 1500)
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] Oscar: 🏆 WINNER (Bid: 10000)
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] Expected ranking by bid value:
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] 1. Oscar (Bid: 10000)
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] 2. Bob (Bid: 5000)
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] 3. Alice (Bid: 1500)
+[2025-10-22 11:24:19] (+37.40 mins | took: 0.00 mins)  [host] ==================================================================================
