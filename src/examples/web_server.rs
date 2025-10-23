@@ -39,10 +39,10 @@ pub fn start_web_server() {
 }
 
 fn handle_client(mut stream: TcpStream, log_buffer: LogBuffer) {
-    let mut buffer = [0; 1024];
-    stream.read(&mut buffer).unwrap();
+    let mut buffer = [0; 4096];
+    let bytes_read = stream.read(&mut buffer).unwrap_or(0);
     
-    let request = String::from_utf8_lossy(&buffer[..]);
+    let request = String::from_utf8_lossy(&buffer[..bytes_read]);
     let request_line = request.lines().next().unwrap_or("");
     
     if request_line.starts_with("GET / ") {
@@ -52,8 +52,8 @@ fn handle_client(mut stream: TcpStream, log_buffer: LogBuffer) {
         // Serve the logs as Server-Sent Events
         serve_logs(&mut stream, log_buffer);
     } else if request_line.starts_with("POST /execute ") {
-        // Execute the auction protocol
-        execute_auction(&mut stream, log_buffer);
+        // Execute the auction protocol - pass the full request
+        execute_auction(&mut stream, log_buffer, &request);
     } else {
         // 404 Not Found
         let response = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
@@ -602,7 +602,61 @@ fn serve_logs(stream: &mut TcpStream, log_buffer: LogBuffer) {
     }
 }
 
-fn execute_auction(stream: &mut TcpStream, log_buffer: LogBuffer) {
+fn parse_json_body(json_str: &str) -> (String, String) {
+    // Simple JSON parsing for {"bidderNames":["Alice","Bob"],"bidValues":"1000,2000"}
+    let bidder_names = if let Some(start) = json_str.find("\"bidderNames\"") {
+        if let Some(bracket_start) = json_str[start..].find('[') {
+            if let Some(bracket_end) = json_str[start + bracket_start..].find(']') {
+                let array_content = &json_str[start + bracket_start + 1..start + bracket_start + bracket_end];
+                // Remove quotes and extract names
+                array_content
+                    .split(',')
+                    .map(|s| s.trim().trim_matches('"'))
+                    .collect::<Vec<_>>()
+                    .join(",")
+            } else {
+                "Alice,Bob,Charlie".to_string()
+            }
+        } else {
+            "Alice,Bob,Charlie".to_string()
+        }
+    } else {
+        "Alice,Bob,Charlie".to_string()
+    };
+    
+    let bid_values = if let Some(start) = json_str.find("\"bidValues\"") {
+        if let Some(colon) = json_str[start..].find(':') {
+            let after_colon = &json_str[start + colon + 1..];
+            if let Some(quote_start) = after_colon.find('"') {
+                if let Some(quote_end) = after_colon[quote_start + 1..].find('"') {
+                    after_colon[quote_start + 1..quote_start + 1 + quote_end].to_string()
+                } else {
+                    "1000,2000,3000".to_string()
+                }
+            } else {
+                "1000,2000,3000".to_string()
+            }
+        } else {
+            "1000,2000,3000".to_string()
+        }
+    } else {
+        "1000,2000,3000".to_string()
+    };
+    
+    (bidder_names, bid_values)
+}
+
+fn execute_auction(stream: &mut TcpStream, log_buffer: LogBuffer, request: &str) {
+    // Extract JSON from the body (after the headers)
+    let json_body = if let Some(body_start) = request.find("\r\n\r\n") {
+        &request[body_start + 4..].trim_end_matches('\0')
+    } else {
+        ""
+    };
+    
+    // Parse bidder names and values from JSON
+    let (bidder_names, bid_values) = parse_json_body(json_body);
+    
     // Send response immediately
     let response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nAuction protocol execution started";
     stream.write_all(response.as_bytes()).unwrap();
@@ -612,22 +666,24 @@ fn execute_auction(stream: &mut TcpStream, log_buffer: LogBuffer) {
         use std::process::{Command, Stdio};
         use std::io::{BufRead, BufReader};
         
+        let num_bidders = bidder_names.split(',').count();
         let mut buffer = log_buffer.lock().unwrap();
-        buffer.push_back("[WEB-SERVER] ==================================================================================".to_string());
         buffer.push_back("[WEB-SERVER] Starting auction protocol execution as subprocess...".to_string());
+        buffer.push_back(format!("[WEB-SERVER] Number of Bidders: {}", num_bidders));
         buffer.push_back("[WEB-SERVER] Running: RISC0_DEV_MODE=true cargo run --release".to_string());
-        buffer.push_back("[WEB-SERVER] This will execute Example 2 (N-Bidders) with Oscar(10000), Bob(5000), Alice(3000)".to_string());
-        buffer.push_back("[WEB-SERVER] ==================================================================================".to_string());
         drop(buffer);
         
         // Execute cargo run as a subprocess to capture ALL stdout/stderr
-        // Pass "2" as argument to run example 2 (N-Bidders)
+        // Pass "2" as argument to run example 2 (N-Bidders), followed by bidder names and values
+        let current_dir = std::env::current_dir().expect("Failed to get current directory");
         let mut child = Command::new("cargo")
             .arg("run")
             .arg("--release")
             .arg("--")
             .arg("2")  // Run example 2 (N-Bidders)
-            .current_dir("/home/iskander/Projects/zk-auctions-archive")
+            .arg(&bidder_names)  // Pass bidder names as argument
+            .arg(&bid_values)    // Pass bid values as argument
+            .current_dir(&current_dir)
             .env("RISC0_DEV_MODE", "true")
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -669,7 +725,7 @@ fn execute_auction(stream: &mut TcpStream, log_buffer: LogBuffer) {
                         continue;
                     }
                     
-                    let timestamp = Local::now().format("[%Y-%m-%d %H:%M:%S]");
+                    let timestamp = Local::now().format("[%H:%M]");
                     let mut buffer = log_buffer_clone.lock().unwrap();
                     buffer.push_back(format!("{} {}", timestamp, line));
                 }

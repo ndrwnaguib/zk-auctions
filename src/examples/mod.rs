@@ -10,133 +10,6 @@ use std::collections::HashMap;
 
 pub mod web_server;
 
-// Version of run_n_bidders_example that accepts a logger function
-pub fn run_n_bidders_example_with_logger<F>(bidders: Vec<(String, BigInt)>, mut logger: F) 
-where
-    F: FnMut(String) + Send + 'static,
-{
-    // ==================================================================================
-    // N-BIDDER AUCTION PROTOCOL - Configurable bidders with names and bid values
-    // ==================================================================================
-    logger("[host] ==================================================================================".to_string());
-    logger("[host] Starting N-Bidder Auction Protocol...".to_string());
-    logger("[host] ==================================================================================".to_string());
-    
-    let num_bidders = bidders.len();
-    let sound_param: usize = 40;
-    let sigma: BigInt = BigInt::from(40);
-    
-    logger(format!("[host] Running auction with {} bidders", num_bidders));
-    logger(format!("[host] sound_param = {} sigma = {}", sound_param, sigma));
-
-    // ==================================================================================
-    // PHASE 1: BIDDERS JOIN - Generate keys and encrypt bid values (parallel)
-    // ==================================================================================
-    logger("[host] ==================================================================================".to_string());
-    logger(format!("[host] PHASE 1: Bidders Join - Generating keys and encrypting bids for {} bidders...", num_bidders));
-    logger("[host] ==================================================================================".to_string());
-
-    let (tx, rx) = mpsc::channel();
-    let mut threads = Vec::new();
-    
-    for (bidder_id, bid_value) in bidders {
-        let tx_clone = tx.clone();
-        
-        // Log before spawning the thread
-        logger(format!("[({})-host-bidders-join] Starting {} thread with bid v = {}", bidder_id, bidder_id, bid_value));
-        
-        let handle = thread::spawn(move || {
-            let result = mock_bidder_join(bidder_id.clone(), bid_value.clone());
-            tx_clone.send((bidder_id, bid_value, result)).unwrap();
-        });
-        
-        threads.push(handle);
-    }
-    
-    // Collect results from all bidders
-    let mut bidder_results = HashMap::new();
-    for _ in 0..num_bidders {
-        let (bidder_id, bid_value, (n, c, r, (p, q))) = rx.recv().unwrap();
-        bidder_results.insert(bidder_id.clone(), (n, c, r, p, q, bid_value));
-        logger(format!("[({})-host-bidders-join] {} thread completed", bidder_id, bidder_id));
-        logger(format!("[({})-host-bidders-join] Received {} results", bidder_id, bidder_id));
-    }
-    
-    // Wait for all threads to complete
-    for handle in threads {
-        handle.join().unwrap();
-    }
-    
-    logger(format!("[host] PHASE 1: All {} bidders have joined successfully", num_bidders));
-
-    // ==================================================================================
-    // PHASE 2: BIDDER PROVE - Each bidder runs bidder_prove against other bidders (parallel)
-    // ==================================================================================
-    logger("[host] ==================================================================================".to_string());
-    logger("[host] PHASE 2: Bidder Prove - Generating zero-knowledge proofs for all bidder pairs...".to_string());
-    logger("[host] ==================================================================================".to_string());
-    logger(format!("[host] Expected number of proof operations: {} (n*(n-1) where n={})", num_bidders * (num_bidders - 1), num_bidders));
-    
-    // Prepare bidders data for parallel processing
-    let mut bidders_data = Vec::new();
-    let mut bidders_data_map = HashMap::new();
-    
-    for (bidder_id, (n, c, r, p, q, v)) in &bidder_results {
-        bidders_data.push((
-            bidder_id.clone(),
-            n.clone(),
-            c.clone(),
-            r.clone(),
-            v.clone(),
-            p.clone(),
-            q.clone(),
-        ));
-        bidders_data_map.insert(bidder_id.clone(), (n.clone(), p.clone(), q.clone()));
-    }
-    
-    // Run Phase 2 in parallel
-    let phase2_results = bidders_prove_all(bidders_data, sound_param, sigma);
-    
-    logger(format!("[host] PHASE 2: All bidder_prove operations completed for {} bidders", num_bidders));
-
-    // ==================================================================================
-    // PHASE 3: AUCTIONEER VERIFY - Verify all proof_eval and receipts from all bidders
-    // ==================================================================================
-    logger("[host] ==================================================================================".to_string());
-    logger("[host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs and receipts...".to_string());
-    logger("[host] ==================================================================================".to_string());
-    
-    if !auctioneer_verify_all(&phase2_results, &bidders_data_map, sound_param) {
-        logger("[host] Protocol stopped due to verification failures".to_string());
-        return;
-    }
-    
-    logger("[host] PHASE 3: All auctioneer verifications passed".to_string());
-
-    // ==================================================================================
-    // PHASE 4: BIDDER VERIFY ALL & WINNER DETERMINATION - Each bidder verifies other bidders' results
-    // ==================================================================================
-    logger("[host] ==================================================================================".to_string());
-    logger("[host] PHASE 4: Bidder Verify All - Each bidder verifies other bidders' results in parallel...".to_string());
-    logger("[host] ==================================================================================".to_string());
-    
-    // Run the comprehensive bidder verification
-    let winner_results = bidder_verify_all(&phase2_results, &bidders_data_map, sound_param);
-    
-    // Final winner announcement (only show winner id and bid value if there is exactly one)
-    let mut winners = Vec::new();
-    for (bidder_id, is_winner) in &winner_results {
-        if *is_winner {
-            winners.push(bidder_id);
-        }
-    }
-    if winners.len() == 1 {
-        let winner_id = winners[0];
-        let winner_bid = bidder_results.get(winner_id).unwrap().5.clone();
-        logger(format!("[host] 🎉 WINNER: {} (Bid: {})", winner_id, winner_bid));
-    }
-}
-
 pub fn run_two_bidders_example() { 
     // ==================================================================================
     // PHASE 1: BIDDERS JOIN - Generate keys and encrypt bid values
@@ -149,9 +22,7 @@ pub fn run_two_bidders_example() {
     //   - r_j: random values used in encryption
     //   - (p_j, q_j): private key components
     // ==================================================================================
-    println!("[host] ==================================================================================");
     println!("[host] PHASE 1: Bidders Join - Generating keys and encrypting bids...");
-    println!("[host] ==================================================================================");
     
     // Create channels for communication between threads
     let (tx, rx) = mpsc::channel();
@@ -218,9 +89,7 @@ pub fn run_two_bidders_example() {
     // This generates zero-knowledge proofs that bidder j's bid is valid
     // Output: proof_eval, proof_enc, proof_dlog, and comparison results
     // ==================================================================================
-    println!("[host] ==================================================================================");
     println!("[host] PHASE 2: Bidder Prove - Generating zero-knowledge proofs in parallel...");
-    println!("[host] ==================================================================================");
 
     let sound_param: usize = 40;
     let sigma: BigInt = BigInt::from(40);
@@ -294,24 +163,19 @@ pub fn run_n_bidders_example(bidders: Vec<(String, BigInt)>) {
     // ==================================================================================
     // N-BIDDER AUCTION PROTOCOL - Configurable bidders with names and bid values
     // ==================================================================================
-    println!("[host] ==================================================================================");
     println!("[host] Starting N-Bidder Auction Protocol...");
-    println!("[host] ==================================================================================");
     
     let num_bidders = bidders.len();
     let sound_param: usize = 40;
     let sigma: BigInt = BigInt::from(40);
     
     println!("[host] Running auction with {} bidders", num_bidders);
-    println!("[host] Bidders: {:?}", bidders);
     println!("[host] sound_param = {} sigma = {}", sound_param, sigma);
 
     // ==================================================================================
     // PHASE 1: BIDDERS JOIN - Generate keys and encrypt bid values (parallel)
     // ==================================================================================
-    println!("[host] ==================================================================================");
     println!("[host] PHASE 1: Bidders Join - Generating keys and encrypting bids for {} bidders...", num_bidders);
-    println!("[host] ==================================================================================");
 
     let (tx, rx) = mpsc::channel();
     let mut threads = Vec::new();
@@ -347,9 +211,7 @@ pub fn run_n_bidders_example(bidders: Vec<(String, BigInt)>) {
     // ==================================================================================
     // PHASE 2: BIDDER PROVE - Each bidder runs bidder_prove against other bidders (parallel)
     // ==================================================================================
-    println!("[host] ==================================================================================");
     println!("[host] PHASE 2: Bidder Prove - Generating zero-knowledge proofs for all bidder pairs...");
-    println!("[host] ==================================================================================");
     println!("[host] Expected number of proof operations: {} (n*(n-1) where n={})", num_bidders * (num_bidders - 1), num_bidders);
     
     // Prepare bidders data for parallel processing
@@ -377,9 +239,7 @@ pub fn run_n_bidders_example(bidders: Vec<(String, BigInt)>) {
     // ==================================================================================
     // PHASE 3: AUCTIONEER VERIFY - Verify all proof_eval and receipts from all bidders
     // ==================================================================================
-    println!("[host] ==================================================================================");
     println!("[host] PHASE 3: Auctioneer Verify - Verifying all evaluation proofs and receipts...");
-    println!("[host] ==================================================================================");
     
     if !auctioneer_verify_all(&phase2_results, &bidders_data_map, sound_param) {
         println!("[host] Protocol stopped due to verification failures");
@@ -391,9 +251,7 @@ pub fn run_n_bidders_example(bidders: Vec<(String, BigInt)>) {
     // ==================================================================================
     // PHASE 4: BIDDER VERIFY ALL & WINNER DETERMINATION - Each bidder verifies other bidders' results
     // ==================================================================================
-    println!("[host] ==================================================================================");
     println!("[host] PHASE 4: Bidder Verify All - Each bidder verifies other bidders' results in parallel...");
-    println!("[host] ==================================================================================");
     
     // Run the comprehensive bidder verification
     let winner_results = bidder_verify_all(&phase2_results, &bidders_data_map, sound_param);
