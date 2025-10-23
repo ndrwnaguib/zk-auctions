@@ -60,11 +60,36 @@ fn main() {
     } else if run_example == 2 {
         // Example 2: Run the configurable n-bidders example
         println!("Running Example 2: N Bidders Example (Configurable)");
-        let bidders = vec![
-            ("Alice".to_string(), BigInt::from(1500)),
-            ("Bob".to_string(), BigInt::from(5000)),
-            ("Oscar".to_string(), BigInt::from(10000)),
-        ];
+        
+        // Parse bidder names and values from command-line arguments if provided
+        let bidders = if args.len() >= 4 {
+            // args[2] = comma-separated bidder names (e.g., "Bob,Alice")
+            // args[3] = comma-separated bid values (e.g., "5000,3000")
+            let names: Vec<String> = args[2].split(',').map(|s| s.trim().to_string()).collect();
+            let values: Vec<BigInt> = args[3]
+                .split(',')
+                .map(|s| s.trim().parse::<i64>().unwrap_or(1000))
+                .map(BigInt::from)
+                .collect();
+            
+            println!("Received {} bidder names: {:?}", names.len(), names);
+            println!("Received {} bid values: {:?}", values.len(), values);
+            
+            // Combine names and values
+            names.iter()
+                .zip(values.iter())
+                .map(|(name, value)| (name.clone(), value.clone()))
+                .collect()
+        } else {
+            // Default bidders if no arguments provided
+            println!("No command-line arguments provided, using default bidders");
+            vec![
+                ("Alice".to_string(), BigInt::from(1500)),
+                ("Bob".to_string(), BigInt::from(5000)),
+                ("Oscar".to_string(), BigInt::from(10000)),
+            ]
+        };
+        
         run_n_bidders_example(bidders);
     } else if run_example == 3 {
         // Example 3: Start web server with real-time log streaming
