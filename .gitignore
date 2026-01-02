@@ -19,3 +19,4 @@ methods/guest/Cargo.lock
 
 .DS_Store
 .vscode
+logs/*.log
