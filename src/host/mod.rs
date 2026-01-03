@@ -78,7 +78,7 @@ pub fn auctioneer_verify_all(
             }
             
             // Get the corresponding bidder i data for verification
-            let (n_i, p_i, q_i) = bidders_data.get(bidder_id).unwrap();
+            let (n_i, _, _) = bidders_data.get(bidder_id).unwrap();
             
             // println!("[(auctioneer)-host] Verifying proof_eval for {} vs {}", bidder_id, result.other_bidder_id);
             // println!("[host] proof_eval = {:?}", result.proof_eval);
