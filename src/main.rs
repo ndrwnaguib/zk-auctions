@@ -78,7 +78,20 @@ fn main() {
             let names: Vec<String> = args[2].split(',').map(|s| s.trim().to_string()).collect();
             let values: Vec<BigInt> = args[3]
                 .split(',')
-                .map(|s| s.trim().parse::<i64>().unwrap_or(1000))
+                .map(|s| {
+                    let trimmed = s.trim();
+                    match trimmed.parse::<i64>() {
+                        Ok(v) => v,
+                        Err(e) => {
+                            eprintln!(
+                                "Warning: unable to parse bid value '{}': {}. Falling back to 1000.",
+                                trimmed,
+                                e
+                            );
+                            1000
+                        }
+                    }
+                })
                 .map(BigInt::from)
                 .collect();
             
