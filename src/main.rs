@@ -48,7 +48,17 @@ fn main() {
     // Check if an argument was passed to override the default
     let args: Vec<String> = std::env::args().collect();
     let run_example = if args.len() > 1 {
-        args[1].parse::<i32>().unwrap_or(3)
+        match args[1].parse::<i32>() {
+            Ok(val) => val,
+            Err(e) => {
+                eprintln!(
+                    "Warning: failed to parse argument '{}' as an integer ({}). Defaulting to 3 (web server).",
+                    args[1],
+                    e
+                );
+                3
+            }
+        }
     } else {
         3 // Default to web server
     };
