@@ -19,8 +19,8 @@ use zk_auctions_core::protocols::strain::bidder::{Bidder, StrainBidder};
 fn main() {
     eprintln!("");
     let mut rng = rand::thread_rng();
-    let guest_id: String = env::read();
-    let prefix = format!("[({})-zkvm-bidder-prover-guest]", guest_id);
+    let bidder_id: String = env::read();
+    let prefix = format!("[({})-zkvm-bidder-prover-guest]", bidder_id);
     eprintln!("{} Starting main function", prefix);
 
     // Read inputs from the environment.
