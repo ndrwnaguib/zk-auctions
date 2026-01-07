@@ -5,8 +5,8 @@ use zk_auctions_core::utils::rand32;
 
 // TODO: set reserve price as a constraint
 fn main() {
-    let guest_id: String = env::read();
-    let prefix = format!("[({})-zkvm-bidder-join-guest]", guest_id);
+    let bidder_id: String = env::read();
+    let prefix = format!("[({})-zkvm-bidder-join-guest]", bidder_id);
     eprintln!("{} Starting main()", prefix);
     // Read the bid value from the environment
     eprintln!("{} Reading bid value from environment", prefix);
