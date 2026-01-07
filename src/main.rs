@@ -5,274 +5,120 @@ extern crate risc0_zkvm;
 extern crate zk_auctions_core;
 extern crate zk_auctions_methods;
 
-use num_bigint::{BigInt, RandBigInt};
-use num_traits::One;
-use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
-use risc0_zkvm::{default_prover, serde::from_slice, ExecutorEnv};
-use std::collections::HashMap;
-use zk_auctions_core::gm::{encrypt_bit_gm_coin, encrypt_gm, generate_keys, get_next_random};
-use zk_auctions_core::utils::{
-    compare_leq_honest, get_rand_jn1, hash_flat, rand32, set_rand_seed, StrainProof,
-};
-use zk_auctions_methods::{GUEST_ELF, GUEST_ID};
+pub mod host;
+pub mod examples;
+
+use num_bigint::BigInt;
+
+use examples::run_two_bidders_example;
+use examples::run_n_bidders_example;
+use examples::web_server::start_web_server;
 
 fn main() {
-    // The host code here plays the role of the auctioneer and a second bidder
-    // Ideally, the second bidder would be a separate entity, but for simplicity, we run it in the same process.
-    let mut rng = rand::thread_rng();
-
-    let keys_i = generate_keys(None);
-    let n_i = &keys_i.pub_key;
-
-    // let v_i: BigInt = rng.gen_bigint_range(&BigInt::from(0u32), &(BigInt::from(1u32) << 31));
-    let v_i: BigInt = BigInt::from(1500);
-
-    let r_i: Vec<BigInt> = rand32(n_i);
-    let c_i: Vec<BigInt> = encrypt_gm(&v_i, n_i);
-
-    let sound_param: usize = 40;
-    let sigma: BigInt = BigInt::from(40);
-
-    let mut rand1: Vec<Vec<BigInt>> = Vec::with_capacity(32);
-    let mut rand2: Vec<Vec<BigInt>> = Vec::with_capacity(32);
-    let mut rand3: Vec<Vec<BigInt>> = Vec::with_capacity(32);
-    let mut rand4: Vec<Vec<BigInt>> = Vec::with_capacity(32);
-
-    for _ in 0..32 {
-        let mut x = Vec::with_capacity(128);
-        let mut y = Vec::with_capacity(128);
-        let mut x2 = Vec::with_capacity(128);
-        let mut y2 = Vec::with_capacity(128);
-        for _ in 0..128 {
-            x.push(get_next_random(n_i));
-            y.push(get_next_random(n_i));
-            x2.push(get_next_random(n_i));
-            y2.push(get_next_random(n_i));
+    println!("==================================================================================");
+    println!("ZERO-KNOWLEDGE AUCTION PROTOCOL - 4 PHASE IMPLEMENTATION");
+    println!("==================================================================================");
+    println!("This implementation follows a 4-phase zero-knowledge auction protocol:");
+    println!("");
+    println!("PHASE 1: BIDDERS JOIN");
+    println!("  - Each bidder generates GM keypair and encrypts their bid");
+    println!("  - Runs in parallel for efficiency");
+    println!("  - Output: (n_j, c_j, r_j, (p_j, q_j)) for each bidder");
+    println!("");
+    println!("PHASE 2: BIDDER PROVE");
+    println!("  - Each bidder 'j' runs bidder_prove against bidder 'i'");
+    println!("  - 'j' = bidder running proof, 'i' = other bidder being compared");
+    println!("  - Generates zero-knowledge proofs of bid validity");
+    println!("");
+    println!("PHASE 3: AUCTIONEER VERIFY");
+    println!("  - Auctioneer verifies all proof_eval from all bidders");
+    println!("  - Ensures all bidders provided valid zero-knowledge proofs");
+    println!("  - Auctioneer acts as trusted verifier");
+    println!("");
+    println!("PHASE 4: BIDDER VERIFY ALL & WINNER DETERMINATION");
+    println!("  - Each bidder verifies other bidders' proofs using bidder_verify_all");
+    println!("  - Verifies proof_enc (encryption) and proof_dlog (discrete log)");
+    println!("  - Ensures mutual verification between bidders");
+    println!("  - Final bid comparison using compare_leq_honest");
+    println!("  - Determines winner by comparing against all other bidders");
+    println!("  - Runs in parallel for efficiency");
+    println!("==================================================================================");
+    
+    // Choose which example to run
+    // Check if an argument was passed to override the default
+    let args: Vec<String> = std::env::args().collect();
+    let run_example = if args.len() > 1 {
+        match args[1].parse::<i32>() {
+            Ok(val) => val,
+            Err(e) => {
+                eprintln!(
+                    "Warning: failed to parse argument '{}' as an integer ({}). Defaulting to 3 (web server).",
+                    args[1],
+                    e
+                );
+                3
+            }
         }
-        rand1.push(x);
-        rand2.push(y);
-        rand3.push(x2);
-        rand4.push(y2);
-    }
-
-    let mut private_output = Vec::new();
-    let env = ExecutorEnv::builder()
-        .write(&(&c_i, &n_i, &r_i))
-        .expect("Failed to add encryption proof input")
-        .write(&(&sigma, &(sound_param as u32)))
-        .expect("Failed to add discrete-log input")
-        .write(&(&rand1, &rand2, &rand3, &rand4))
-        .expect("Failed to add shuffle proof input")
-        .stdout(&mut private_output)
-        .build()
-        .unwrap();
-
-    let session = default_prover();
-    let receipt = session.prove(env, GUEST_ELF).unwrap().receipt;
-    receipt.verify(GUEST_ID).unwrap();
-
-    let (proof_eval, plaintext_and_coins): (
-        Vec<Vec<Vec<BigInt>>>,
-        Vec<Vec<(BigInt, BigInt, BigInt)>>,
-    ) = from_slice(&private_output).expect("Failed to deserialize private data");
-
-    let (n_j, proof_enc, (proof_dlog, y_j, y_pow_r, z_pow_r), (proof_shuffle, res)): (
-        BigInt,
-        Vec<Vec<Vec<BigInt>>>,
-        (Vec<(BigInt, BigInt, BigInt)>, BigInt, BigInt, BigInt),
-        (HashMap<u32, StrainProof>, Vec<Vec<BigInt>>),
-    ) = receipt.journal.decode().expect("Failed to decode all results");
-
-    let eval_res =
-        Some(verify_eval(proof_eval.clone(), plaintext_and_coins.clone(), n_i, &n_j, sound_param));
-    assert!(eval_res.is_some(), "`proof_eval` verification failed.");
-
-    assert!(verify_proof_enc(proof_enc));
-
-    assert!(verify_dlog_eq(&n_j, &y_j, &y_pow_r, &z_pow_r, &proof_dlog, Some(sound_param)));
-
-    let success = verify_shuffle(&proof_shuffle, &n_j, &res);
-    assert!(success, "verify_shuffle failed");
-    if compare_leq_honest(&res, &keys_i.priv_key) {
-        println!("The second bidder's bid is less than or equal to the first bidder's bid.");
     } else {
-        println!("The second bidder's bid is greater than the first bidder's bid.");
-    }
-}
-
-fn verify_proof_enc(proof: Vec<Vec<Vec<BigInt>>>) -> bool {
-    let n1 = &proof[0][0][0];
-
-    let c1: &Vec<BigInt> = &proof[1][0];
-
-    let r1t4s: &Vec<Vec<BigInt>> = &proof[2];
-
-    let h = hash_flat(r1t4s);
-    let bitstring =
-        format!("{:0256b}", BigInt::from_bytes_be(num_bigint::Sign::Plus, &h.to_be_bytes()));
-
-    let mut success = true;
-
-    for (i, bit) in bitstring.chars().enumerate().take(40) {
-        let q = if bit == '1' { 1 } else { 0 };
-
-        let proof_per_bit: &Vec<BigInt> = &proof[i + 3 /* this is how proof is structured */][0];
-
-        for (j, c1_val) in c1.iter().enumerate() {
-            let a = &r1t4s[i][j];
-            let rhs = (a * c1_val.modpow(&BigInt::from(2 * q), n1)) % n1;
-
-            let r = &proof_per_bit[j];
-            let lhs = r.modpow(&BigInt::from(4), n1);
-
-            if lhs != rhs {
-                success = false;
-            }
-        }
-    }
-
-    success
-}
-
-fn verify_eval(
-    p_eval: Vec<Vec<Vec<BigInt>>>,
-    plaintext_and_coins: Vec<Vec<(BigInt, BigInt, BigInt)>>,
-    n1: &BigInt,
-    n2: &BigInt,
-    sound_param: usize,
-) -> Option<()> {
-    let (gamma, gamma2, cipher_i, _cipher_j, cipher_ij) =
-        (&p_eval[0], &p_eval[1], &p_eval[2], &p_eval[3], &p_eval[4]);
-
-    let h = hash_flat(&p_eval);
-    let mut rng_seed = StdRng::seed_from_u64(h);
-
-    for l in 0..32 {
-        assert_eq!(plaintext_and_coins[l].len(), sound_param as usize);
-        for m in 0..(sound_param as usize) {
-            let (plaintext, coins_gamma, coins_gamma2) = &plaintext_and_coins[l][m];
-            if rng_seed.gen::<u8>() % 2 == 0 {
-                let detc1 = encrypt_bit_gm_coin(plaintext, n1, coins_gamma.clone());
-                let detc2 = encrypt_bit_gm_coin(plaintext, n2, coins_gamma2.clone());
-                if detc1 != gamma[l][m] || detc2 != gamma2[l][m] {
-                    return None;
-                }
-            } else {
-                let product1 = (&gamma[l][m] * &cipher_i[0][l]/* this 0 is the result of the extra enclosing happened in `p_eval`*/)
-                    % n1;
-                let product2 = (&gamma2[l][m] * &cipher_ij[0][l]) % n2;
-                if encrypt_bit_gm_coin(plaintext, n1, coins_gamma.clone()) != product1
-                    || encrypt_bit_gm_coin(plaintext, n2, coins_gamma2.clone()) != product2
-                {
-                    return None;
-                }
-            }
-        }
-    }
-    Some(())
-}
-
-fn verify_dlog_eq(
-    n: &BigInt,
-    y: &BigInt,
-    y_pow_r: &BigInt,
-    z_pow_r: &BigInt,
-    p_dlog: &[(BigInt, BigInt, BigInt)],
-    k: Option<usize>,
-) -> bool {
-    let k = k.unwrap_or(/* default value */ 10) as usize;
-    if p_dlog.len() < k {
-        // println!("Insufficient number of rounds");
-        return false;
-    }
-
-    // println!("Sufficient number of rounds test: Passed");
-
-    let z = n - BigInt::one();
-
-    for (i, proof) in p_dlog.iter().take(k).enumerate() {
-        let (t1, t2, s) = proof;
-        let rng = set_rand_seed(&[
-            y.clone(),
-            z.clone(),
-            y_pow_r.clone(),
-            z_pow_r.clone(),
-            t1.clone(),
-            t2.clone(),
-            BigInt::from(i),
-        ]);
-
-        let c = get_rand_jn1(n, Some(rng));
-
-        if y.modpow(s, n) != t1 * y_pow_r.modpow(&c, n) % n {
-            return false;
-        }
-
-        if z.modpow(s, n) != t2 * z_pow_r.modpow(&c, n) % n {
-            return false;
-        }
-    }
-    true
-}
-
-fn verify_shuffle(proof: &HashMap<u32, StrainProof>, n2: &BigInt, res: &[Vec<BigInt>]) -> bool {
-    let challenges_length = 40;
-    let StrainProof::HashInput(hash_input) = &proof[&0] else { todo!() };
-
-    let h = hash_flat(hash_input);
-    let bitstring =
-        format!("{:0256b}", BigInt::from_bytes_be(num_bigint::Sign::Plus, &h.to_be_bytes()));
-
-    let ae_permutation = &hash_input[&0].0;
-    let mut am_permutations = HashMap::new();
-    let mut me_permutations = HashMap::new();
-
-    for i in 0..challenges_length {
-        let (am_permutation, me_permutation) = &hash_input[&(i + 1)];
-        am_permutations.insert(i, am_permutation.clone());
-        me_permutations.insert(i, me_permutation.clone());
-    }
-
-    let mut success = true;
-
-    for (i, bit) in bitstring.chars().enumerate().take(challenges_length as usize) {
-        if bit == '0' {
-            // Open A-M permutation
-            if let Some(StrainProof::AMPermutations((am_perm_desc, am_reencrypt_factors))) =
-                &proof.get(&((i as u32) + 1))
-            {
-                for j in 0..am_perm_desc.len() {
-                    for k in 0..challenges_length {
-                        let lhs = &am_permutations[&(i as u32)][&am_perm_desc[&(j as u32)]][&k];
-                        let r: &_ = &am_reencrypt_factors[j][k as usize];
-                        let rsquare = r.modpow(&BigInt::from(2), n2);
-                        let rhs = (rsquare * &res[j][k as usize]) % n2;
-                        if lhs != &rhs {
-                            success = false;
+        3 // Default to web server
+    };
+    
+    if run_example == 1 {
+        // Example 1: Run the fixed two-bidders example
+        println!("Running Example 1: Two Bidders Example");
+        run_two_bidders_example();
+    } else if run_example == 2 {
+        // Example 2: Run the configurable n-bidders example
+        println!("Running Example 2: N Bidders Example (Configurable)");
+        
+        // Parse bidder names and values from command-line arguments if provided
+        let bidders = if args.len() >= 4 {
+            // args[2] = comma-separated bidder names (e.g., "Bob,Alice")
+            // args[3] = comma-separated bid values (e.g., "5000,3000")
+            let names: Vec<String> = args[2].split(',').map(|s| s.trim().to_string()).collect();
+            let values: Vec<BigInt> = args[3]
+                .split(',')
+                .map(|s| {
+                    let trimmed = s.trim();
+                    match trimmed.parse::<i64>() {
+                        Ok(v) => v,
+                        Err(e) => {
+                            eprintln!(
+                                "Warning: unable to parse bid value '{}': {}. Falling back to 1000.",
+                                trimmed,
+                                e
+                            );
+                            1000
                         }
                     }
-                }
-            }
+                })
+                .map(BigInt::from)
+                .collect();
+            
+            println!("Received {} bidder names: {:?}", names.len(), names);
+            println!("Received {} bid values: {:?}", values.len(), values);
+            
+            // Combine names and values
+            names.iter()
+                .zip(values.iter())
+                .map(|(name, value)| (name.clone(), value.clone()))
+                .collect()
         } else {
-            // Open M-E permutation
-            if let Some(StrainProof::MEPermutations((me_perm_desc, me_reencrypt_factors))) =
-                &proof.get(&((i as u32) + 1))
-            {
-                for j in 0..me_perm_desc.len() {
-                    for k in 0..challenges_length {
-                        let lhs = &ae_permutation[&me_perm_desc[&(j as u32)]][&k];
-                        let r: &BigInt = &me_reencrypt_factors[&(j as u32)][&k];
-                        let rsquare = r.modpow(&BigInt::from(2), n2);
-                        let rhs = (rsquare * &me_permutations[&(i as u32)][&(j as u32)][&k]) % n2;
-                        if lhs != &rhs {
-                            success = false;
-                        }
-                    }
-                }
-            }
-        }
+            // Default bidders if no arguments provided
+            println!("No command-line arguments provided, using default bidders");
+            vec![
+                ("Alice".to_string(), BigInt::from(1500)),
+                ("Bob".to_string(), BigInt::from(5000)),
+                ("Oscar".to_string(), BigInt::from(10000)),
+            ]
+        };
+        
+        run_n_bidders_example(bidders);
+    } else if run_example == 3 {
+        // Example 3: Start web server with real-time log streaming
+        println!("Running Example 3: Web Server with Real-Time Logs");
+        start_web_server();
+    } else {
+        println!("Invalid example number. Please set run_example to 1, 2, or 3.");
     }
-
-    success
 }

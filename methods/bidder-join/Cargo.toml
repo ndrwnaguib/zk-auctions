@@ -1,9 +1,7 @@
 [package]
-name = "guest"
+name = "bidder-join"
 version = "0.1.0"
 edition = "2021"
-
-[workspace]
 
 [dependencies]
 zk-auctions-core = { path = "../../core" }
