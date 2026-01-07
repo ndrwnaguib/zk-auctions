@@ -40,7 +40,13 @@ pub fn start_web_server() {
 
 fn handle_client(mut stream: TcpStream, log_buffer: LogBuffer) {
     let mut buffer = [0; 4096];
-    let bytes_read = stream.read(&mut buffer).unwrap_or(0);
+    let bytes_read = match stream.read(&mut buffer) {
+        Ok(n) => n,
+        Err(e) => {
+            eprintln!("Error reading from client stream: {}", e);
+            0
+        }
+    };
     
     let request = String::from_utf8_lossy(&buffer[..bytes_read]);
     let request_line = request.lines().next().unwrap_or("");
