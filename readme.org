@@ -150,10 +150,15 @@ reasons:
    #+begin_src text
    http://127.0.0.1:8080
    #+end_src
-4. The auction logs should now be visible in your browser.
-5. At the end of the auction, you should expect the following output
+4. The auction logs should now be visible in your browser:
 
-[[./media/auction-web-interface-complete.png]]
+  [[./media/auction-web-interface-complete-1.png]]
+
+5. Enter custom bid values.
+6. Click “EXECUTE REAL PROTOCOL”
+7. At the end of the auction, you should expect the following output
+
+  [[./media/auction-web-interface-complete.png]]
 
 ** Known Issues
 
