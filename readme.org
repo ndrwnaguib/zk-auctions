@@ -129,25 +129,35 @@ reasons:
 
 * Demo
 
-Currently, the host represents both an auctioneer and a bidder, where the guest code represents the other bidder. The bid values are currently fixed to 1500 and 5000.
-
-To run, without generating proofs (i.e., in DEV mode), please run:
+1. To run, without generating proofs (i.e., in DEV mode), please run:
 
 #+BEGIN_SRC
    export RISC0_DEV_MODE=true; cargo run --release
 #+END_SRC
 
-To generate the proofs, please run:
+1. To generate the proofs, please run:
 
 #+begin_src
   cargo run --release
 #+end_src
 
-You should expect the following output
+1. When you see the following output, the server is running:
+   #+begin_src text
+   Starting HTTP server on http://127.0.0.1:8080
+   #+end_src
+2. Open your web browser (e.g., Firefox, Chrome, Safari).
+3. Navigate to the following URL:
+   #+begin_src text
+   http://127.0.0.1:8080
+   #+end_src
+4. The auction logs should now be visible in your browser.
+5. At the end of the auction, you should expect the following output
 
-#+begin_src
-  The second bidder's bid is greater than the first bidder's bid.
-#+end_src
+[[./media/auction-web-interface-complete.png]]
+
+** Known Issues
+
+- The program may occasionally fail due to non-deterministic initialization caused by random starting conditions. Retrying usually resolves the issue.
 
 * Team
 
